@@ -232,19 +232,32 @@ FlyGen/
 - **iCloud Requirement:** Required - must be signed in to use app
 - **Payment Model:** One-time credit packs (consumable IAP) - Phase 2
 - **Phase 1 (This Plan):** CloudKit sync + free 3 credits
-- **Phase 2 (Future):** StoreKit 2 credit purchases
+- **Phase 2:** StoreKit 2 credit purchases ✅ COMPLETED
 
 ---
 
-## Phase 2: StoreKit Credit Purchases (Future)
+## Phase 2: StoreKit Credit Purchases ✅ COMPLETED
 
-After CloudKit integration is complete, add paid credit packs:
+**Implemented Features:**
 
-**App Store Connect Setup:**
-- Create consumable IAP products (e.g., 10/25/50 credit packs)
+**StoreKit Configuration:**
+- Created `FlyGenProducts.storekit` with 3 consumable products:
+  - `com.flygen.credits.10` - 10 Credits ($1.99)
+  - `com.flygen.credits.25` - 25 Credits ($3.99) - "Best Value"
+  - `com.flygen.credits.50` - 50 Credits ($6.99) - "Most Popular"
 
 **Implementation:**
-- StoreKitService using StoreKit 2
-- Update PremiumTab with purchase UI
-- On successful purchase: increment `UserProfile.credits`
+- `StoreKitService` - Manages product loading, purchases, transaction listening
+- `CreditPack` enum - Product definitions with credit amounts
+- Updated `PremiumTab` with purchase UI (credit pack cards, loading states, error handling)
+- Purchase success adds credits to `UserProfile.credits`
 - Credits sync across devices via CloudKit
+- Updated `ProfileTab` with "Need More Credits?" link
+
+**Files Created/Modified:**
+- `FlyGen/Resources/FlyGenProducts.storekit` (new)
+- `FlyGen/Services/StoreKitService.swift` (new)
+- `FlyGen/Views/Tabs/PremiumTab.swift` (updated)
+- `FlyGen/Views/Tabs/ProfileTab.swift` (updated)
+- `FlyGen/App/FlyGenApp.swift` (added StoreKitService)
+- `project.yml` (added scheme with StoreKit config)

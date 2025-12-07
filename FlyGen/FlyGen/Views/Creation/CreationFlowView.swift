@@ -31,6 +31,8 @@ struct CreationFlowView: View {
                         ColorsStepView(viewModel: viewModel)
                     case .format:
                         FormatStepView(viewModel: viewModel)
+                    case .qrCode:
+                        QRCodeStepView(viewModel: viewModel)
                     case .extras:
                         ExtrasStepView(viewModel: viewModel)
                     case .review:

@@ -10,6 +10,15 @@ settings:
   DEVELOPMENT_TEAM: ""
   SWIFT_VERSION: "5.9"
 
+schemes:
+  FlyGen:
+    build:
+      targets:
+        FlyGen: all
+    run:
+      config: Debug
+      storeKitConfiguration: FlyGen/Resources/FlyGenProducts.storekit
+
 targets:
   FlyGen:
     type: application

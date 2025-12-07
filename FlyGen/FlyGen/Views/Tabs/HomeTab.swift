@@ -6,6 +6,7 @@ struct HomeTab: View {
     @Binding var showingSettings: Bool
     @AppStorage("openrouter_api_key") private var apiKey: String = ""
     @Query private var userProfiles: [UserProfile]
+    @State private var showingTemplates = false
 
     private var credits: Int {
         userProfiles.first?.credits ?? 3
@@ -84,6 +85,30 @@ struct HomeTab: View {
                     .padding(.horizontal, 40)
                     .padding(.top, 16)
 
+                    // Use Template button
+                    Button {
+                        if credits > 0 {
+                            showingTemplates = true
+                        }
+                    } label: {
+                        HStack {
+                            Image(systemName: "doc.on.doc")
+                            Text("Use Template")
+                        }
+                        .font(.headline)
+                        .foregroundColor(credits > 0 ? Color.accentColor : Color.gray)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.clear)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(credits > 0 ? Color.accentColor : Color.gray, lineWidth: 2)
+                        )
+                    }
+                    .disabled(credits <= 0)
+                    .padding(.horizontal, 40)
+                    .padding(.top, 8)
+
                     // Credits warning
                     if credits <= 0 {
                         HStack {
@@ -122,6 +147,9 @@ struct HomeTab: View {
             }
             .sheet(isPresented: $showingSettings) {
                 SettingsView()
+            }
+            .sheet(isPresented: $showingTemplates) {
+                TemplatePickerView(viewModel: viewModel)
             }
         }
     }

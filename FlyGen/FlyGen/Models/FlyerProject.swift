@@ -10,6 +10,7 @@ struct FlyerProject: Codable, Identifiable, Equatable {
     var targetAudience: String?
     var specialInstructions: String?
     var logoImageData: Data?
+    var qrSettings: QRCodeSettings
     let createdAt: Date
     var updatedAt: Date
 
@@ -20,6 +21,7 @@ struct FlyerProject: Codable, Identifiable, Equatable {
         self.colors = ColorSettings()
         self.visuals = VisualSettings()
         self.output = OutputSettings()
+        self.qrSettings = QRCodeSettings()
         self.createdAt = Date()
         self.updatedAt = Date()
     }

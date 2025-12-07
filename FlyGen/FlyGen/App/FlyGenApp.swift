@@ -4,6 +4,7 @@ import SwiftData
 @main
 struct FlyGenApp: App {
     @StateObject private var cloudKitService = CloudKitService()
+    @StateObject private var storeKitService = StoreKitService()
 
     private static let iCloudContainerIdentifier = "iCloud.com.flygen.app"
 
@@ -33,6 +34,7 @@ struct FlyGenApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(cloudKitService)
+                .environmentObject(storeKitService)
         }
         .modelContainer(sharedModelContainer)
     }

@@ -94,23 +94,26 @@ struct ProfileTab: View {
                     }
                 }
 
-                // Credit Packs section (Coming Soon)
+                // Need More Credits section
                 Section {
-                    VStack(spacing: 12) {
-                        Image(systemName: "sparkles")
-                            .font(.largeTitle)
-                            .foregroundColor(.yellow)
+                    NavigationLink {
+                        PremiumTab()
+                    } label: {
+                        HStack(spacing: 12) {
+                            Image(systemName: "sparkles")
+                                .font(.title2)
+                                .foregroundColor(.yellow)
 
-                        Text("Credit Packs Coming Soon")
-                            .font(.headline)
-
-                        Text("Purchase additional credits to create more flyers. Available in a future update.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Need More Credits?")
+                                    .font(.headline)
+                                Text("Purchase credit packs to create more flyers")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        .padding(.vertical, 8)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 20)
                 }
             }
             .navigationTitle("Profile")
@@ -140,4 +143,5 @@ struct StatRow: View {
 #Preview {
     ProfileTab()
         .environmentObject(CloudKitService())
+        .environmentObject(StoreKitService())
 }

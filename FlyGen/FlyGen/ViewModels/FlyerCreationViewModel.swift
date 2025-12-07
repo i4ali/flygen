@@ -9,8 +9,9 @@ enum CreationStep: Int, CaseIterable {
     case mood = 3
     case colors = 4
     case format = 5
-    case extras = 6
-    case review = 7
+    case qrCode = 6
+    case extras = 7
+    case review = 8
 
     var title: String {
         switch self {
@@ -20,6 +21,7 @@ enum CreationStep: Int, CaseIterable {
         case .mood: return "Mood"
         case .colors: return "Colors"
         case .format: return "Format"
+        case .qrCode: return "QR Code"
         case .extras: return "Extras"
         case .review: return "Review"
         }
@@ -33,6 +35,7 @@ enum CreationStep: Int, CaseIterable {
         case .mood: return "Set the mood"
         case .colors: return "Pick colors"
         case .format: return "Select format"
+        case .qrCode: return "Add scannable link"
         case .extras: return "Finishing touches"
         case .review: return "Review your flyer"
         }
@@ -99,7 +102,7 @@ class FlyerCreationViewModel: ObservableObject {
             return true // Category is selected when project is created
         case .textContent:
             return project.textContent.isValid
-        case .visualStyle, .mood, .colors, .format, .extras:
+        case .visualStyle, .mood, .colors, .format, .qrCode, .extras:
             return true
         case .review:
             return project.isReadyForGeneration
@@ -122,6 +125,16 @@ class FlyerCreationViewModel: ObservableObject {
         currentStep = .textContent
         generationState = .idle
         generatedImageData = nil
+        showingCreationFlow = true
+    }
+
+    /// Load a template and start the creation flow at Text Content step
+    func loadTemplate(_ template: FlyerTemplate) {
+        project = template.toProject()
+        currentStep = .textContent
+        generationState = .idle
+        generatedImageData = nil
+        generatedFlyer = nil
         showingCreationFlow = true
     }
 
@@ -170,13 +183,31 @@ class FlyerCreationViewModel: ObservableObject {
             let promptBuilder = PromptBuilder(project: project)
             lastPrompt = promptBuilder.build().mainPrompt
 
-            generatedImageData = result.imageData
-            generationState = .success(result.image)
+            // Apply QR code if enabled
+            var finalImage = result.image
+            var finalImageData = result.imageData
+
+            if project.qrSettings.enabled {
+                let qrService = QRCodeService()
+                if let content = await qrService.generateContent(from: project.qrSettings),
+                   let qrImage = await qrService.generateQRCode(from: content),
+                   let composited = await qrService.compositeQRCode(
+                       onto: finalImage,
+                       qrCode: qrImage,
+                       position: project.qrSettings.position
+                   ) {
+                    finalImage = composited
+                    finalImageData = composited.pngData() ?? result.imageData
+                }
+            }
+
+            generatedImageData = finalImageData
+            generationState = .success(finalImage)
 
             // Create GeneratedFlyer for saving to gallery
             generatedFlyer = GeneratedFlyer(
                 projectId: project.id,
-                imageData: result.imageData,
+                imageData: finalImageData,
                 prompt: lastPrompt,
                 negativePrompt: promptBuilder.build().negativePrompt,
                 model: "flux-schnell"
