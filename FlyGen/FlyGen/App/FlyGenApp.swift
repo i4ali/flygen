@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 @main
 struct FlyGenApp: App {
@@ -14,5 +15,6 @@ struct FlyGenApp: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: SavedFlyer.self)
     }
 }

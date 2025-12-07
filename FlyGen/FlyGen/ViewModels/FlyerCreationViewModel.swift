@@ -77,6 +77,7 @@ class FlyerCreationViewModel: ObservableObject {
     @Published var project: FlyerProject?
     @Published var generationState: GenerationState = .idle
     @Published var generatedImageData: Data?
+    @Published var generatedFlyer: GeneratedFlyer?
     @Published var lastPrompt: String = ""
     @Published var showingCreationFlow = false
     @Published var showingResult = false
@@ -150,6 +151,7 @@ class FlyerCreationViewModel: ObservableObject {
         project = nil
         generationState = .idle
         generatedImageData = nil
+        generatedFlyer = nil
     }
 
     /// Generate the flyer
@@ -170,6 +172,16 @@ class FlyerCreationViewModel: ObservableObject {
 
             generatedImageData = result.imageData
             generationState = .success(result.image)
+
+            // Create GeneratedFlyer for saving to gallery
+            generatedFlyer = GeneratedFlyer(
+                projectId: project.id,
+                imageData: result.imageData,
+                prompt: lastPrompt,
+                negativePrompt: promptBuilder.build().negativePrompt,
+                model: "flux-schnell"
+            )
+
             showingResult = true
 
         } catch {
@@ -200,6 +212,17 @@ class FlyerCreationViewModel: ObservableObject {
             generatedImageData = result.imageData
             generationState = .success(result.image)
 
+            // Update GeneratedFlyer
+            if let projectId = project?.id {
+                generatedFlyer = GeneratedFlyer(
+                    projectId: projectId,
+                    imageData: result.imageData,
+                    prompt: refinedPrompt,
+                    negativePrompt: "",
+                    model: "flux-schnell"
+                )
+            }
+
         } catch {
             generationState = .error(error.localizedDescription)
         }
@@ -222,6 +245,17 @@ class FlyerCreationViewModel: ObservableObject {
             project?.output.aspectRatio = newRatio
             generatedImageData = result.imageData
             generationState = .success(result.image)
+
+            // Update GeneratedFlyer
+            if let projectId = project?.id {
+                generatedFlyer = GeneratedFlyer(
+                    projectId: projectId,
+                    imageData: result.imageData,
+                    prompt: lastPrompt,
+                    negativePrompt: "",
+                    model: "flux-schnell"
+                )
+            }
 
         } catch {
             generationState = .error(error.localizedDescription)

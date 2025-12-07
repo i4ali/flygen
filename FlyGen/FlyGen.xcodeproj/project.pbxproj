@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		000000000001 /* SavedFlyer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000011 /* SavedFlyer.swift */; };
+		000000000002 /* HomeTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000012 /* HomeTab.swift */; };
+		000000000003 /* GalleryTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000013 /* GalleryTab.swift */; };
+		000000000004 /* PremiumTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000014 /* PremiumTab.swift */; };
+		000000000005 /* ProfileTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000015 /* ProfileTab.swift */; };
+		000000000006 /* OnboardingContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000016 /* OnboardingContainerView.swift */; };
 		018C2423C0C86CE01329D1C1 /* PhotoLibraryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C61A47D28D08C6960017130 /* PhotoLibraryService.swift */; };
 		05236A51D1AADA5B81A322C2 /* NegativePrompts.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5F0A68F65B4BF9A1CFA475A /* NegativePrompts.swift */; };
 		0A5F72F3A177D8151F5B70D0 /* ExtrasStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2585C5073F35A6470775B3 /* ExtrasStepView.swift */; };
@@ -52,6 +58,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		000000000011 /* SavedFlyer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedFlyer.swift; sourceTree = "<group>"; };
+		000000000012 /* HomeTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTab.swift; sourceTree = "<group>"; };
+		000000000013 /* GalleryTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryTab.swift; sourceTree = "<group>"; };
+		000000000014 /* PremiumTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumTab.swift; sourceTree = "<group>"; };
+		000000000015 /* ProfileTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileTab.swift; sourceTree = "<group>"; };
+		000000000016 /* OnboardingContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingContainerView.swift; sourceTree = "<group>"; };
 		02FE6F65315FE96A35C34223 /* FlyerCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyerCategory.swift; sourceTree = "<group>"; };
 		06A2021DD0B02DD6E91E8438 /* FormatStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormatStepView.swift; sourceTree = "<group>"; };
 		0B3C4ECDD1E3D317F67F2CE0 /* ColorSchemePreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorSchemePreset.swift; sourceTree = "<group>"; };
@@ -188,10 +200,31 @@
 				2605283C83C2130F4FC196CC /* Creation */,
 				E4F5D4AD1FA45D96A13F57F6 /* Generation */,
 				F193179322040C4BCCFDF3E9 /* Home */,
+				000000000020 /* Onboarding */,
 				1864AE8D955C413A93B4C1E1 /* Result */,
 				E2C5627C1AABFC8475D0FCA8 /* Settings */,
+				000000000021 /* Tabs */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		000000000020 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				000000000016 /* OnboardingContainerView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		000000000021 /* Tabs */ = {
+			isa = PBXGroup;
+			children = (
+				000000000012 /* HomeTab.swift */,
+				000000000013 /* GalleryTab.swift */,
+				000000000014 /* PremiumTab.swift */,
+				000000000015 /* ProfileTab.swift */,
+			);
+			path = Tabs;
 			sourceTree = "<group>";
 		};
 		98953C86D335F62757263E61 /* Components */ = {
@@ -244,6 +277,7 @@
 				91F81AFF070A145CF531597E /* ColorSettings.swift */,
 				EDBC65359BBD8F17309A355E /* FlyerProject.swift */,
 				7753024C905464D110F059D5 /* OutputSettings.swift */,
+				000000000011 /* SavedFlyer.swift */,
 				A4E86A123D7FDBB3C7C8AAEF /* TextContent.swift */,
 				22AD3ED9139C2DCCA31C6A01 /* VisualSettings.swift */,
 				37B486BD64EA5BB283BD2145 /* Enums */,
@@ -357,6 +391,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				000000000001 /* SavedFlyer.swift in Sources */,
+				000000000002 /* HomeTab.swift in Sources */,
+				000000000003 /* GalleryTab.swift in Sources */,
+				000000000004 /* PremiumTab.swift in Sources */,
+				000000000005 /* ProfileTab.swift in Sources */,
+				000000000006 /* OnboardingContainerView.swift in Sources */,
 				E8CA330BA5E4268BC3E03BA4 /* AspectRatio.swift in Sources */,
 				51A412CAA71CCC99E9905560 /* BackgroundType.swift in Sources */,
 				A5629E3E2DD610E4FB277467 /* CategoryConfiguration.swift in Sources */,

@@ -1,14 +1,18 @@
 import SwiftUI
+import SwiftData
 
 struct ResultView: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
     @AppStorage("openrouter_api_key") private var apiKey: String = ""
+    @AppStorage("userCredits") private var credits: Int = 3
 
     @State private var showingRefinementSheet = false
     @State private var showingReformatSheet = false
     @State private var showingSaveSuccess = false
     @State private var saveError: String?
+    @State private var hasSavedToGallery = false
 
     var body: some View {
         NavigationStack {
@@ -72,8 +76,7 @@ struct ResultView: View {
 
                     // Done button
                     Button {
-                        viewModel.cancelCreation()
-                        dismiss()
+                        saveToGalleryAndDismiss()
                     } label: {
                         Text("Done")
                             .font(.headline)
@@ -165,6 +168,38 @@ struct ResultView: View {
                 saveError = error.localizedDescription
                 showingSaveSuccess = false
             }
+        }
+    }
+
+    private func saveToGalleryAndDismiss() {
+        // Save to gallery if not already saved
+        if !hasSavedToGallery {
+            saveToGallery()
+        }
+
+        viewModel.cancelCreation()
+        dismiss()
+    }
+
+    private func saveToGallery() {
+        guard let project = viewModel.project,
+              let generatedFlyer = viewModel.generatedFlyer else {
+            return
+        }
+
+        let savedFlyer = SavedFlyer(project: project, generatedFlyer: generatedFlyer)
+        modelContext.insert(savedFlyer)
+
+        do {
+            try modelContext.save()
+            hasSavedToGallery = true
+
+            // Deduct a credit after successful generation
+            if credits > 0 {
+                credits -= 1
+            }
+        } catch {
+            print("Failed to save flyer to gallery: \(error)")
         }
     }
 }
