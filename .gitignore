@@ -1,0 +1,40 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.env
+
+# Secrets
+openrouterkey.txt
+*.key
+*.pem
+
+# Generated files
+generated/
+test_output/
+
+# Xcode
+*.xcuserstate
+xcuserdata/
+DerivedData/
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+
+# IDE
+.idea/
+*.swp
+*.swo
+.vscode/
+
+# Images (keep logo files but ignore other generated images)
+# Brightmount-logo.png
+# brightmont-center-logo5.png

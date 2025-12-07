@@ -1,0 +1,57 @@
+import Foundation
+
+struct FlyerProject: Codable, Identifiable, Equatable {
+    let id: UUID
+    var category: FlyerCategory
+    var textContent: TextContent
+    var colors: ColorSettings
+    var visuals: VisualSettings
+    var output: OutputSettings
+    var targetAudience: String?
+    var specialInstructions: String?
+    var logoImageData: Data?
+    let createdAt: Date
+    var updatedAt: Date
+
+    init(category: FlyerCategory) {
+        self.id = UUID()
+        self.category = category
+        self.textContent = TextContent()
+        self.colors = ColorSettings()
+        self.visuals = VisualSettings()
+        self.output = OutputSettings()
+        self.createdAt = Date()
+        self.updatedAt = Date()
+    }
+
+    /// Updates the updatedAt timestamp
+    mutating func touch() {
+        updatedAt = Date()
+    }
+
+    /// Returns true if the project has minimum required data
+    var isReadyForGeneration: Bool {
+        textContent.isValid
+    }
+}
+
+/// Result of a flyer generation
+struct GeneratedFlyer: Codable, Identifiable {
+    let id: UUID
+    let projectId: UUID
+    let imageData: Data
+    let prompt: String
+    let negativePrompt: String
+    let model: String
+    let createdAt: Date
+
+    init(projectId: UUID, imageData: Data, prompt: String, negativePrompt: String, model: String) {
+        self.id = UUID()
+        self.projectId = projectId
+        self.imageData = imageData
+        self.prompt = prompt
+        self.negativePrompt = negativePrompt
+        self.model = model
+        self.createdAt = Date()
+    }
+}
