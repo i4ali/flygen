@@ -8,9 +8,13 @@ struct OnboardingContainerView: View {
 
     var body: some View {
         ZStack {
-            // Background gradient
+            // Background
+            FGColors.backgroundPrimary
+                .ignoresSafeArea()
+
+            // Subtle gradient overlay
             LinearGradient(
-                colors: [Color.accentColor.opacity(0.1), Color.purple.opacity(0.1)],
+                colors: [FGColors.accentPrimary.opacity(0.05), FGColors.accentPrimary.opacity(0.1)],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
@@ -24,8 +28,9 @@ struct OnboardingContainerView: View {
                         Button("Skip") {
                             onComplete()
                         }
-                        .foregroundColor(.secondary)
-                        .padding()
+                        .font(FGTypography.body)
+                        .foregroundColor(FGColors.textSecondary)
+                        .padding(FGSpacing.md)
                     }
                 }
 
@@ -38,7 +43,7 @@ struct OnboardingContainerView: View {
                         icon: "wand.and.stars",
                         title: "AI-Powered Creation",
                         description: "Create professional flyers in seconds with the power of AI. No design skills needed!",
-                        color: .purple
+                        color: FGColors.accentPrimary
                     )
                     .tag(1)
 
@@ -46,7 +51,7 @@ struct OnboardingContainerView: View {
                         icon: "bolt.fill",
                         title: "Fast & Simple",
                         description: "Just answer a few questions and watch your flyer come to life. Create stunning designs in minutes!",
-                        color: .orange
+                        color: FGColors.warning
                     )
                     .tag(2)
 
@@ -54,39 +59,46 @@ struct OnboardingContainerView: View {
                         icon: "paintpalette.fill",
                         title: "Endless Customization",
                         description: "Choose from 12 categories, 10 visual styles, 9 moods, and 8 color palettes to make your flyer unique.",
-                        color: .blue
+                        color: FGColors.accentSecondary
                     )
                     .tag(3)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
 
                 // Page indicator
-                HStack(spacing: 8) {
+                HStack(spacing: FGSpacing.sm) {
                     ForEach(0..<totalPages, id: \.self) { index in
                         Circle()
-                            .fill(index == currentPage ? Color.accentColor : Color.gray.opacity(0.3))
+                            .fill(index == currentPage ? FGColors.accentPrimary : FGColors.textTertiary.opacity(0.5))
                             .frame(width: 8, height: 8)
+                            .scaleEffect(index == currentPage ? 1.2 : 1.0)
+                            .animation(.spring(response: 0.3), value: currentPage)
                     }
                 }
-                .padding(.bottom, 20)
+                .padding(.bottom, FGSpacing.lg)
 
                 // Navigation buttons
-                HStack(spacing: 16) {
+                HStack(spacing: FGSpacing.md) {
                     if currentPage > 0 {
                         Button {
                             withAnimation {
                                 currentPage -= 1
                             }
                         } label: {
-                            HStack {
+                            HStack(spacing: FGSpacing.xs) {
                                 Image(systemName: "chevron.left")
                                 Text("Back")
                             }
+                            .font(FGTypography.button)
                             .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.secondary.opacity(0.1))
-                            .foregroundColor(.primary)
-                            .cornerRadius(12)
+                            .padding(.vertical, FGSpacing.md)
+                            .background(FGColors.surfaceDefault)
+                            .foregroundColor(FGColors.textPrimary)
+                            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: FGSpacing.buttonRadius)
+                                    .stroke(FGColors.borderSubtle, lineWidth: 1)
+                            )
                         }
                     }
 
@@ -99,21 +111,23 @@ struct OnboardingContainerView: View {
                             onComplete()
                         }
                     } label: {
-                        HStack {
+                        HStack(spacing: FGSpacing.xs) {
                             Text(currentPage < totalPages - 1 ? "Next" : "Get Started")
                             if currentPage < totalPages - 1 {
                                 Image(systemName: "chevron.right")
                             }
                         }
+                        .font(FGTypography.button)
                         .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.accentColor)
-                        .foregroundColor(.white)
-                        .cornerRadius(12)
+                        .padding(.vertical, FGSpacing.md)
+                        .background(FGColors.accentPrimary)
+                        .foregroundColor(FGColors.textOnAccent)
+                        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+                        .shadow(color: FGColors.accentPrimary.opacity(0.4), radius: 8, y: 4)
                     }
                 }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 40)
+                .padding(.horizontal, FGSpacing.xl)
+                .padding(.bottom, FGSpacing.xxl)
             }
         }
     }
@@ -121,33 +135,42 @@ struct OnboardingContainerView: View {
 
 struct WelcomeView: View {
     var body: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: FGSpacing.xl) {
             Spacer()
 
-            // App icon
-            Image(systemName: "doc.richtext.fill")
-                .font(.system(size: 100))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [.accentColor, .purple],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
+            // App icon with glow
+            ZStack {
+                Circle()
+                    .fill(FGColors.accentPrimary.opacity(0.15))
+                    .frame(width: 150, height: 150)
+                    .blur(radius: 30)
+
+                Image(systemName: "doc.richtext.fill")
+                    .font(.system(size: 80))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [FGColors.accentPrimary, FGColors.accentSecondary],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
                     )
-                )
+            }
 
-            Text("Welcome to FlyGen")
-                .font(.largeTitle)
-                .fontWeight(.bold)
+            VStack(spacing: FGSpacing.md) {
+                Text("Welcome to FlyGen")
+                    .font(FGTypography.displayMedium)
+                    .foregroundColor(FGColors.textPrimary)
 
-            Text("Create beautiful flyers\nwith the power of AI")
-                .font(.title3)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
+                Text("Create beautiful flyers\nwith the power of AI")
+                    .font(FGTypography.h3)
+                    .foregroundColor(FGColors.textSecondary)
+                    .multilineTextAlignment(.center)
+            }
 
             Spacer()
             Spacer()
         }
-        .padding()
+        .padding(FGSpacing.screenHorizontal)
     }
 }
 
@@ -158,13 +181,18 @@ struct ValuePropView: View {
     let color: Color
 
     var body: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: FGSpacing.xl) {
             Spacer()
 
-            // Icon
+            // Icon with glow
             ZStack {
                 Circle()
                     .fill(color.opacity(0.15))
+                    .frame(width: 140, height: 140)
+                    .blur(radius: 20)
+
+                Circle()
+                    .fill(color.opacity(0.2))
                     .frame(width: 120, height: 120)
 
                 Image(systemName: icon)
@@ -172,21 +200,23 @@ struct ValuePropView: View {
                     .foregroundColor(color)
             }
 
-            Text(title)
-                .font(.title)
-                .fontWeight(.bold)
-                .multilineTextAlignment(.center)
+            VStack(spacing: FGSpacing.md) {
+                Text(title)
+                    .font(FGTypography.h2)
+                    .foregroundColor(FGColors.textPrimary)
+                    .multilineTextAlignment(.center)
 
-            Text(description)
-                .font(.body)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
+                Text(description)
+                    .font(FGTypography.body)
+                    .foregroundColor(FGColors.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, FGSpacing.xl)
+            }
 
             Spacer()
             Spacer()
         }
-        .padding()
+        .padding(FGSpacing.screenHorizontal)
     }
 }
 

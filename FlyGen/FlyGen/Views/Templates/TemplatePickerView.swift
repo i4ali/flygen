@@ -19,7 +19,7 @@ struct TemplatePickerView: View {
             VStack(spacing: 0) {
                 // Category filter
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
+                    HStack(spacing: FGSpacing.sm) {
                         CategoryFilterChip(
                             title: "All",
                             isSelected: selectedCategory == nil
@@ -36,28 +36,32 @@ struct TemplatePickerView: View {
                             }
                         }
                     }
-                    .padding(.horizontal)
+                    .padding(.horizontal, FGSpacing.screenHorizontal)
                 }
-                .padding(.vertical, 12)
-                .background(Color(.systemBackground))
+                .padding(.vertical, FGSpacing.sm)
+                .background(FGColors.backgroundSecondary)
 
-                Divider()
+                Rectangle()
+                    .fill(FGColors.borderSubtle)
+                    .frame(height: 1)
 
                 // Template grid
                 ScrollView {
                     LazyVGrid(columns: [
-                        GridItem(.flexible(), spacing: 16),
-                        GridItem(.flexible(), spacing: 16)
-                    ], spacing: 16) {
+                        GridItem(.flexible(), spacing: FGSpacing.md),
+                        GridItem(.flexible(), spacing: FGSpacing.md)
+                    ], spacing: FGSpacing.md) {
                         ForEach(filteredTemplates) { template in
                             TemplateCard(template: template) {
                                 selectedTemplate = template
                             }
                         }
                     }
-                    .padding()
+                    .padding(FGSpacing.screenHorizontal)
                 }
+                .background(FGColors.backgroundPrimary)
             }
+            .background(FGColors.backgroundPrimary)
             .navigationTitle("Templates")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -65,6 +69,7 @@ struct TemplatePickerView: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .foregroundColor(FGColors.accentPrimary)
                 }
             }
             .sheet(item: $selectedTemplate) { template in
@@ -88,13 +93,16 @@ private struct CategoryFilterChip: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.subheadline)
-                .fontWeight(isSelected ? .semibold : .regular)
-                .foregroundColor(isSelected ? .white : .primary)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(isSelected ? Color.accentColor : Color(.systemGray5))
-                .cornerRadius(20)
+                .font(FGTypography.label)
+                .foregroundColor(isSelected ? FGColors.textOnAccent : FGColors.textPrimary)
+                .padding(.horizontal, FGSpacing.md)
+                .padding(.vertical, FGSpacing.sm)
+                .background(isSelected ? FGColors.accentPrimary : FGColors.surfaceDefault)
+                .clipShape(Capsule())
+                .overlay(
+                    Capsule()
+                        .stroke(isSelected ? FGColors.accentPrimary : FGColors.borderSubtle, lineWidth: 1)
+                )
         }
     }
 }
@@ -107,7 +115,7 @@ private struct TemplateCard: View {
 
     var body: some View {
         Button(action: action) {
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: FGSpacing.sm) {
                 // Style preview area
                 ZStack {
                     // Background gradient based on template colors
@@ -118,46 +126,47 @@ private struct TemplateCard: View {
                     )
 
                     // Visual style indicator
-                    VStack(spacing: 4) {
+                    VStack(spacing: FGSpacing.xs) {
                         Image(systemName: template.category.icon)
                             .font(.title)
                         Text(template.visuals.style.displayName)
-                            .font(.caption2)
-                            .fontWeight(.medium)
+                            .font(FGTypography.captionBold)
                     }
-                    .foregroundColor(template.colors.backgroundType == .dark ? .white : .primary)
+                    .foregroundColor(template.colors.backgroundType == .dark ? .white : .black)
                 }
                 .frame(height: 100)
-                .cornerRadius(8)
+                .clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
 
                 // Template info
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: FGSpacing.xxs) {
                     Text(template.name)
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.primary)
+                        .font(FGTypography.labelLarge)
+                        .foregroundColor(FGColors.textPrimary)
                         .lineLimit(1)
 
                     Text(template.category.displayName)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                        .font(FGTypography.caption)
+                        .foregroundColor(FGColors.textSecondary)
 
                     // Color dots
-                    HStack(spacing: 4) {
+                    HStack(spacing: FGSpacing.xxs) {
                         ForEach(template.colors.preset.previewColors.prefix(4), id: \.self) { color in
                             Circle()
                                 .fill(color)
                                 .frame(width: 12, height: 12)
                         }
                     }
-                    .padding(.top, 4)
+                    .padding(.top, FGSpacing.xxs)
                 }
-                .padding(.horizontal, 4)
+                .padding(.horizontal, FGSpacing.xxs)
             }
-            .padding(12)
-            .background(Color(.systemBackground))
-            .cornerRadius(12)
-            .shadow(color: .black.opacity(0.1), radius: 4, y: 2)
+            .padding(FGSpacing.sm)
+            .background(FGColors.backgroundElevated)
+            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+            .overlay(
+                RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
+                    .stroke(FGColors.borderSubtle, lineWidth: 1)
+            )
         }
     }
 }

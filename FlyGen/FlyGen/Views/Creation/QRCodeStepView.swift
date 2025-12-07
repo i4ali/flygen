@@ -12,50 +12,86 @@ struct QRCodeStepView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: FGSpacing.lg) {
+                // Header
+                FGStepHeader(
+                    title: "Add QR Code",
+                    subtitle: "Add a scannable link to your flyer (optional)",
+                    tooltipText: "QR codes help viewers quickly access your website or contact info"
+                )
+
                 // Enable toggle
-                Toggle(isOn: qrSettings.enabled) {
-                    Label("Add QR Code", systemImage: "qrcode")
-                        .font(.headline)
+                VStack(spacing: FGSpacing.md) {
+                    Toggle(isOn: qrSettings.enabled) {
+                        HStack(spacing: FGSpacing.sm) {
+                            Image(systemName: "qrcode")
+                                .font(.system(size: 20))
+                                .foregroundColor(FGColors.accentPrimary)
+
+                            Text("Include QR Code")
+                                .font(FGTypography.labelLarge)
+                                .foregroundColor(FGColors.textPrimary)
+                        }
+                    }
+                    .tint(FGColors.accentPrimary)
+                    .padding(FGSpacing.cardPadding)
+                    .background(FGColors.surfaceDefault)
+                    .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
+                            .stroke(FGColors.borderSubtle, lineWidth: 1)
+                    )
                 }
-                .tint(.accentColor)
+                .padding(.horizontal, FGSpacing.screenHorizontal)
 
                 if qrSettings.wrappedValue.enabled {
                     // Content type picker
                     contentTypePicker
+                        .padding(.horizontal, FGSpacing.screenHorizontal)
 
                     // Content fields
                     contentFieldsView
+                        .padding(.horizontal, FGSpacing.screenHorizontal)
 
-                    Divider()
+                    // Divider
+                    Rectangle()
+                        .fill(FGColors.borderSubtle)
+                        .frame(height: 1)
+                        .padding(.horizontal, FGSpacing.screenHorizontal)
 
                     // Position picker
                     positionPicker
+                        .padding(.horizontal, FGSpacing.screenHorizontal)
 
                     // Preview
                     previewSection
+                        .padding(.horizontal, FGSpacing.screenHorizontal)
                 }
             }
-            .padding()
+            .padding(.vertical, FGSpacing.lg)
         }
+        .background(FGColors.backgroundPrimary)
         .scrollDismissesKeyboard(.interactively)
     }
 
     // MARK: - Content Type Picker
 
     private var contentTypePicker: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: FGSpacing.sm) {
             Text("QR Code Content")
-                .font(.headline)
+                .font(FGTypography.h3)
+                .foregroundColor(FGColors.textPrimary)
 
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 12) {
+                HStack(spacing: FGSpacing.sm) {
                     ForEach(QRContentType.allCases) { type in
                         ContentTypeButton(
                             type: type,
                             isSelected: qrSettings.wrappedValue.contentType == type
                         ) {
-                            qrSettings.wrappedValue.contentType = type
+                            withAnimation(FGAnimations.spring) {
+                                qrSettings.wrappedValue.contentType = type
+                            }
                         }
                     }
                 }
@@ -67,35 +103,23 @@ struct QRCodeStepView: View {
 
     @ViewBuilder
     private var contentFieldsView: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: FGSpacing.md) {
             switch qrSettings.wrappedValue.contentType {
             case .url:
-                TextField("https://example.com", text: qrSettings.url.bound)
-                    .textFieldStyle(.roundedBorder)
-                    .keyboardType(.URL)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
+                FGTextField(placeholder: "https://example.com", text: qrSettings.url.bound, icon: "link")
 
             case .vcard:
                 VCardFieldsView(settings: qrSettings)
 
             case .text:
-                TextField("Enter text message", text: qrSettings.text.bound)
-                    .textFieldStyle(.roundedBorder)
+                FGTextField(placeholder: "Enter text message", text: qrSettings.text.bound, icon: "text.alignleft")
 
             case .email:
-                TextField("email@example.com", text: qrSettings.emailAddress.bound)
-                    .textFieldStyle(.roundedBorder)
-                    .keyboardType(.emailAddress)
-                    .textInputAutocapitalization(.never)
-
-                TextField("Subject (optional)", text: qrSettings.emailSubject.bound)
-                    .textFieldStyle(.roundedBorder)
+                FGTextField(placeholder: "email@example.com", text: qrSettings.emailAddress.bound, icon: "envelope")
+                FGTextField(placeholder: "Subject (optional)", text: qrSettings.emailSubject.bound)
 
             case .phone:
-                TextField("+1 555 123 4567", text: qrSettings.phoneNumber.bound)
-                    .textFieldStyle(.roundedBorder)
-                    .keyboardType(.phonePad)
+                FGTextField(placeholder: "+1 555 123 4567", text: qrSettings.phoneNumber.bound, icon: "phone")
 
             case .wifi:
                 WiFiFieldsView(settings: qrSettings)
@@ -106,20 +130,23 @@ struct QRCodeStepView: View {
     // MARK: - Position Picker
 
     private var positionPicker: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: FGSpacing.md) {
             Text("Position")
-                .font(.headline)
+                .font(FGTypography.h3)
+                .foregroundColor(FGColors.textPrimary)
 
             LazyVGrid(columns: [
-                GridItem(.flexible()),
-                GridItem(.flexible())
-            ], spacing: 12) {
+                GridItem(.flexible(), spacing: FGSpacing.sm),
+                GridItem(.flexible(), spacing: FGSpacing.sm)
+            ], spacing: FGSpacing.sm) {
                 ForEach(QRPosition.allCases) { position in
                     PositionButton(
                         position: position,
                         isSelected: qrSettings.wrappedValue.position == position
                     ) {
-                        qrSettings.wrappedValue.position = position
+                        withAnimation(FGAnimations.spring) {
+                            qrSettings.wrappedValue.position = position
+                        }
                     }
                 }
             }
@@ -131,9 +158,10 @@ struct QRCodeStepView: View {
     @ViewBuilder
     private var previewSection: some View {
         if qrSettings.wrappedValue.hasValidContent {
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: FGSpacing.sm) {
                 Text("Preview")
-                    .font(.headline)
+                    .font(FGTypography.h3)
+                    .foregroundColor(FGColors.textPrimary)
 
                 QRPreviewView(settings: qrSettings.wrappedValue)
             }
@@ -150,18 +178,23 @@ struct ContentTypeButton: View {
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 4) {
+            VStack(spacing: FGSpacing.xxs) {
                 Image(systemName: type.icon)
-                    .font(.title2)
+                    .font(.system(size: 20, weight: .medium))
                 Text(type.displayName)
-                    .font(.caption)
+                    .font(FGTypography.captionBold)
                     .lineLimit(1)
             }
-            .frame(width: 80, height: 60)
-            .background(isSelected ? Color.accentColor : Color(.systemGray6))
-            .foregroundColor(isSelected ? .white : .primary)
-            .cornerRadius(8)
+            .frame(width: 80, height: 64)
+            .background(isSelected ? FGColors.accentPrimary : FGColors.surfaceDefault)
+            .foregroundColor(isSelected ? FGColors.textOnAccent : FGColors.textSecondary)
+            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+            .overlay(
+                RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
+                    .stroke(isSelected ? FGColors.accentPrimary : FGColors.borderSubtle, lineWidth: 1)
+            )
         }
+        .buttonStyle(FGCardButtonStyle())
     }
 }
 
@@ -174,16 +207,23 @@ struct PositionButton: View {
 
     var body: some View {
         Button(action: action) {
-            HStack {
+            HStack(spacing: FGSpacing.xs) {
                 Image(systemName: position.icon)
+                    .font(.system(size: 16))
                 Text(position.displayName)
+                    .font(FGTypography.label)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
-            .background(isSelected ? Color.accentColor : Color(.systemGray6))
-            .foregroundColor(isSelected ? .white : .primary)
-            .cornerRadius(8)
+            .padding(.vertical, FGSpacing.sm)
+            .background(isSelected ? FGColors.accentPrimary : FGColors.surfaceDefault)
+            .foregroundColor(isSelected ? FGColors.textOnAccent : FGColors.textSecondary)
+            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+            .overlay(
+                RoundedRectangle(cornerRadius: FGSpacing.buttonRadius)
+                    .stroke(isSelected ? FGColors.accentPrimary : FGColors.borderSubtle, lineWidth: 1)
+            )
         }
+        .buttonStyle(FGCardButtonStyle())
     }
 }
 
@@ -193,29 +233,13 @@ struct VCardFieldsView: View {
     @Binding var settings: QRCodeSettings
 
     var body: some View {
-        VStack(spacing: 12) {
-            TextField("Name *", text: $settings.vcardName.bound)
-                .textFieldStyle(.roundedBorder)
-
-            TextField("Phone", text: $settings.vcardPhone.bound)
-                .textFieldStyle(.roundedBorder)
-                .keyboardType(.phonePad)
-
-            TextField("Email", text: $settings.vcardEmail.bound)
-                .textFieldStyle(.roundedBorder)
-                .keyboardType(.emailAddress)
-                .textInputAutocapitalization(.never)
-
-            TextField("Company", text: $settings.vcardCompany.bound)
-                .textFieldStyle(.roundedBorder)
-
-            TextField("Job Title", text: $settings.vcardTitle.bound)
-                .textFieldStyle(.roundedBorder)
-
-            TextField("Website", text: $settings.vcardWebsite.bound)
-                .textFieldStyle(.roundedBorder)
-                .keyboardType(.URL)
-                .textInputAutocapitalization(.never)
+        VStack(spacing: FGSpacing.sm) {
+            FGTextField(placeholder: "Name *", text: $settings.vcardName.bound, icon: "person")
+            FGTextField(placeholder: "Phone", text: $settings.vcardPhone.bound, icon: "phone")
+            FGTextField(placeholder: "Email", text: $settings.vcardEmail.bound, icon: "envelope")
+            FGTextField(placeholder: "Company", text: $settings.vcardCompany.bound, icon: "building.2")
+            FGTextField(placeholder: "Job Title", text: $settings.vcardTitle.bound, icon: "briefcase")
+            FGTextField(placeholder: "Website", text: $settings.vcardWebsite.bound, icon: "globe")
         }
     }
 }
@@ -226,19 +250,40 @@ struct WiFiFieldsView: View {
     @Binding var settings: QRCodeSettings
 
     var body: some View {
-        VStack(spacing: 12) {
-            TextField("Network Name (SSID) *", text: $settings.wifiSSID.bound)
-                .textFieldStyle(.roundedBorder)
+        VStack(spacing: FGSpacing.sm) {
+            FGTextField(placeholder: "Network Name (SSID) *", text: $settings.wifiSSID.bound, icon: "wifi")
 
-            SecureField("Password", text: $settings.wifiPassword.bound)
-                .textFieldStyle(.roundedBorder)
+            // Password field
+            HStack(spacing: FGSpacing.sm) {
+                Image(systemName: "lock")
+                    .font(.system(size: 16))
+                    .foregroundColor(FGColors.textTertiary)
 
-            Picker("Security", selection: $settings.wifiSecurity.bound) {
-                Text("WPA/WPA2").tag("WPA")
-                Text("WEP").tag("WEP")
-                Text("None").tag("nopass")
+                SecureField("Password", text: $settings.wifiPassword.bound)
+                    .font(FGTypography.body)
+                    .foregroundColor(FGColors.textPrimary)
             }
-            .pickerStyle(.segmented)
+            .padding(FGSpacing.sm)
+            .background(FGColors.surfaceDefault)
+            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
+            .overlay(
+                RoundedRectangle(cornerRadius: FGSpacing.inputRadius)
+                    .stroke(FGColors.borderSubtle, lineWidth: 1)
+            )
+
+            // Security picker
+            VStack(alignment: .leading, spacing: FGSpacing.xs) {
+                Text("Security")
+                    .font(FGTypography.label)
+                    .foregroundColor(FGColors.textSecondary)
+
+                Picker("Security", selection: $settings.wifiSecurity.bound) {
+                    Text("WPA/WPA2").tag("WPA")
+                    Text("WEP").tag("WEP")
+                    Text("None").tag("nopass")
+                }
+                .pickerStyle(.segmented)
+            }
         }
     }
 }
@@ -250,20 +295,43 @@ struct QRPreviewView: View {
     @State private var qrImage: UIImage?
 
     var body: some View {
-        Group {
-            if let image = qrImage {
-                Image(uiImage: image)
-                    .interpolation(.none)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 100, height: 100)
-                    .background(Color.white)
-                    .cornerRadius(8)
-            } else {
-                ProgressView()
-                    .frame(width: 100, height: 100)
+        HStack {
+            Group {
+                if let image = qrImage {
+                    Image(uiImage: image)
+                        .interpolation(.none)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 100, height: 100)
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
+                } else {
+                    ProgressView()
+                        .frame(width: 100, height: 100)
+                        .background(FGColors.surfaceDefault)
+                        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
+                }
             }
+
+            VStack(alignment: .leading, spacing: FGSpacing.xs) {
+                Text("Scan to test")
+                    .font(FGTypography.label)
+                    .foregroundColor(FGColors.textSecondary)
+
+                Text("This QR code will be added to your flyer")
+                    .font(FGTypography.caption)
+                    .foregroundColor(FGColors.textTertiary)
+            }
+
+            Spacer()
         }
+        .padding(FGSpacing.cardPadding)
+        .background(FGColors.surfaceDefault)
+        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+        .overlay(
+            RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
+                .stroke(FGColors.borderSubtle, lineWidth: 1)
+        )
         .task(id: settings) {
             await generatePreview()
         }

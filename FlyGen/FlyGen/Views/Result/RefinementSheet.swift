@@ -18,46 +18,55 @@ struct RefinementSheet: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 24) {
+            VStack(spacing: FGSpacing.xl) {
                 // Current image preview
                 if case .success(let image) = viewModel.generationState {
                     Image(uiImage: image)
                         .resizable()
                         .scaledToFit()
                         .frame(height: 200)
-                        .cornerRadius(8)
+                        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+                        .shadow(color: FGColors.accentPrimary.opacity(0.2), radius: 8)
                 }
 
                 // Feedback input
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: FGSpacing.sm) {
                     Text("What would you like to change?")
-                        .font(.headline)
+                        .font(FGTypography.h4)
+                        .foregroundColor(FGColors.textPrimary)
 
                     TextEditor(text: $feedback)
+                        .font(FGTypography.body)
+                        .foregroundColor(FGColors.textPrimary)
+                        .scrollContentBackground(.hidden)
                         .frame(minHeight: 80)
-                        .padding(8)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(8)
+                        .padding(FGSpacing.sm)
+                        .background(FGColors.surfaceDefault)
+                        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: FGSpacing.inputRadius)
+                                .stroke(FGColors.borderSubtle, lineWidth: 1)
+                        )
                 }
 
                 // Quick suggestions
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: FGSpacing.sm) {
                     Text("Quick suggestions:")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .font(FGTypography.label)
+                        .foregroundColor(FGColors.textSecondary)
 
-                    FlowLayout(spacing: 8) {
+                    FlowLayout(spacing: FGSpacing.sm) {
                         ForEach(quickSuggestions, id: \.self) { suggestion in
                             Button {
                                 addSuggestion(suggestion)
                             } label: {
                                 Text(suggestion)
-                                    .font(.caption)
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 6)
-                                    .background(Color.accentColor.opacity(0.1))
-                                    .foregroundColor(.accentColor)
-                                    .cornerRadius(16)
+                                    .font(FGTypography.caption)
+                                    .padding(.horizontal, FGSpacing.sm)
+                                    .padding(.vertical, FGSpacing.xs)
+                                    .background(FGColors.accentPrimary.opacity(0.15))
+                                    .foregroundColor(FGColors.accentPrimary)
+                                    .clipShape(Capsule())
                             }
                         }
                     }
@@ -72,25 +81,27 @@ struct RefinementSheet: View {
                         dismiss()
                     }
                 } label: {
-                    HStack {
+                    HStack(spacing: FGSpacing.sm) {
                         if viewModel.generationState == .generating {
                             ProgressView()
-                                .tint(.white)
+                                .tint(FGColors.textOnAccent)
                         } else {
                             Image(systemName: "sparkles")
                         }
                         Text("Apply Changes")
                     }
-                    .font(.headline)
-                    .foregroundColor(.white)
+                    .font(FGTypography.buttonLarge)
+                    .foregroundColor(FGColors.textOnAccent)
                     .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(feedback.isEmpty ? Color.gray : Color.accentColor)
-                    .cornerRadius(12)
+                    .padding(.vertical, FGSpacing.md)
+                    .background(feedback.isEmpty ? FGColors.textTertiary : FGColors.accentPrimary)
+                    .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+                    .shadow(color: feedback.isEmpty ? .clear : FGColors.accentPrimary.opacity(0.4), radius: 12, y: 4)
                 }
                 .disabled(feedback.isEmpty || viewModel.generationState == .generating)
             }
-            .padding()
+            .padding(FGSpacing.screenHorizontal)
+            .background(FGColors.backgroundPrimary)
             .navigationTitle("Refine Flyer")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -98,6 +109,7 @@ struct RefinementSheet: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .foregroundColor(FGColors.accentPrimary)
                 }
             }
         }
@@ -163,18 +175,19 @@ struct ReformatSheet: View {
     @State private var selectedRatio: AspectRatio = .portrait
 
     private let columns = [
-        GridItem(.flexible()),
-        GridItem(.flexible()),
-        GridItem(.flexible())
+        GridItem(.flexible(), spacing: FGSpacing.sm),
+        GridItem(.flexible(), spacing: FGSpacing.sm),
+        GridItem(.flexible(), spacing: FGSpacing.sm)
     ]
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 24) {
+            VStack(spacing: FGSpacing.xl) {
                 Text("Select a new format")
-                    .font(.headline)
+                    .font(FGTypography.h3)
+                    .foregroundColor(FGColors.textPrimary)
 
-                LazyVGrid(columns: columns, spacing: 12) {
+                LazyVGrid(columns: columns, spacing: FGSpacing.sm) {
                     ForEach(AspectRatio.allCases) { ratio in
                         AspectRatioCard(
                             ratio: ratio,
@@ -194,25 +207,27 @@ struct ReformatSheet: View {
                         dismiss()
                     }
                 } label: {
-                    HStack {
+                    HStack(spacing: FGSpacing.sm) {
                         if viewModel.generationState == .generating {
                             ProgressView()
-                                .tint(.white)
+                                .tint(FGColors.textOnAccent)
                         } else {
                             Image(systemName: "aspectratio")
                         }
                         Text("Regenerate in \(selectedRatio.displayName)")
                     }
-                    .font(.headline)
-                    .foregroundColor(.white)
+                    .font(FGTypography.buttonLarge)
+                    .foregroundColor(FGColors.textOnAccent)
                     .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.accentColor)
-                    .cornerRadius(12)
+                    .padding(.vertical, FGSpacing.md)
+                    .background(FGColors.accentPrimary)
+                    .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+                    .shadow(color: FGColors.accentPrimary.opacity(0.4), radius: 12, y: 4)
                 }
                 .disabled(viewModel.generationState == .generating)
             }
-            .padding()
+            .padding(FGSpacing.screenHorizontal)
+            .background(FGColors.backgroundPrimary)
             .navigationTitle("Resize Flyer")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -220,6 +235,7 @@ struct ReformatSheet: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .foregroundColor(FGColors.accentPrimary)
                 }
             }
             .onAppear {

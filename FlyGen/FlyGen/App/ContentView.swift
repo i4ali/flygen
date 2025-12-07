@@ -14,7 +14,16 @@ struct ContentView: View {
         Group {
             if cloudKitService.isChecking {
                 // Show loading while checking iCloud status
-                ProgressView("Checking iCloud...")
+                VStack {
+                    ProgressView()
+                        .tint(FGColors.accentPrimary)
+                    Text("Checking iCloud...")
+                        .font(FGTypography.body)
+                        .foregroundColor(FGColors.textSecondary)
+                        .padding(.top, FGSpacing.sm)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(FGColors.backgroundPrimary)
             } else if !cloudKitService.isSignedIn {
                 // Require iCloud sign-in
                 iCloudRequiredView()
@@ -26,6 +35,7 @@ struct ContentView: View {
                 }
             }
         }
+        .preferredColorScheme(.dark)
         .onAppear {
             ensureUserProfileExists()
         }

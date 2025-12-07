@@ -17,7 +17,7 @@ struct PremiumTab: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 24) {
+                VStack(spacing: FGSpacing.xl) {
                     // Header
                     headerSection
 
@@ -30,9 +30,10 @@ struct PremiumTab: View {
                     // Features list
                     featuresSection
 
-                    Spacer(minLength: 40)
+                    Spacer(minLength: FGSpacing.xl)
                 }
             }
+            .background(FGColors.backgroundPrimary)
             .navigationTitle("Get Credits")
             .alert("Purchase Successful!", isPresented: $showingPurchaseSuccess) {
                 Button("OK", role: .cancel) { }
@@ -45,70 +46,106 @@ struct PremiumTab: View {
     // MARK: - Header Section
 
     private var headerSection: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "sparkles")
-                .font(.system(size: 50))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [.yellow, .orange],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
+        VStack(spacing: FGSpacing.md) {
+            ZStack {
+                Circle()
+                    .fill(FGColors.accentSecondary.opacity(0.15))
+                    .frame(width: 100, height: 100)
+                    .blur(radius: 15)
+
+                Image(systemName: "sparkles")
+                    .font(.system(size: 50))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [FGColors.accentSecondary, FGColors.warning],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
                     )
-                )
+            }
 
             Text("Credit Packs")
-                .font(.title)
-                .fontWeight(.bold)
+                .font(FGTypography.displaySmall)
+                .foregroundColor(FGColors.textPrimary)
 
             Text("Purchase credits to create\nmore AI-powered flyers")
-                .font(.body)
-                .foregroundColor(.secondary)
+                .font(FGTypography.body)
+                .foregroundColor(FGColors.textSecondary)
                 .multilineTextAlignment(.center)
         }
-        .padding(.top, 24)
+        .padding(.top, FGSpacing.xl)
     }
 
     // MARK: - Credits Display
 
     private var creditsDisplay: some View {
-        HStack {
+        HStack(spacing: FGSpacing.sm) {
             Image(systemName: "sparkles")
-                .foregroundColor(.yellow)
-            Text("Current Credits: \(credits)")
-                .fontWeight(.medium)
+                .foregroundColor(FGColors.accentSecondary)
+            Text("Current Credits:")
+                .font(FGTypography.body)
+                .foregroundColor(FGColors.textSecondary)
+            Text("\(credits)")
+                .font(FGTypography.h3)
+                .foregroundColor(FGColors.textPrimary)
         }
-        .padding()
+        .padding(FGSpacing.md)
         .frame(maxWidth: .infinity)
-        .background(Color.yellow.opacity(0.1))
-        .cornerRadius(12)
-        .padding(.horizontal)
+        .background(FGColors.surfaceDefault)
+        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+        .overlay(
+            RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
+                .stroke(FGColors.accentSecondary.opacity(0.3), lineWidth: 1)
+        )
+        .padding(.horizontal, FGSpacing.screenHorizontal)
     }
 
     // MARK: - Credit Packs Section
 
     private var creditPacksSection: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: FGSpacing.md) {
             if storeKitService.isLoading {
-                ProgressView("Loading products...")
-                    .padding()
+                VStack(spacing: FGSpacing.sm) {
+                    ProgressView()
+                        .tint(FGColors.accentPrimary)
+                    Text("Loading products...")
+                        .font(FGTypography.body)
+                        .foregroundColor(FGColors.textSecondary)
+                }
+                .padding(FGSpacing.xl)
             } else if storeKitService.products.isEmpty {
-                VStack(spacing: 12) {
+                VStack(spacing: FGSpacing.md) {
                     Image(systemName: "exclamationmark.triangle")
-                        .font(.largeTitle)
-                        .foregroundColor(.orange)
+                        .font(.system(size: 40))
+                        .foregroundColor(FGColors.warning)
+
                     Text("Unable to load products")
-                        .font(.headline)
+                        .font(FGTypography.h4)
+                        .foregroundColor(FGColors.textPrimary)
+
                     Text("Please check your connection and try again")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Button("Retry") {
+                        .font(FGTypography.caption)
+                        .foregroundColor(FGColors.textSecondary)
+
+                    Button {
                         Task {
                             await storeKitService.loadProducts()
                         }
+                    } label: {
+                        Text("Retry")
+                            .font(FGTypography.button)
+                            .foregroundColor(FGColors.accentPrimary)
+                            .padding(.horizontal, FGSpacing.lg)
+                            .padding(.vertical, FGSpacing.sm)
+                            .background(FGColors.surfaceDefault)
+                            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: FGSpacing.buttonRadius)
+                                    .stroke(FGColors.accentPrimary, lineWidth: 1)
+                            )
                     }
-                    .buttonStyle(.bordered)
                 }
-                .padding()
+                .padding(FGSpacing.lg)
             } else {
                 ForEach(CreditPack.allCases, id: \.rawValue) { pack in
                     if let product = storeKitService.product(for: pack) {
@@ -125,28 +162,31 @@ struct PremiumTab: View {
 
             if let error = storeKitService.errorMessage {
                 Text(error)
-                    .font(.caption)
-                    .foregroundColor(.red)
-                    .padding(.horizontal)
+                    .font(FGTypography.caption)
+                    .foregroundColor(FGColors.error)
+                    .padding(.horizontal, FGSpacing.screenHorizontal)
             }
         }
-        .padding(.horizontal)
+        .padding(.horizontal, FGSpacing.screenHorizontal)
     }
 
     // MARK: - Features Section
 
     private var featuresSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: FGSpacing.md) {
             Text("What You Get")
-                .font(.headline)
-                .padding(.horizontal)
+                .font(FGTypography.h3)
+                .foregroundColor(FGColors.textPrimary)
+                .padding(.horizontal, FGSpacing.screenHorizontal)
 
-            FeatureRow(icon: "wand.and.stars", title: "AI-Powered Design", description: "Professional flyers in seconds")
-            FeatureRow(icon: "arrow.triangle.2.circlepath", title: "Unlimited Refinements", description: "Perfect your design with feedback")
-            FeatureRow(icon: "icloud", title: "Cloud Sync", description: "Access flyers on all your devices")
-            FeatureRow(icon: "square.and.arrow.up", title: "Easy Sharing", description: "Share directly to social media")
+            VStack(spacing: FGSpacing.sm) {
+                FeatureRow(icon: "wand.and.stars", title: "AI-Powered Design", description: "Professional flyers in seconds")
+                FeatureRow(icon: "arrow.triangle.2.circlepath", title: "Unlimited Refinements", description: "Perfect your design with feedback")
+                FeatureRow(icon: "icloud", title: "Cloud Sync", description: "Access flyers on all your devices")
+                FeatureRow(icon: "square.and.arrow.up", title: "Easy Sharing", description: "Share directly to social media")
+            }
         }
-        .padding(.vertical)
+        .padding(.vertical, FGSpacing.md)
     }
 
     // MARK: - Purchase Action
@@ -175,29 +215,28 @@ struct CreditPackCard: View {
     let onPurchase: () async -> Void
 
     var body: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: FGSpacing.md) {
             // Credits amount
-            VStack(alignment: .leading, spacing: 4) {
-                HStack {
+            VStack(alignment: .leading, spacing: FGSpacing.xxs) {
+                HStack(spacing: FGSpacing.sm) {
                     Text(pack.displayName)
-                        .font(.headline)
-                        .fontWeight(.bold)
+                        .font(FGTypography.h4)
+                        .foregroundColor(FGColors.textPrimary)
 
                     if let badge = pack.badge {
                         Text(badge)
-                            .font(.caption2)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 2)
-                            .background(Color.orange)
-                            .cornerRadius(4)
+                            .font(FGTypography.captionBold)
+                            .foregroundColor(FGColors.textOnAccent)
+                            .padding(.horizontal, FGSpacing.sm)
+                            .padding(.vertical, FGSpacing.xxxs)
+                            .background(FGColors.warning)
+                            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.chipRadius))
                     }
                 }
 
                 Text(product.description)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                    .font(FGTypography.caption)
+                    .foregroundColor(FGColors.textSecondary)
             }
 
             Spacer()
@@ -210,24 +249,27 @@ struct CreditPackCard: View {
             } label: {
                 if isLoading {
                     ProgressView()
+                        .tint(FGColors.textOnAccent)
                         .frame(width: 80)
                 } else {
                     Text(product.displayPrice)
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.white)
+                        .font(FGTypography.buttonLarge)
+                        .foregroundColor(FGColors.textOnAccent)
                         .frame(width: 80)
-                        .padding(.vertical, 10)
-                        .background(Color.accentColor)
-                        .cornerRadius(8)
+                        .padding(.vertical, FGSpacing.sm)
+                        .background(FGColors.accentPrimary)
+                        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
                 }
             }
             .disabled(isLoading)
         }
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .padding(FGSpacing.cardPadding)
+        .background(FGColors.backgroundElevated)
+        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+        .overlay(
+            RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
+                .stroke(FGColors.borderSubtle, lineWidth: 1)
+        )
     }
 }
 
@@ -239,28 +281,28 @@ struct FeatureRow: View {
     let description: String
 
     var body: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: FGSpacing.md) {
             Image(systemName: icon)
                 .font(.title2)
-                .foregroundColor(.accentColor)
+                .foregroundColor(FGColors.accentPrimary)
                 .frame(width: 40)
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: FGSpacing.xxxs) {
                 Text(title)
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
+                    .font(FGTypography.labelLarge)
+                    .foregroundColor(FGColors.textPrimary)
 
                 Text(description)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                    .font(FGTypography.caption)
+                    .foregroundColor(FGColors.textSecondary)
             }
 
             Spacer()
 
             Image(systemName: "checkmark.circle.fill")
-                .foregroundColor(.green)
+                .foregroundColor(FGColors.success)
         }
-        .padding(.horizontal)
+        .padding(.horizontal, FGSpacing.screenHorizontal)
     }
 }
 

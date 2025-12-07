@@ -13,6 +13,7 @@ struct ResultView: View {
     @State private var showingSaveSuccess = false
     @State private var saveError: String?
     @State private var hasSavedToGallery = false
+    @State private var hasDeductedCredit = false
 
     var body: some View {
         NavigationStack {
@@ -22,20 +23,21 @@ struct ResultView: View {
                     GenerationView(viewModel: viewModel)
                 } else if case .success(let image) = viewModel.generationState {
                     ScrollView {
-                        VStack(spacing: 16) {
+                        VStack(spacing: FGSpacing.lg) {
+                            // Generated image with glow
                             Image(uiImage: image)
                                 .resizable()
                                 .scaledToFit()
-                                .cornerRadius(12)
-                                .shadow(radius: 8)
-                                .padding()
+                                .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+                                .shadow(color: FGColors.accentPrimary.opacity(0.3), radius: 16)
+                                .padding(FGSpacing.screenHorizontal)
 
                             // Action buttons
-                            HStack(spacing: 12) {
+                            HStack(spacing: FGSpacing.md) {
                                 ActionButton(
                                     title: "Refine",
                                     icon: "arrow.triangle.2.circlepath",
-                                    color: .orange
+                                    color: FGColors.warning
                                 ) {
                                     showingRefinementSheet = true
                                 }
@@ -43,7 +45,7 @@ struct ResultView: View {
                                 ActionButton(
                                     title: "Resize",
                                     icon: "aspectratio",
-                                    color: .purple
+                                    color: FGColors.accentPrimary
                                 ) {
                                     showingReformatSheet = true
                                 }
@@ -51,27 +53,34 @@ struct ResultView: View {
                                 ActionButton(
                                     title: "Save",
                                     icon: "square.and.arrow.down",
-                                    color: .green
+                                    color: FGColors.success
                                 ) {
                                     saveToPhotos()
                                 }
                             }
-                            .padding(.horizontal)
+                            .padding(.horizontal, FGSpacing.screenHorizontal)
 
                             // Save feedback
                             if showingSaveSuccess {
-                                Label("Saved to Photos!", systemImage: "checkmark.circle.fill")
-                                    .foregroundColor(.green)
-                                    .padding()
+                                HStack(spacing: FGSpacing.sm) {
+                                    Image(systemName: "checkmark.circle.fill")
+                                    Text("Saved to Photos!")
+                                }
+                                .font(FGTypography.label)
+                                .foregroundColor(FGColors.success)
+                                .padding(FGSpacing.sm)
+                                .background(FGColors.success.opacity(0.1))
+                                .clipShape(RoundedRectangle(cornerRadius: FGSpacing.chipRadius))
                             }
 
                             if let error = saveError {
                                 Text(error)
-                                    .font(.caption)
-                                    .foregroundColor(.red)
-                                    .padding()
+                                    .font(FGTypography.caption)
+                                    .foregroundColor(FGColors.error)
+                                    .padding(FGSpacing.sm)
                             }
                         }
+                        .padding(.vertical, FGSpacing.lg)
                     }
 
                     // Done button
@@ -79,42 +88,60 @@ struct ResultView: View {
                         saveToGalleryAndDismiss()
                     } label: {
                         Text("Done")
-                            .font(.headline)
-                            .foregroundColor(.white)
+                            .font(FGTypography.buttonLarge)
+                            .foregroundColor(FGColors.textOnAccent)
                             .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.accentColor)
-                            .cornerRadius(12)
+                            .padding(.vertical, FGSpacing.md)
+                            .background(FGColors.accentPrimary)
+                            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+                            .shadow(color: FGColors.accentPrimary.opacity(0.4), radius: 12, y: 4)
                     }
-                    .padding()
+                    .padding(FGSpacing.screenHorizontal)
+                    .padding(.bottom, FGSpacing.md)
 
                 } else if case .error(let message) = viewModel.generationState {
-                    VStack(spacing: 16) {
-                        Image(systemName: "exclamationmark.triangle")
-                            .font(.system(size: 60))
-                            .foregroundColor(.orange)
+                    VStack(spacing: FGSpacing.lg) {
+                        ZStack {
+                            Circle()
+                                .fill(FGColors.warning.opacity(0.1))
+                                .frame(width: 100, height: 100)
 
-                        Text("Generation Failed")
-                            .font(.title2)
-                            .fontWeight(.semibold)
+                            Image(systemName: "exclamationmark.triangle")
+                                .font(.system(size: 50))
+                                .foregroundColor(FGColors.warning)
+                        }
 
-                        Text(message)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal)
+                        VStack(spacing: FGSpacing.sm) {
+                            Text("Generation Failed")
+                                .font(FGTypography.h2)
+                                .foregroundColor(FGColors.textPrimary)
 
-                        Button("Try Again") {
+                            Text(message)
+                                .font(FGTypography.body)
+                                .foregroundColor(FGColors.textSecondary)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, FGSpacing.xl)
+                        }
+
+                        Button {
                             Task {
                                 await viewModel.generateFlyer(apiKey: apiKey)
                             }
+                        } label: {
+                            Text("Try Again")
+                                .font(FGTypography.button)
+                                .foregroundColor(FGColors.textOnAccent)
+                                .padding(.horizontal, FGSpacing.xxl)
+                                .padding(.vertical, FGSpacing.md)
+                                .background(FGColors.accentPrimary)
+                                .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
                         }
-                        .buttonStyle(.borderedProminent)
-                        .padding(.top)
+                        .padding(.top, FGSpacing.md)
                     }
-                    .padding()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
+            .background(FGColors.backgroundPrimary)
             .navigationTitle("Your Flyer")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -123,6 +150,7 @@ struct ResultView: View {
                         viewModel.showingResult = false
                     } label: {
                         Image(systemName: "xmark")
+                            .foregroundColor(FGColors.textSecondary)
                     }
                 }
 
@@ -133,6 +161,7 @@ struct ResultView: View {
                             preview: SharePreview("My Flyer", image: shareImage)
                         ) {
                             Image(systemName: "square.and.arrow.up")
+                                .foregroundColor(FGColors.accentPrimary)
                         }
                     }
                 }
@@ -143,6 +172,29 @@ struct ResultView: View {
             .sheet(isPresented: $showingReformatSheet) {
                 ReformatSheet(viewModel: viewModel, apiKey: apiKey)
             }
+            .onChange(of: viewModel.generationState) { oldState, newState in
+                // Deduct credit immediately when generation succeeds
+                if case .success = newState, !hasDeductedCredit {
+                    deductCredit()
+                }
+            }
+            .onAppear {
+                // Also check on appear in case generation already succeeded
+                if case .success = viewModel.generationState, !hasDeductedCredit {
+                    deductCredit()
+                }
+            }
+        }
+    }
+
+    private func deductCredit() {
+        guard !hasDeductedCredit else { return }
+
+        if let profile = userProfiles.first, profile.credits > 0 {
+            profile.credits -= 1
+            hasDeductedCredit = true
+            try? modelContext.save()
+            print("Credit deducted. Remaining credits: \(profile.credits)")
         }
     }
 
@@ -193,12 +245,6 @@ struct ResultView: View {
         do {
             try modelContext.save()
             hasSavedToGallery = true
-
-            // Deduct a credit after successful generation
-            if let profile = userProfiles.first, profile.credits > 0 {
-                profile.credits -= 1
-                try? modelContext.save()
-            }
         } catch {
             print("Failed to save flyer to gallery: \(error)")
         }
@@ -213,17 +259,21 @@ struct ActionButton: View {
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 8) {
+            VStack(spacing: FGSpacing.sm) {
                 Image(systemName: icon)
                     .font(.title2)
                 Text(title)
-                    .font(.caption)
+                    .font(FGTypography.caption)
             }
             .frame(maxWidth: .infinity)
-            .padding()
-            .background(color.opacity(0.1))
+            .padding(FGSpacing.md)
+            .background(color.opacity(0.15))
             .foregroundColor(color)
-            .cornerRadius(12)
+            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+            .overlay(
+                RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
+                    .stroke(color.opacity(0.3), lineWidth: 1)
+            )
         }
     }
 }

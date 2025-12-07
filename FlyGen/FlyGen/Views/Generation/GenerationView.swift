@@ -16,49 +16,61 @@ struct GenerationView: View {
     }
 
     var body: some View {
-        VStack(spacing: 32) {
+        VStack(spacing: FGSpacing.xxl) {
             Spacer()
 
-            // Animated icon
+            // Animated icon with glow
             ZStack {
+                // Outer glow
                 Circle()
-                    .fill(Color.accentColor.opacity(0.1))
+                    .fill(FGColors.accentPrimary.opacity(0.1))
+                    .frame(width: 140, height: 140)
+                    .blur(radius: 20)
+
+                // Middle ring
+                Circle()
+                    .fill(FGColors.accentPrimary.opacity(0.15))
                     .frame(width: 120, height: 120)
 
+                // Inner ring
                 Circle()
-                    .fill(Color.accentColor.opacity(0.2))
+                    .fill(FGColors.accentPrimary.opacity(0.25))
                     .frame(width: 100, height: 100)
 
+                // Icon
                 Image(systemName: "sparkles")
-                    .font(.system(size: 40))
-                    .foregroundColor(.accentColor)
+                    .font(.system(size: 40, weight: .medium))
+                    .foregroundColor(FGColors.accentPrimary)
                     .symbolEffect(.pulse)
             }
 
-            VStack(spacing: 16) {
+            VStack(spacing: FGSpacing.md) {
                 Text("Generating Your Flyer")
-                    .font(.title2)
-                    .fontWeight(.semibold)
+                    .font(FGTypography.h2)
+                    .foregroundColor(FGColors.textPrimary)
 
                 Text(currentMessage)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .font(FGTypography.body)
+                    .foregroundColor(FGColors.textSecondary)
                     .animation(.easeInOut, value: animationPhase)
 
                 ProgressView()
+                    .tint(FGColors.accentPrimary)
                     .scaleEffect(1.2)
-                    .padding(.top, 8)
+                    .padding(.top, FGSpacing.sm)
             }
 
             Spacer()
 
             // Estimated time
             Text("This usually takes 10-30 seconds")
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .padding(.bottom, 40)
+                .font(FGTypography.caption)
+                .foregroundColor(FGColors.textTertiary)
+                .padding(.bottom, FGSpacing.xl)
         }
-        .padding()
+        .padding(FGSpacing.screenHorizontal)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(FGColors.backgroundPrimary)
         .onAppear {
             startMessageRotation()
         }

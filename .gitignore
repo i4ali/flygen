@@ -28,6 +28,11 @@ xcuserdata/
 DerivedData/
 *.xcworkspace/xcuserdata/
 *.xcodeproj/xcuserdata/
+.build/
+.swiftpm/
+*.ipa
+*.dSYM.zip
+*.dSYM
 
 # IDE
 .idea/

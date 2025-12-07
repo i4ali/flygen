@@ -13,157 +13,297 @@ struct ExtrasStepView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-                // Include elements
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Elements to Include")
-                        .font(.headline)
+            VStack(alignment: .leading, spacing: FGSpacing.xl) {
+                // Header
+                FGStepHeader(
+                    title: "Fine-tune details",
+                    subtitle: "Add specific elements, audience info, and optional logo",
+                    tooltipText: "These extras help the AI understand exactly what you want"
+                )
 
-                    TextField("e.g., balloons, confetti, stars", text: $includeElementsText)
-                        .textFieldStyle(.plain)
-                        .padding(12)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(8)
-                        .onChange(of: includeElementsText) { _, newValue in
-                            viewModel.project?.visuals.includeElements = newValue
-                                .split(separator: ",")
-                                .map { $0.trimmingCharacters(in: .whitespaces) }
-                                .filter { !$0.isEmpty }
-                        }
+                // Include elements section
+                includeElementsSection
+                    .padding(.horizontal, FGSpacing.screenHorizontal)
 
-                    // Suggestions
-                    if !suggestedElements.isEmpty {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 8) {
-                                Text("Suggestions:")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+                // Avoid elements section
+                avoidElementsSection
+                    .padding(.horizontal, FGSpacing.screenHorizontal)
 
-                                ForEach(suggestedElements, id: \.self) { element in
-                                    Button {
-                                        addSuggestion(element)
-                                    } label: {
-                                        Text(element)
-                                            .font(.caption)
-                                            .padding(.horizontal, 8)
-                                            .padding(.vertical, 4)
-                                            .background(Color.accentColor.opacity(0.1))
-                                            .foregroundColor(.accentColor)
-                                            .cornerRadius(4)
-                                    }
+                // Divider
+                Rectangle()
+                    .fill(FGColors.borderSubtle)
+                    .frame(height: 1)
+                    .padding(.horizontal, FGSpacing.screenHorizontal)
+
+                // Target audience section
+                targetAudienceSection
+                    .padding(.horizontal, FGSpacing.screenHorizontal)
+
+                // Special instructions section
+                specialInstructionsSection
+                    .padding(.horizontal, FGSpacing.screenHorizontal)
+
+                // Divider
+                Rectangle()
+                    .fill(FGColors.borderSubtle)
+                    .frame(height: 1)
+                    .padding(.horizontal, FGSpacing.screenHorizontal)
+
+                // Logo upload section
+                logoUploadSection
+                    .padding(.horizontal, FGSpacing.screenHorizontal)
+            }
+            .padding(.vertical, FGSpacing.lg)
+        }
+        .background(FGColors.backgroundPrimary)
+        .scrollDismissesKeyboard(.interactively)
+    }
+
+    // MARK: - Include Elements Section
+
+    private var includeElementsSection: some View {
+        VStack(alignment: .leading, spacing: FGSpacing.md) {
+            HStack {
+                Text("Elements to Include")
+                    .font(FGTypography.h3)
+                    .foregroundColor(FGColors.textPrimary)
+
+                FGTooltip(text: "Specific visual elements you want in your flyer")
+            }
+
+            FGTextField(
+                placeholder: "e.g., balloons, confetti, stars",
+                text: $includeElementsText,
+                icon: "plus.circle"
+            )
+            .onChange(of: includeElementsText) { _, newValue in
+                viewModel.project?.visuals.includeElements = newValue
+                    .split(separator: ",")
+                    .map { $0.trimmingCharacters(in: .whitespaces) }
+                    .filter { !$0.isEmpty }
+            }
+
+            // Suggestions
+            if !suggestedElements.isEmpty {
+                VStack(alignment: .leading, spacing: FGSpacing.xs) {
+                    Text("Suggestions")
+                        .font(FGTypography.caption)
+                        .foregroundColor(FGColors.textTertiary)
+
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: FGSpacing.xs) {
+                            ForEach(suggestedElements, id: \.self) { element in
+                                SuggestionChip(text: element, isAdded: includeElementsText.contains(element)) {
+                                    addSuggestion(element)
                                 }
                             }
                         }
                     }
                 }
+            }
+        }
+    }
 
-                // Avoid elements
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Elements to Avoid")
-                        .font(.headline)
+    // MARK: - Avoid Elements Section
 
-                    TextField("e.g., people, faces, hands", text: $avoidElementsText)
-                        .textFieldStyle(.plain)
-                        .padding(12)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(8)
-                        .onChange(of: avoidElementsText) { _, newValue in
-                            viewModel.project?.visuals.avoidElements = newValue
-                                .split(separator: ",")
-                                .map { $0.trimmingCharacters(in: .whitespaces) }
-                                .filter { !$0.isEmpty }
-                        }
-                }
+    private var avoidElementsSection: some View {
+        VStack(alignment: .leading, spacing: FGSpacing.md) {
+            HStack {
+                Text("Elements to Avoid")
+                    .font(FGTypography.h3)
+                    .foregroundColor(FGColors.textPrimary)
 
-                Divider()
+                FGTooltip(text: "Things you don't want in your design")
+            }
 
-                // Target audience
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Target Audience")
-                        .font(.headline)
+            FGTextField(
+                placeholder: "e.g., people, faces, hands",
+                text: $avoidElementsText,
+                icon: "minus.circle"
+            )
+            .onChange(of: avoidElementsText) { _, newValue in
+                viewModel.project?.visuals.avoidElements = newValue
+                    .split(separator: ",")
+                    .map { $0.trimmingCharacters(in: .whitespaces) }
+                    .filter { !$0.isEmpty }
+            }
 
-                    TextField("e.g., Young professionals, families", text: Binding(
-                        get: { viewModel.project?.targetAudience ?? "" },
-                        set: { viewModel.project?.targetAudience = $0.isEmpty ? nil : $0 }
-                    ))
-                    .textFieldStyle(.plain)
-                    .padding(12)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
-                }
-
-                // Special instructions
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Special Instructions")
-                        .font(.headline)
-
-                    TextEditor(text: Binding(
-                        get: { viewModel.project?.specialInstructions ?? "" },
-                        set: { viewModel.project?.specialInstructions = $0.isEmpty ? nil : $0 }
-                    ))
-                    .frame(minHeight: 80)
-                    .padding(8)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
-                }
-
-                Divider()
-
-                // Logo upload
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Logo (Optional)")
-                        .font(.headline)
-
-                    if let logoData = viewModel.project?.logoImageData,
-                       let uiImage = UIImage(data: logoData) {
-                        // Show uploaded logo
-                        HStack {
-                            Image(uiImage: uiImage)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height: 60)
-                                .cornerRadius(8)
-
-                            Spacer()
-
-                            Button(role: .destructive) {
-                                viewModel.clearLogo()
-                            } label: {
-                                Image(systemName: "xmark.circle.fill")
-                                    .font(.title2)
-                            }
-                        }
-                        .padding()
-                        .background(Color(.systemGray6))
-                        .cornerRadius(8)
-                    } else {
-                        PhotosPicker(selection: $viewModel.selectedLogoItem, matching: .images) {
-                            HStack {
-                                Image(systemName: "photo")
-                                Text("Add Logo")
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color(.systemGray6))
-                            .foregroundColor(.primary)
-                            .cornerRadius(8)
-                        }
-                        .onChange(of: viewModel.selectedLogoItem) { _, _ in
-                            Task {
-                                await viewModel.loadLogo()
-                            }
+            // Common avoidance suggestions
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: FGSpacing.xs) {
+                    ForEach(["people", "faces", "hands", "text", "watermarks"], id: \.self) { element in
+                        SuggestionChip(
+                            text: element,
+                            isAdded: avoidElementsText.contains(element),
+                            style: .avoid
+                        ) {
+                            addAvoidSuggestion(element)
                         }
                     }
-
-                    Text("Logo will be incorporated into the flyer design")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
                 }
             }
-            .padding()
         }
-        .scrollDismissesKeyboard(.interactively)
     }
+
+    // MARK: - Target Audience Section
+
+    private var targetAudienceSection: some View {
+        VStack(alignment: .leading, spacing: FGSpacing.md) {
+            HStack {
+                Text("Target Audience")
+                    .font(FGTypography.h3)
+                    .foregroundColor(FGColors.textPrimary)
+
+                FGTooltip(text: "Who is this flyer designed for?")
+            }
+
+            FGTextField(
+                placeholder: "e.g., Young professionals, families",
+                text: Binding(
+                    get: { viewModel.project?.targetAudience ?? "" },
+                    set: { viewModel.project?.targetAudience = $0.isEmpty ? nil : $0 }
+                ),
+                icon: "person.2"
+            )
+        }
+    }
+
+    // MARK: - Special Instructions Section
+
+    private var specialInstructionsSection: some View {
+        VStack(alignment: .leading, spacing: FGSpacing.md) {
+            HStack {
+                Text("Special Instructions")
+                    .font(FGTypography.h3)
+                    .foregroundColor(FGColors.textPrimary)
+
+                FGTooltip(text: "Any additional guidance for the AI")
+            }
+
+            TextEditor(text: Binding(
+                get: { viewModel.project?.specialInstructions ?? "" },
+                set: { viewModel.project?.specialInstructions = $0.isEmpty ? nil : $0 }
+            ))
+            .font(FGTypography.body)
+            .foregroundColor(FGColors.textPrimary)
+            .scrollContentBackground(.hidden)
+            .frame(minHeight: 100)
+            .padding(FGSpacing.sm)
+            .background(FGColors.surfaceDefault)
+            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
+            .overlay(
+                RoundedRectangle(cornerRadius: FGSpacing.inputRadius)
+                    .stroke(FGColors.borderSubtle, lineWidth: 1)
+            )
+
+            Text("Example: \"Use a clean layout with text at the top\"")
+                .font(FGTypography.caption)
+                .foregroundColor(FGColors.textTertiary)
+        }
+    }
+
+    // MARK: - Logo Upload Section
+
+    private var logoUploadSection: some View {
+        VStack(alignment: .leading, spacing: FGSpacing.md) {
+            HStack {
+                Text("Logo")
+                    .font(FGTypography.h3)
+                    .foregroundColor(FGColors.textPrimary)
+
+                FGInfoBadge(text: "Optional")
+            }
+
+            if let logoData = viewModel.project?.logoImageData,
+               let uiImage = UIImage(data: logoData) {
+                // Show uploaded logo
+                HStack(spacing: FGSpacing.md) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 64)
+                        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: FGSpacing.inputRadius)
+                                .stroke(FGColors.borderSubtle, lineWidth: 1)
+                        )
+
+                    VStack(alignment: .leading, spacing: FGSpacing.xxs) {
+                        Text("Logo uploaded")
+                            .font(FGTypography.label)
+                            .foregroundColor(FGColors.textPrimary)
+
+                        Text("Will be incorporated into design")
+                            .font(FGTypography.caption)
+                            .foregroundColor(FGColors.textTertiary)
+                    }
+
+                    Spacer()
+
+                    Button {
+                        withAnimation(FGAnimations.spring) {
+                            viewModel.clearLogo()
+                        }
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 24))
+                            .foregroundColor(FGColors.statusError)
+                    }
+                }
+                .padding(FGSpacing.cardPadding)
+                .background(FGColors.surfaceDefault)
+                .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+                .overlay(
+                    RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
+                        .stroke(FGColors.borderSubtle, lineWidth: 1)
+                )
+            } else {
+                PhotosPicker(selection: $viewModel.selectedLogoItem, matching: .images) {
+                    HStack(spacing: FGSpacing.sm) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: FGSpacing.inputRadius)
+                                .fill(FGColors.backgroundTertiary)
+                                .frame(width: 48, height: 48)
+
+                            Image(systemName: "photo.badge.plus")
+                                .font(.system(size: 20))
+                                .foregroundColor(FGColors.accentPrimary)
+                        }
+
+                        VStack(alignment: .leading, spacing: FGSpacing.xxs) {
+                            Text("Add Your Logo")
+                                .font(FGTypography.labelLarge)
+                                .foregroundColor(FGColors.textPrimary)
+
+                            Text("PNG or JPG, transparent background works best")
+                                .font(FGTypography.caption)
+                                .foregroundColor(FGColors.textTertiary)
+                        }
+
+                        Spacer()
+
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(FGColors.textTertiary)
+                    }
+                    .padding(FGSpacing.cardPadding)
+                    .background(FGColors.surfaceDefault)
+                    .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
+                            .stroke(FGColors.borderSubtle, lineWidth: 1)
+                    )
+                }
+                .onChange(of: viewModel.selectedLogoItem) { _, _ in
+                    Task {
+                        await viewModel.loadLogo()
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Helper Methods
 
     private func addSuggestion(_ element: String) {
         if includeElementsText.isEmpty {
@@ -171,6 +311,72 @@ struct ExtrasStepView: View {
         } else if !includeElementsText.contains(element) {
             includeElementsText += ", \(element)"
         }
+    }
+
+    private func addAvoidSuggestion(_ element: String) {
+        if avoidElementsText.isEmpty {
+            avoidElementsText = element
+        } else if !avoidElementsText.contains(element) {
+            avoidElementsText += ", \(element)"
+        }
+    }
+}
+
+// MARK: - Suggestion Chip
+
+struct SuggestionChip: View {
+    let text: String
+    let isAdded: Bool
+    var style: ChipStyle = .include
+    let action: () -> Void
+
+    enum ChipStyle {
+        case include
+        case avoid
+    }
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: FGSpacing.xxs) {
+                if isAdded {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 10, weight: .bold))
+                }
+                Text(text)
+                    .font(FGTypography.captionBold)
+            }
+            .padding(.horizontal, FGSpacing.sm)
+            .padding(.vertical, FGSpacing.xs)
+            .background(chipBackground)
+            .foregroundColor(chipForeground)
+            .clipShape(Capsule())
+            .overlay(
+                Capsule()
+                    .stroke(chipBorder, lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var chipBackground: Color {
+        if isAdded {
+            return style == .include ? FGColors.accentPrimary.opacity(0.2) : FGColors.statusError.opacity(0.2)
+        }
+        return FGColors.backgroundTertiary
+    }
+
+    private var chipForeground: Color {
+        if isAdded {
+            return style == .include ? FGColors.accentPrimary : FGColors.statusError
+        }
+        return FGColors.textSecondary
+    }
+
+    private var chipBorder: Color {
+        if isAdded {
+            return style == .include ? FGColors.accentPrimary.opacity(0.5) : FGColors.statusError.opacity(0.5)
+        }
+        return FGColors.borderSubtle
     }
 }
 

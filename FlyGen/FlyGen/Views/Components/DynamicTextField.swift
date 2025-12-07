@@ -1,53 +1,75 @@
 import SwiftUI
 
 /// A styled text field for the creation flow
+/// Updated with FlyGen dark theme
 struct DynamicTextField: View {
     let field: TextFieldType
     @Binding var text: String
     var isFocused: FocusState<TextFieldType?>.Binding
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            // Label
-            HStack {
+        VStack(alignment: .leading, spacing: FGSpacing.xs) {
+            // Label with required indicator
+            HStack(spacing: FGSpacing.xxs) {
                 Text(field.label)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .foregroundColor(.primary)
+                    .font(FGTypography.labelLarge)
+                    .foregroundColor(FGColors.textPrimary)
 
                 if field.isRequired {
                     Text("*")
-                        .foregroundColor(.red)
+                        .font(FGTypography.labelLarge)
+                        .foregroundColor(FGColors.error)
+                }
+
+                Spacer()
+
+                // Character count for multiline
+                if field.isMultiline && !text.isEmpty {
+                    Text("\(text.count)")
+                        .font(FGTypography.captionSmall)
+                        .foregroundColor(FGColors.textTertiary)
                 }
             }
 
             // Text field
             if field.isMultiline {
                 TextEditor(text: $text)
-                    .frame(minHeight: 80)
-                    .padding(8)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
+                    .font(FGTypography.body)
+                    .foregroundColor(FGColors.textPrimary)
+                    .scrollContentBackground(.hidden)
+                    .frame(minHeight: 100)
+                    .padding(FGSpacing.sm)
+                    .background(FGColors.surfaceDefault)
+                    .clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
                     .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(isFocused.wrappedValue == field ? Color.accentColor : Color.clear, lineWidth: 2)
+                        RoundedRectangle(cornerRadius: FGSpacing.inputRadius)
+                            .stroke(
+                                isFocused.wrappedValue == field ? FGColors.accentPrimary : FGColors.borderSubtle,
+                                lineWidth: isFocused.wrappedValue == field ? 2 : 1
+                            )
                     )
                     .focused(isFocused, equals: field)
             } else {
                 TextField(field.placeholder, text: $text)
+                    .font(FGTypography.body)
+                    .foregroundColor(FGColors.textPrimary)
                     .textFieldStyle(.plain)
-                    .padding(12)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
+                    .padding(FGSpacing.sm)
+                    .background(FGColors.surfaceDefault)
+                    .clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
                     .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(isFocused.wrappedValue == field ? Color.accentColor : Color.clear, lineWidth: 2)
+                        RoundedRectangle(cornerRadius: FGSpacing.inputRadius)
+                            .stroke(
+                                isFocused.wrappedValue == field ? FGColors.accentPrimary : FGColors.borderSubtle,
+                                lineWidth: isFocused.wrappedValue == field ? 2 : 1
+                            )
                     )
                     .focused(isFocused, equals: field)
                     .keyboardType(keyboardType)
                     .textContentType(contentType)
                     .textInputAutocapitalization(autocapitalization)
             }
+
         }
     }
 
@@ -82,23 +104,132 @@ struct DynamicTextField: View {
     }
 }
 
-#Preview {
-    @FocusState var focusedField: TextFieldType?
-    @State var headline = ""
-    @State var body = ""
+/// Standalone text input with dark theme styling
+struct FGTextField: View {
+    let placeholder: String
+    @Binding var text: String
+    var icon: String? = nil
+    var isMultiline: Bool = false
 
-    return VStack(spacing: 16) {
-        DynamicTextField(
-            field: .headline,
-            text: $headline,
-            isFocused: $focusedField
+    @FocusState private var isFocused: Bool
+
+    var body: some View {
+        HStack(spacing: FGSpacing.sm) {
+            if let icon = icon {
+                Image(systemName: icon)
+                    .font(.system(size: 16))
+                    .foregroundColor(isFocused ? FGColors.accentPrimary : FGColors.textTertiary)
+            }
+
+            if isMultiline {
+                TextEditor(text: $text)
+                    .font(FGTypography.body)
+                    .foregroundColor(FGColors.textPrimary)
+                    .scrollContentBackground(.hidden)
+                    .frame(minHeight: 80)
+                    .focused($isFocused)
+            } else {
+                TextField(placeholder, text: $text)
+                    .font(FGTypography.body)
+                    .foregroundColor(FGColors.textPrimary)
+                    .textFieldStyle(.plain)
+                    .focused($isFocused)
+            }
+        }
+        .padding(FGSpacing.sm)
+        .background(FGColors.surfaceDefault)
+        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
+        .overlay(
+            RoundedRectangle(cornerRadius: FGSpacing.inputRadius)
+                .stroke(
+                    isFocused ? FGColors.accentPrimary : FGColors.borderSubtle,
+                    lineWidth: isFocused ? 2 : 1
+                )
         )
+        .animation(FGAnimations.quickEaseOut, value: isFocused)
+    }
+}
 
-        DynamicTextField(
-            field: .bodyText,
-            text: $body,
-            isFocused: $focusedField
+/// Search field with dark theme styling
+struct FGSearchField: View {
+    let placeholder: String
+    @Binding var text: String
+
+    @FocusState private var isFocused: Bool
+
+    var body: some View {
+        HStack(spacing: FGSpacing.sm) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 16))
+                .foregroundColor(FGColors.textTertiary)
+
+            TextField(placeholder, text: $text)
+                .font(FGTypography.body)
+                .foregroundColor(FGColors.textPrimary)
+                .textFieldStyle(.plain)
+                .focused($isFocused)
+
+            if !text.isEmpty {
+                Button {
+                    text = ""
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 16))
+                        .foregroundColor(FGColors.textTertiary)
+                }
+            }
+        }
+        .padding(FGSpacing.sm)
+        .background(FGColors.surfaceDefault)
+        .clipShape(Capsule())
+        .overlay(
+            Capsule()
+                .stroke(FGColors.borderSubtle, lineWidth: 1)
         )
     }
-    .padding()
+}
+
+#Preview("DynamicTextField - Dark Theme") {
+    struct PreviewWrapper: View {
+        @FocusState var focusedField: TextFieldType?
+        @State var headline = ""
+        @State var bodyText = ""
+        @State var search = ""
+
+        var body: some View {
+            ScrollView {
+                VStack(spacing: FGSpacing.lg) {
+                    Text("Text Fields")
+                        .font(FGTypography.h2)
+                        .foregroundColor(FGColors.textPrimary)
+
+                    DynamicTextField(
+                        field: .headline,
+                        text: $headline,
+                        isFocused: $focusedField
+                    )
+
+                    DynamicTextField(
+                        field: .bodyText,
+                        text: $bodyText,
+                        isFocused: $focusedField
+                    )
+
+                    Divider().background(FGColors.borderSubtle)
+
+                    Text("Standalone Fields")
+                        .font(FGTypography.label)
+                        .foregroundColor(FGColors.textSecondary)
+
+                    FGTextField(placeholder: "Enter text...", text: $headline, icon: "pencil")
+
+                    FGSearchField(placeholder: "Search...", text: $search)
+                }
+                .padding(FGSpacing.screenHorizontal)
+            }
+            .background(FGColors.backgroundPrimary)
+        }
+    }
+
+    return PreviewWrapper()
 }

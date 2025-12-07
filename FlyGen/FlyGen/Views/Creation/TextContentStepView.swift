@@ -11,33 +11,83 @@ struct TextContentStepView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 16) {
+            VStack(spacing: FGSpacing.lg) {
+                // Header
+                FGStepHeader(
+                    title: "Add your content",
+                    subtitle: "Enter the text that will appear on your flyer",
+                    tooltipText: "Required fields are marked with *"
+                )
+
                 // Category indicator
                 if let category = viewModel.project?.category {
-                    HStack {
+                    HStack(spacing: FGSpacing.xs) {
                         Text(category.emoji)
+                            .font(.system(size: 20))
+
                         Text(category.displayName)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
+                            .font(FGTypography.label)
+                            .foregroundColor(FGColors.textSecondary)
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
+                    .padding(.horizontal, FGSpacing.sm)
+                    .padding(.vertical, FGSpacing.xs)
+                    .background(FGColors.surfaceDefault)
+                    .clipShape(Capsule())
+                    .overlay(
+                        Capsule()
+                            .stroke(FGColors.borderSubtle, lineWidth: 1)
+                    )
+                    .padding(.horizontal, FGSpacing.screenHorizontal)
                 }
 
                 // Dynamic text fields
-                ForEach(fields) { field in
-                    DynamicTextField(
-                        field: field,
-                        text: viewModel.binding(for: field),
-                        isFocused: $focusedField
-                    )
+                VStack(spacing: FGSpacing.md) {
+                    ForEach(fields) { field in
+                        DynamicTextField(
+                            field: field,
+                            text: viewModel.binding(for: field),
+                            isFocused: $focusedField
+                        )
+                    }
+                }
+                .padding(.horizontal, FGSpacing.screenHorizontal)
+
+                // Validation indicator
+                if let project = viewModel.project {
+                    ValidationIndicator(isValid: project.textContent.isValid)
+                        .padding(.horizontal, FGSpacing.screenHorizontal)
                 }
             }
-            .padding()
+            .padding(.vertical, FGSpacing.lg)
         }
+        .background(FGColors.backgroundPrimary)
         .scrollDismissesKeyboard(.interactively)
+    }
+}
+
+/// Shows validation status for the text content
+private struct ValidationIndicator: View {
+    let isValid: Bool
+
+    var body: some View {
+        HStack(spacing: FGSpacing.xs) {
+            Image(systemName: isValid ? "checkmark.circle.fill" : "exclamationmark.circle")
+                .font(.system(size: 14))
+                .foregroundColor(isValid ? FGColors.success : FGColors.warning)
+
+            Text(isValid ? "Ready to continue" : "Fill in required fields to continue")
+                .font(FGTypography.caption)
+                .foregroundColor(isValid ? FGColors.success : FGColors.textTertiary)
+
+            Spacer()
+        }
+        .padding(FGSpacing.sm)
+        .background(isValid ? FGColors.success.opacity(0.1) : FGColors.surfaceDefault)
+        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.chipRadius))
+        .overlay(
+            RoundedRectangle(cornerRadius: FGSpacing.chipRadius)
+                .stroke(isValid ? FGColors.success.opacity(0.3) : FGColors.borderSubtle, lineWidth: 1)
+        )
     }
 }
 

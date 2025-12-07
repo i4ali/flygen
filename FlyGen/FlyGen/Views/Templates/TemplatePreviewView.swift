@@ -10,7 +10,7 @@ struct TemplatePreviewView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 24) {
+                VStack(spacing: FGSpacing.xl) {
                     // Template preview card
                     templatePreviewCard
 
@@ -26,21 +26,23 @@ struct TemplatePreviewView: View {
                         dismiss()
                         onDismissParent()
                     } label: {
-                        HStack {
+                        HStack(spacing: FGSpacing.sm) {
                             Image(systemName: "doc.badge.plus")
                             Text("Use This Template")
                         }
-                        .font(.headline)
-                        .foregroundColor(.white)
+                        .font(FGTypography.buttonLarge)
+                        .foregroundColor(FGColors.textOnAccent)
                         .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.accentColor)
-                        .cornerRadius(12)
+                        .padding(.vertical, FGSpacing.md)
+                        .background(FGColors.accentPrimary)
+                        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+                        .shadow(color: FGColors.accentPrimary.opacity(0.4), radius: 12, y: 4)
                     }
-                    .padding(.top, 8)
+                    .padding(.top, FGSpacing.sm)
                 }
-                .padding()
+                .padding(FGSpacing.screenHorizontal)
             }
+            .background(FGColors.backgroundPrimary)
             .navigationTitle(template.name)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -48,6 +50,7 @@ struct TemplatePreviewView: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .foregroundColor(FGColors.accentPrimary)
                 }
             }
         }
@@ -65,53 +68,52 @@ struct TemplatePreviewView: View {
             )
 
             // Content preview
-            VStack(spacing: 12) {
+            VStack(spacing: FGSpacing.md) {
                 Image(systemName: template.category.icon)
                     .font(.system(size: 40))
 
                 Text(template.textContent.headline)
-                    .font(.title2)
-                    .fontWeight(.bold)
+                    .font(FGTypography.h2)
                     .multilineTextAlignment(.center)
 
                 if let subheadline = template.textContent.subheadline {
                     Text(subheadline)
-                        .font(.subheadline)
+                        .font(FGTypography.body)
                         .multilineTextAlignment(.center)
                 }
 
                 if let cta = template.textContent.ctaText {
                     Text(cta)
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
+                        .font(FGTypography.captionBold)
+                        .padding(.horizontal, FGSpacing.md)
+                        .padding(.vertical, FGSpacing.sm)
                         .background(Color.white.opacity(0.3))
-                        .cornerRadius(8)
-                        .padding(.top, 8)
+                        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.chipRadius))
+                        .padding(.top, FGSpacing.sm)
                 }
             }
-            .padding(24)
-            .foregroundColor(template.colors.backgroundType == .dark ? .white : .primary)
+            .padding(FGSpacing.xl)
+            .foregroundColor(template.colors.backgroundType == .dark ? .white : .black)
         }
         .frame(height: 280)
-        .cornerRadius(16)
-        .shadow(color: .black.opacity(0.15), radius: 8, y: 4)
+        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+        .shadow(color: FGColors.accentPrimary.opacity(0.2), radius: 12, y: 4)
     }
 
     // MARK: - Template Details
 
     private var templateDetails: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: FGSpacing.md) {
             Text("About This Template")
-                .font(.headline)
+                .font(FGTypography.h3)
+                .foregroundColor(FGColors.textPrimary)
 
             Text(template.previewDescription)
-                .font(.body)
-                .foregroundColor(.secondary)
+                .font(FGTypography.body)
+                .foregroundColor(FGColors.textSecondary)
 
             // Style badges
-            HStack(spacing: 12) {
+            HStack(spacing: FGSpacing.sm) {
                 StyleBadge(
                     icon: "paintpalette",
                     title: template.colors.preset.displayName
@@ -132,24 +134,29 @@ struct TemplatePreviewView: View {
     // MARK: - Placeholder Fields Section
 
     private var placeholderFieldsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: FGSpacing.sm) {
             Text("Fields to Customize")
-                .font(.headline)
+                .font(FGTypography.h4)
+                .foregroundColor(FGColors.textPrimary)
 
             Text("These fields are pre-filled with placeholder text. Replace them with your own content.")
-                .font(.caption)
-                .foregroundColor(.secondary)
+                .font(FGTypography.caption)
+                .foregroundColor(FGColors.textSecondary)
 
-            VStack(spacing: 8) {
+            VStack(spacing: FGSpacing.xs) {
                 ForEach(placeholderFields, id: \.label) { field in
                     PlaceholderFieldRow(label: field.label, value: field.value)
                 }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
+        .padding(FGSpacing.cardPadding)
+        .background(FGColors.backgroundElevated)
+        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+        .overlay(
+            RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
+                .stroke(FGColors.borderSubtle, lineWidth: 1)
+        )
     }
 
     // Extract placeholder fields from template
@@ -206,16 +213,17 @@ private struct StyleBadge: View {
     let title: String
 
     var body: some View {
-        HStack(spacing: 4) {
+        HStack(spacing: FGSpacing.xxs) {
             Image(systemName: icon)
                 .font(.caption2)
             Text(title)
-                .font(.caption)
+                .font(FGTypography.caption)
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
-        .background(Color(.systemGray5))
-        .cornerRadius(16)
+        .foregroundColor(FGColors.textSecondary)
+        .padding(.horizontal, FGSpacing.sm)
+        .padding(.vertical, FGSpacing.xs)
+        .background(FGColors.surfaceDefault)
+        .clipShape(Capsule())
     }
 }
 
@@ -228,13 +236,13 @@ private struct PlaceholderFieldRow: View {
     var body: some View {
         HStack {
             Text(label)
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+                .font(FGTypography.label)
+                .foregroundColor(FGColors.textSecondary)
                 .frame(width: 100, alignment: .leading)
 
             Text(value)
-                .font(.subheadline)
-                .foregroundColor(.primary)
+                .font(FGTypography.body)
+                .foregroundColor(FGColors.textPrimary)
                 .lineLimit(1)
 
             Spacer()

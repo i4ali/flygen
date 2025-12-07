@@ -67,6 +67,13 @@
 		F315B5B3E510D452B864EFA8 /* MoodStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A5464C24F5B8B13D097698 /* MoodStepView.swift */; };
 		F698469DE0F1EF731F03ACB7 /* QRCodeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BF8F3456115A7D92EB1F149 /* QRCodeService.swift */; };
 		F927960154E78DFB295870BA /* QRCodeStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD932742A9E1DC6131CEFEE /* QRCodeStepView.swift */; };
+		AA00000000000001 /* FGColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000001 /* FGColors.swift */; };
+		AA00000000000002 /* FGTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000002 /* FGTypography.swift */; };
+		AA00000000000003 /* FGSpacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000003 /* FGSpacing.swift */; };
+		AA00000000000004 /* FGGradients.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000004 /* FGGradients.swift */; };
+		AA00000000000005 /* FGAnimations.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000005 /* FGAnimations.swift */; };
+		AA00000000000006 /* FGTooltip.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000006 /* FGTooltip.swift */; };
+		AA00000000000008 /* FGButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000008 /* FGButtons.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -133,6 +140,13 @@
 		FB709BFEED3D9A7E60798343 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		FC1056727B410D483D6F9ADD /* OpenRouterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterService.swift; sourceTree = "<group>"; };
 		FCFDACA03D378A28BF9670D9 /* FlyerTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyerTemplate.swift; sourceTree = "<group>"; };
+		BB00000000000001 /* FGColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGColors.swift; sourceTree = "<group>"; };
+		BB00000000000002 /* FGTypography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGTypography.swift; sourceTree = "<group>"; };
+		BB00000000000003 /* FGSpacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGSpacing.swift; sourceTree = "<group>"; };
+		BB00000000000004 /* FGGradients.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGGradients.swift; sourceTree = "<group>"; };
+		BB00000000000005 /* FGAnimations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGAnimations.swift; sourceTree = "<group>"; };
+		BB00000000000006 /* FGTooltip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGTooltip.swift; sourceTree = "<group>"; };
+		BB00000000000008 /* FGButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGButtons.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -181,6 +195,7 @@
 				D9889B5D1274828936CDC9DA /* Models */,
 				40B235A7DF6FC723BA67FF11 /* Resources */,
 				DB7D251A6A98755E7864B64A /* Services */,
+				CC00000000000001 /* Theme */,
 				CDCCF619B69E81FA099D4AF7 /* ViewModels */,
 				71E5C35B572C53DB9D271188 /* Views */,
 			);
@@ -262,6 +277,8 @@
 			isa = PBXGroup;
 			children = (
 				12BBCEF15B2AF34A5A490D50 /* DynamicTextField.swift */,
+				BB00000000000008 /* FGButtons.swift */,
+				BB00000000000006 /* FGTooltip.swift */,
 				F6E4BF8C2207C43A1E6C895F /* SelectionCard.swift */,
 				456744D560C03FD857118347 /* StepProgressBar.swift */,
 			);
@@ -379,6 +396,18 @@
 				181849BBD35235AF52FED857 /* FlyGen.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		CC00000000000001 /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				BB00000000000001 /* FGColors.swift */,
+				BB00000000000002 /* FGTypography.swift */,
+				BB00000000000003 /* FGSpacing.swift */,
+				BB00000000000004 /* FGGradients.swift */,
+				BB00000000000005 /* FGAnimations.swift */,
+			);
+			path = Theme;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -510,6 +539,13 @@
 				64C32D608A4EFC6C72A370D6 /* VisualStyle.swift in Sources */,
 				7E5251F0DAF882D2A7170827 /* VisualStyleStepView.swift in Sources */,
 				EBFAD93E52119F13D747BE9D /* iCloudRequiredView.swift in Sources */,
+				AA00000000000001 /* FGColors.swift in Sources */,
+				AA00000000000002 /* FGTypography.swift in Sources */,
+				AA00000000000003 /* FGSpacing.swift in Sources */,
+				AA00000000000004 /* FGGradients.swift in Sources */,
+				AA00000000000005 /* FGAnimations.swift in Sources */,
+				AA00000000000006 /* FGTooltip.swift in Sources */,
+				AA00000000000008 /* FGButtons.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
