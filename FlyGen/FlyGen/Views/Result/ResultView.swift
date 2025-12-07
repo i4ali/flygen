@@ -13,7 +13,6 @@ struct ResultView: View {
     @State private var showingSaveSuccess = false
     @State private var saveError: String?
     @State private var hasSavedToGallery = false
-    @State private var hasDeductedCredit = false
 
     var body: some View {
         NavigationStack {
@@ -172,15 +171,9 @@ struct ResultView: View {
             .sheet(isPresented: $showingReformatSheet) {
                 ReformatSheet(viewModel: viewModel, apiKey: apiKey)
             }
-            .onChange(of: viewModel.generationState) { oldState, newState in
-                // Deduct credit immediately when generation succeeds
-                if case .success = newState, !hasDeductedCredit {
-                    deductCredit()
-                }
-            }
             .onAppear {
-                // Also check on appear in case generation already succeeded
-                if case .success = viewModel.generationState, !hasDeductedCredit {
+                // Wire up credit deduction callback - called after each successful API call
+                viewModel.onCreditDeduction = { [self] in
                     deductCredit()
                 }
             }
@@ -188,11 +181,8 @@ struct ResultView: View {
     }
 
     private func deductCredit() {
-        guard !hasDeductedCredit else { return }
-
         if let profile = userProfiles.first, profile.credits > 0 {
             profile.credits -= 1
-            hasDeductedCredit = true
             try? modelContext.save()
             print("Credit deducted. Remaining credits: \(profile.credits)")
         }

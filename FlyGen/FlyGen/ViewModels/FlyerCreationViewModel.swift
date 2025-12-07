@@ -88,6 +88,11 @@ class FlyerCreationViewModel: ObservableObject {
     // Logo picker
     @Published var selectedLogoItem: PhotosPickerItem?
 
+    // MARK: - Credit Management
+
+    /// Callback triggered after each successful API call to deduct a credit
+    var onCreditDeduction: (() -> Void)?
+
     // MARK: - Services
 
     private let openRouterService = OpenRouterService()
@@ -204,6 +209,9 @@ class FlyerCreationViewModel: ObservableObject {
             generatedImageData = finalImageData
             generationState = .success(finalImage)
 
+            // Deduct credit for successful generation
+            onCreditDeduction?()
+
             // Create GeneratedFlyer for saving to gallery
             generatedFlyer = GeneratedFlyer(
                 projectId: project.id,
@@ -243,6 +251,9 @@ class FlyerCreationViewModel: ObservableObject {
             generatedImageData = result.imageData
             generationState = .success(result.image)
 
+            // Deduct credit for successful refinement
+            onCreditDeduction?()
+
             // Update GeneratedFlyer
             if let projectId = project?.id {
                 generatedFlyer = GeneratedFlyer(
@@ -276,6 +287,9 @@ class FlyerCreationViewModel: ObservableObject {
             project?.output.aspectRatio = newRatio
             generatedImageData = result.imageData
             generationState = .success(result.image)
+
+            // Deduct credit for successful reformat
+            onCreditDeduction?()
 
             // Update GeneratedFlyer
             if let projectId = project?.id {
