@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 63;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -33,6 +33,24 @@
 		7FEF504FA9A80B345EEA6AF1 /* SelectionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6E4BF8C2207C43A1E6C895F /* SelectionCard.swift */; };
 		85E0287D14A5A7FF9C00D9EF /* ImageryType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B19FB9D5DD3973FDEA7EABC /* ImageryType.swift */; };
 		8B9444F119058A6009D3D5A0 /* ResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD83E70692A589F8678D5A0D /* ResultView.swift */; };
+		8BE98D1E2EE5FA3A005A4DC3 /* workflow-styles.json in Resources */ = {isa = PBXBuildFile; fileRef = 8BE98D1C2EE5FA3A005A4DC3 /* workflow-styles.json */; };
+		8BE98D1F2EE5FA3A005A4DC3 /* workflow-categories.json in Resources */ = {isa = PBXBuildFile; fileRef = 8BE98D1B2EE5FA3A005A4DC3 /* workflow-categories.json */; };
+		8BE98D202EE5FA3A005A4DC3 /* ai-generation-magic.json in Resources */ = {isa = PBXBuildFile; fileRef = 8BE98D192EE5FA3A005A4DC3 /* ai-generation-magic.json */; };
+		8BE98D212EE5FA3A005A4DC3 /* welcome-flyer.json in Resources */ = {isa = PBXBuildFile; fileRef = 8BE98D1A2EE5FA3A005A4DC3 /* welcome-flyer.json */; };
+		8BE98D222EE5FA3A005A4DC3 /* onboarding-category.json in Resources */ = {isa = PBXBuildFile; fileRef = 8BE98D232EE5FA3A005A4DC3 /* onboarding-category.json */; };
+		8BE98D242EE5FA3A005A4DC3 /* onboarding-text.json in Resources */ = {isa = PBXBuildFile; fileRef = 8BE98D252EE5FA3A005A4DC3 /* onboarding-text.json */; };
+		8BE98D262EE5FA3A005A4DC3 /* onboarding-logo.json in Resources */ = {isa = PBXBuildFile; fileRef = 8BE98D272EE5FA3A005A4DC3 /* onboarding-logo.json */; };
+		8BE98D282EE5FA3A005A4DC3 /* onboarding-qrcode.json in Resources */ = {isa = PBXBuildFile; fileRef = 8BE98D292EE5FA3A005A4DC3 /* onboarding-qrcode.json */; };
+		8BE98D2A2EE5FA3A005A4DC3 /* onboarding-colors.json in Resources */ = {isa = PBXBuildFile; fileRef = 8BE98D2B2EE5FA3A005A4DC3 /* onboarding-colors.json */; };
+		8BE98D2C2EE5FA3A005A4DC3 /* onboarding-ready.json in Resources */ = {isa = PBXBuildFile; fileRef = 8BE98D2D2EE5FA3A005A4DC3 /* onboarding-ready.json */; };
+		8BF224B82EE5FE9700E8776A /* AIGenerationScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF224B42EE5FE9700E8776A /* AIGenerationScreen.swift */; };
+		8BF224B92EE5FE9700E8776A /* InteractiveOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF224B32EE5FE9700E8776A /* InteractiveOnboardingView.swift */; };
+		8BF224BA2EE5FE9700E8776A /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF224B12EE5FE9700E8776A /* OnboardingViewModel.swift */; };
+		8BF224BB2EE5FE9700E8776A /* MockSelectionChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF224AF2EE5FE9700E8776A /* MockSelectionChip.swift */; };
+		8BF224BC2EE5FE9700E8776A /* WorkflowDemoScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF224B62EE5FE9700E8776A /* WorkflowDemoScreen.swift */; };
+		8BF224BD2EE5FE9700E8776A /* LottieAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF224AE2EE5FE9700E8776A /* LottieAnimationView.swift */; };
+		8BF224BE2EE5FE9700E8776A /* OnboardingProgressIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF224B02EE5FE9700E8776A /* OnboardingProgressIndicator.swift */; };
+		8BF224BF2EE5FE9700E8776A /* WelcomeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF224B52EE5FE9700E8776A /* WelcomeScreen.swift */; };
 		8EAC2A0DC868190AA6F1A97B /* TextContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4E86A123D7FDBB3C7C8AAEF /* TextContent.swift */; };
 		9288B11FBCD6606AF08CDECC /* ColorsStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802D02689D38132C24042AFA /* ColorsStepView.swift */; };
 		95D0F8F627BD2D5768EFA97F /* StoreKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A127BBD1A88D83A876C6249C /* StoreKitService.swift */; };
@@ -41,6 +59,13 @@
 		9FC6E6C9D0FF652459D20F78 /* PromptDescriptors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FA816BFB754005DF233AD04 /* PromptDescriptors.swift */; };
 		A5629E3E2DD610E4FB277467 /* CategoryConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A59507810937320A7BE5896 /* CategoryConfiguration.swift */; };
 		A94C20959D4B1E18DE3859D7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A94669CCDA2F09E03E777709 /* Assets.xcassets */; };
+		AA00000000000001 /* FGColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000001 /* FGColors.swift */; };
+		AA00000000000002 /* FGTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000002 /* FGTypography.swift */; };
+		AA00000000000003 /* FGSpacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000003 /* FGSpacing.swift */; };
+		AA00000000000004 /* FGGradients.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000004 /* FGGradients.swift */; };
+		AA00000000000005 /* FGAnimations.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000005 /* FGAnimations.swift */; };
+		AA00000000000006 /* FGTooltip.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000006 /* FGTooltip.swift */; };
+		AA00000000000008 /* FGButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000008 /* FGButtons.swift */; };
 		AA81BC3EDC68F5F40B236E37 /* TextProminence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F62F08E46FF0DE6F50F5350 /* TextProminence.swift */; };
 		AF0E0F3ACA691B8747193C62 /* TextContentStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB04130801C20BE11F94D733 /* TextContentStepView.swift */; };
 		AF18214E835F054B9D8F49AE /* ColorSchemePreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B3C4ECDD1E3D317F67F2CE0 /* ColorSchemePreset.swift */; };
@@ -67,13 +92,6 @@
 		F315B5B3E510D452B864EFA8 /* MoodStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A5464C24F5B8B13D097698 /* MoodStepView.swift */; };
 		F698469DE0F1EF731F03ACB7 /* QRCodeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BF8F3456115A7D92EB1F149 /* QRCodeService.swift */; };
 		F927960154E78DFB295870BA /* QRCodeStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD932742A9E1DC6131CEFEE /* QRCodeStepView.swift */; };
-		AA00000000000001 /* FGColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000001 /* FGColors.swift */; };
-		AA00000000000002 /* FGTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000002 /* FGTypography.swift */; };
-		AA00000000000003 /* FGSpacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000003 /* FGSpacing.swift */; };
-		AA00000000000004 /* FGGradients.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000004 /* FGGradients.swift */; };
-		AA00000000000005 /* FGAnimations.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000005 /* FGAnimations.swift */; };
-		AA00000000000006 /* FGTooltip.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000006 /* FGTooltip.swift */; };
-		AA00000000000008 /* FGButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000008 /* FGButtons.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -82,10 +100,10 @@
 		0B3C4ECDD1E3D317F67F2CE0 /* ColorSchemePreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorSchemePreset.swift; sourceTree = "<group>"; };
 		0B4EB3FF702C55572A1A3DA0 /* TemplateLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateLibrary.swift; sourceTree = "<group>"; };
 		0BF8F3456115A7D92EB1F149 /* QRCodeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeService.swift; sourceTree = "<group>"; };
-		0D3E46940C3FF0B96D5406A0 /* FlyGenProducts.storekit */ = {isa = PBXFileReference; path = FlyGenProducts.storekit; sourceTree = "<group>"; };
+		0D3E46940C3FF0B96D5406A0 /* FlyGenProducts.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = FlyGenProducts.storekit; sourceTree = "<group>"; };
 		10FCE45EBD805D38DC2CB792 /* TemplatePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplatePreviewView.swift; sourceTree = "<group>"; };
 		12BBCEF15B2AF34A5A490D50 /* DynamicTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicTextField.swift; sourceTree = "<group>"; };
-		181849BBD35235AF52FED857 /* FlyGen.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = FlyGen.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		181849BBD35235AF52FED857 /* FlyGen.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlyGen.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		184D25D42BAC7CE7B252BF86 /* iCloudRequiredView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iCloudRequiredView.swift; sourceTree = "<group>"; };
 		1FA816BFB754005DF233AD04 /* PromptDescriptors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptDescriptors.swift; sourceTree = "<group>"; };
 		22AD3ED9139C2DCCA31C6A01 /* VisualSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualSettings.swift; sourceTree = "<group>"; };
@@ -111,6 +129,24 @@
 		827EC63DDC6A4957895A8B11 /* QRCodeSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeSettings.swift; sourceTree = "<group>"; };
 		898F624DFE2689054E2A708A /* FlyerCreationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyerCreationViewModel.swift; sourceTree = "<group>"; };
 		8B634CC343D768DCA67B127B /* TemplatePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplatePickerView.swift; sourceTree = "<group>"; };
+		8BE98D192EE5FA3A005A4DC3 /* ai-generation-magic.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "ai-generation-magic.json"; sourceTree = "<group>"; };
+		8BE98D1A2EE5FA3A005A4DC3 /* welcome-flyer.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "welcome-flyer.json"; sourceTree = "<group>"; };
+		8BE98D1B2EE5FA3A005A4DC3 /* workflow-categories.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "workflow-categories.json"; sourceTree = "<group>"; };
+		8BE98D1C2EE5FA3A005A4DC3 /* workflow-styles.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "workflow-styles.json"; sourceTree = "<group>"; };
+		8BE98D232EE5FA3A005A4DC3 /* onboarding-category.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "onboarding-category.json"; sourceTree = "<group>"; };
+		8BE98D252EE5FA3A005A4DC3 /* onboarding-text.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "onboarding-text.json"; sourceTree = "<group>"; };
+		8BE98D272EE5FA3A005A4DC3 /* onboarding-logo.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "onboarding-logo.json"; sourceTree = "<group>"; };
+		8BE98D292EE5FA3A005A4DC3 /* onboarding-qrcode.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "onboarding-qrcode.json"; sourceTree = "<group>"; };
+		8BE98D2B2EE5FA3A005A4DC3 /* onboarding-colors.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "onboarding-colors.json"; sourceTree = "<group>"; };
+		8BE98D2D2EE5FA3A005A4DC3 /* onboarding-ready.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "onboarding-ready.json"; sourceTree = "<group>"; };
+		8BF224AE2EE5FE9700E8776A /* LottieAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottieAnimationView.swift; sourceTree = "<group>"; };
+		8BF224AF2EE5FE9700E8776A /* MockSelectionChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSelectionChip.swift; sourceTree = "<group>"; };
+		8BF224B02EE5FE9700E8776A /* OnboardingProgressIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingProgressIndicator.swift; sourceTree = "<group>"; };
+		8BF224B12EE5FE9700E8776A /* OnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewModel.swift; sourceTree = "<group>"; };
+		8BF224B32EE5FE9700E8776A /* InteractiveOnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveOnboardingView.swift; sourceTree = "<group>"; };
+		8BF224B42EE5FE9700E8776A /* AIGenerationScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIGenerationScreen.swift; sourceTree = "<group>"; };
+		8BF224B52EE5FE9700E8776A /* WelcomeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeScreen.swift; sourceTree = "<group>"; };
+		8BF224B62EE5FE9700E8776A /* WorkflowDemoScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowDemoScreen.swift; sourceTree = "<group>"; };
 		8CE5F8A345997A42000089FD /* BackgroundType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundType.swift; sourceTree = "<group>"; };
 		8D909C2791FE2A8700E30AA4 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		91F81AFF070A145CF531597E /* ColorSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorSettings.swift; sourceTree = "<group>"; };
@@ -124,6 +160,13 @@
 		A94669CCDA2F09E03E777709 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		ABD932742A9E1DC6131CEFEE /* QRCodeStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeStepView.swift; sourceTree = "<group>"; };
 		BAF6F1696F9CC685DEFECA3D /* VisualStyleStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualStyleStepView.swift; sourceTree = "<group>"; };
+		BB00000000000001 /* FGColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGColors.swift; sourceTree = "<group>"; };
+		BB00000000000002 /* FGTypography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGTypography.swift; sourceTree = "<group>"; };
+		BB00000000000003 /* FGSpacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGSpacing.swift; sourceTree = "<group>"; };
+		BB00000000000004 /* FGGradients.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGGradients.swift; sourceTree = "<group>"; };
+		BB00000000000005 /* FGAnimations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGAnimations.swift; sourceTree = "<group>"; };
+		BB00000000000006 /* FGTooltip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGTooltip.swift; sourceTree = "<group>"; };
+		BB00000000000008 /* FGButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGButtons.swift; sourceTree = "<group>"; };
 		BD83E70692A589F8678D5A0D /* ResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultView.swift; sourceTree = "<group>"; };
 		BF2FFDC8FE9FB5A25AA9DC55 /* RefinementBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefinementBuilder.swift; sourceTree = "<group>"; };
 		C751A204A7CDA258A17B6A21 /* ReviewStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewStepView.swift; sourceTree = "<group>"; };
@@ -140,19 +183,25 @@
 		FB709BFEED3D9A7E60798343 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		FC1056727B410D483D6F9ADD /* OpenRouterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterService.swift; sourceTree = "<group>"; };
 		FCFDACA03D378A28BF9670D9 /* FlyerTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyerTemplate.swift; sourceTree = "<group>"; };
-		BB00000000000001 /* FGColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGColors.swift; sourceTree = "<group>"; };
-		BB00000000000002 /* FGTypography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGTypography.swift; sourceTree = "<group>"; };
-		BB00000000000003 /* FGSpacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGSpacing.swift; sourceTree = "<group>"; };
-		BB00000000000004 /* FGGradients.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGGradients.swift; sourceTree = "<group>"; };
-		BB00000000000005 /* FGAnimations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGAnimations.swift; sourceTree = "<group>"; };
-		BB00000000000006 /* FGTooltip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGTooltip.swift; sourceTree = "<group>"; };
-		BB00000000000008 /* FGButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGButtons.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8B31641E2EE5FD0000996E8A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		049AA4220C8F3787C3DDF5E0 /* Onboarding */ = {
 			isa = PBXGroup;
 			children = (
+				8BF224B22EE5FE9700E8776A /* Components */,
+				8BF224B32EE5FE9700E8776A /* InteractiveOnboardingView.swift */,
+				8BF224B72EE5FE9700E8776A /* Screens */,
 				A5BF0DFD9D644CED8D1DC591 /* OnboardingContainerView.swift */,
 			);
 			path = Onboarding;
@@ -231,6 +280,7 @@
 		40B235A7DF6FC723BA67FF11 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				8BE98D1D2EE5FA3A005A4DC3 /* Animations 2 */,
 				A94669CCDA2F09E03E777709 /* Assets.xcassets */,
 				0D3E46940C3FF0B96D5406A0 /* FlyGenProducts.storekit */,
 			);
@@ -260,6 +310,44 @@
 				DA9DFA3FF6290234875BE285 /* Templates */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		8BE98D1D2EE5FA3A005A4DC3 /* Animations */ = {
+			isa = PBXGroup;
+			children = (
+				8BE98D192EE5FA3A005A4DC3 /* ai-generation-magic.json */,
+				8BE98D232EE5FA3A005A4DC3 /* onboarding-category.json */,
+				8BE98D2B2EE5FA3A005A4DC3 /* onboarding-colors.json */,
+				8BE98D272EE5FA3A005A4DC3 /* onboarding-logo.json */,
+				8BE98D292EE5FA3A005A4DC3 /* onboarding-qrcode.json */,
+				8BE98D2D2EE5FA3A005A4DC3 /* onboarding-ready.json */,
+				8BE98D252EE5FA3A005A4DC3 /* onboarding-text.json */,
+				8BE98D1A2EE5FA3A005A4DC3 /* welcome-flyer.json */,
+				8BE98D1B2EE5FA3A005A4DC3 /* workflow-categories.json */,
+				8BE98D1C2EE5FA3A005A4DC3 /* workflow-styles.json */,
+			);
+			path = Animations;
+			sourceTree = "<group>";
+		};
+		8BF224B22EE5FE9700E8776A /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				8BF224AE2EE5FE9700E8776A /* LottieAnimationView.swift */,
+				8BF224AF2EE5FE9700E8776A /* MockSelectionChip.swift */,
+				8BF224B02EE5FE9700E8776A /* OnboardingProgressIndicator.swift */,
+				8BF224B12EE5FE9700E8776A /* OnboardingViewModel.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		8BF224B72EE5FE9700E8776A /* Screens */ = {
+			isa = PBXGroup;
+			children = (
+				8BF224B42EE5FE9700E8776A /* AIGenerationScreen.swift */,
+				8BF224B52EE5FE9700E8776A /* WelcomeScreen.swift */,
+				8BF224B62EE5FE9700E8776A /* WorkflowDemoScreen.swift */,
+			);
+			path = Screens;
 			sourceTree = "<group>";
 		};
 		91598030DADD7061BC0F47D8 /* Tabs */ = {
@@ -308,6 +396,18 @@
 				64F969BABBE5624EFD6A441E /* FlyGenApp.swift */,
 			);
 			path = App;
+			sourceTree = "<group>";
+		};
+		CC00000000000001 /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				BB00000000000001 /* FGColors.swift */,
+				BB00000000000002 /* FGTypography.swift */,
+				BB00000000000003 /* FGSpacing.swift */,
+				BB00000000000004 /* FGGradients.swift */,
+				BB00000000000005 /* FGAnimations.swift */,
+			);
+			path = Theme;
 			sourceTree = "<group>";
 		};
 		CDCCF619B69E81FA099D4AF7 /* ViewModels */ = {
@@ -398,18 +498,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		CC00000000000001 /* Theme */ = {
-			isa = PBXGroup;
-			children = (
-				BB00000000000001 /* FGColors.swift */,
-				BB00000000000002 /* FGTypography.swift */,
-				BB00000000000003 /* FGSpacing.swift */,
-				BB00000000000004 /* FGGradients.swift */,
-				BB00000000000005 /* FGAnimations.swift */,
-			);
-			path = Theme;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -418,6 +506,7 @@
 			buildConfigurationList = D1E8A9682B8FAB3784CE191F /* Build configuration list for PBXNativeTarget "FlyGen" */;
 			buildPhases = (
 				DECB6972F933D230AC6D2BCF /* Sources */,
+				8B31641E2EE5FD0000996E8A /* Frameworks */,
 				74A44A3591A94CD0FC197204 /* Resources */,
 			);
 			buildRules = (
@@ -426,6 +515,7 @@
 			);
 			name = FlyGen;
 			packageProductDependencies = (
+				8B31641C2EE5FCF300996E8A /* Lottie */,
 			);
 			productName = FlyGen;
 			productReference = 181849BBD35235AF52FED857 /* FlyGen.app */;
@@ -439,11 +529,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1500;
-				TargetAttributes = {
-					4B5E0270EBC0A6389813315B = {
-						DevelopmentTeam = "";
-					};
-				};
 			};
 			buildConfigurationList = C6788FC10FBFC33B6345EFC3 /* Build configuration list for PBXProject "FlyGen" */;
 			compatibilityVersion = "Xcode 14.0";
@@ -455,7 +540,9 @@
 			);
 			mainGroup = 4E2D5534FBA07A8ED01D9808;
 			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 77;
+			packageReferences = (
+				8B31641B2EE5FCF300996E8A /* XCRemoteSwiftPackageReference "lottie-ios" */,
+			);
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -470,6 +557,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				A94C20959D4B1E18DE3859D7 /* Assets.xcassets in Resources */,
+				8BE98D1E2EE5FA3A005A4DC3 /* workflow-styles.json in Resources */,
+				8BE98D1F2EE5FA3A005A4DC3 /* workflow-categories.json in Resources */,
+				8BE98D202EE5FA3A005A4DC3 /* ai-generation-magic.json in Resources */,
+				8BE98D212EE5FA3A005A4DC3 /* welcome-flyer.json in Resources */,
+				8BE98D222EE5FA3A005A4DC3 /* onboarding-category.json in Resources */,
+				8BE98D242EE5FA3A005A4DC3 /* onboarding-text.json in Resources */,
+				8BE98D262EE5FA3A005A4DC3 /* onboarding-logo.json in Resources */,
+				8BE98D282EE5FA3A005A4DC3 /* onboarding-qrcode.json in Resources */,
+				8BE98D2A2EE5FA3A005A4DC3 /* onboarding-colors.json in Resources */,
+				8BE98D2C2EE5FA3A005A4DC3 /* onboarding-ready.json in Resources */,
 				99A104086420FCC441766ECB /* FlyGenProducts.storekit in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -485,6 +582,14 @@
 				51A412CAA71CCC99E9905560 /* BackgroundType.swift in Sources */,
 				A5629E3E2DD610E4FB277467 /* CategoryConfiguration.swift in Sources */,
 				AF8A46FDD739A68963EAE7EE /* CategoryStepView.swift in Sources */,
+				8BF224B82EE5FE9700E8776A /* AIGenerationScreen.swift in Sources */,
+				8BF224B92EE5FE9700E8776A /* InteractiveOnboardingView.swift in Sources */,
+				8BF224BA2EE5FE9700E8776A /* OnboardingViewModel.swift in Sources */,
+				8BF224BB2EE5FE9700E8776A /* MockSelectionChip.swift in Sources */,
+				8BF224BC2EE5FE9700E8776A /* WorkflowDemoScreen.swift in Sources */,
+				8BF224BD2EE5FE9700E8776A /* LottieAnimationView.swift in Sources */,
+				8BF224BE2EE5FE9700E8776A /* OnboardingProgressIndicator.swift in Sources */,
+				8BF224BF2EE5FE9700E8776A /* WelcomeScreen.swift in Sources */,
 				D958E07702A0C8EE2FE7C9F1 /* CloudKitService.swift in Sources */,
 				277B13203FA5FBD8FC6CA8CB /* Color+Hex.swift in Sources */,
 				AF18214E835F054B9D8F49AE /* ColorSchemePreset.swift in Sources */,
@@ -559,6 +664,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = FlyGen/FlyGen.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 2J2GCJ25MK;
 				INFOPLIST_FILE = FlyGen/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -578,6 +684,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = FlyGen/FlyGen.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 2J2GCJ25MK;
 				INFOPLIST_FILE = FlyGen/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -733,6 +840,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		8B31641B2EE5FCF300996E8A /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8B31641C2EE5FCF300996E8A /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8B31641B2EE5FCF300996E8A /* XCRemoteSwiftPackageReference "lottie-ios" */;
+			productName = Lottie;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = C7D4720515CD4E13086217E0 /* Project object */;
 }
