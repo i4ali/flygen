@@ -2,11 +2,16 @@ import SwiftUI
 import SwiftData
 
 struct ProfileTab: View {
+    @EnvironmentObject var cloudKitService: CloudKitService
     @Environment(\.modelContext) private var modelContext
     @Query private var savedFlyers: [SavedFlyer]
-    @AppStorage("userCredits") private var credits: Int = 3
+    @Query private var userProfiles: [UserProfile]
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = true
     @State private var showingSettings = false
+
+    private var credits: Int {
+        userProfiles.first?.credits ?? 3
+    }
 
     var body: some View {
         NavigationStack {
@@ -19,13 +24,17 @@ struct ProfileTab: View {
                             .foregroundColor(.accentColor)
 
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Guest User")
+                            Text("iCloud User")
                                 .font(.title3)
                                 .fontWeight(.semibold)
 
-                            Text("Sign in to sync your flyers")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                            HStack(spacing: 4) {
+                                Image(systemName: "checkmark.icloud.fill")
+                                    .foregroundColor(.green)
+                                Text("Synced with iCloud")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
                         }
                     }
                     .padding(.vertical, 8)
@@ -37,18 +46,22 @@ struct ProfileTab: View {
                     StatRow(icon: "sparkles", title: "Credits Remaining", value: "\(credits)")
                 }
 
-                // Account section
-                Section("Account") {
-                    Button {
-                        // Coming soon
-                    } label: {
-                        Label("Sign In", systemImage: "person.badge.plus")
+                // iCloud section
+                Section("iCloud") {
+                    HStack {
+                        Label("Sync Status", systemImage: "icloud")
+                        Spacer()
+                        Text(cloudKitService.isSignedIn ? "Connected" : "Not Connected")
+                            .foregroundColor(cloudKitService.isSignedIn ? .green : .red)
                     }
 
-                    Button {
-                        // Coming soon
-                    } label: {
-                        Label("Create Account", systemImage: "person.crop.circle.badge.plus")
+                    if let lastSync = userProfiles.first?.lastSyncedAt {
+                        HStack {
+                            Label("Last Synced", systemImage: "clock")
+                            Spacer()
+                            Text(lastSync, style: .relative)
+                                .foregroundColor(.secondary)
+                        }
                     }
                 }
 
@@ -81,17 +94,17 @@ struct ProfileTab: View {
                     }
                 }
 
-                // Coming Soon section
+                // Credit Packs section (Coming Soon)
                 Section {
                     VStack(spacing: 12) {
-                        Image(systemName: "person.crop.circle.badge.clock")
+                        Image(systemName: "sparkles")
                             .font(.largeTitle)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.yellow)
 
-                        Text("Full Profile Coming Soon")
+                        Text("Credit Packs Coming Soon")
                             .font(.headline)
 
-                        Text("Account management, cloud sync, and more features will be available in a future update.")
+                        Text("Purchase additional credits to create more flyers. Available in a future update.")
                             .font(.caption)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
@@ -126,4 +139,5 @@ struct StatRow: View {
 
 #Preview {
     ProfileTab()
+        .environmentObject(CloudKitService())
 }

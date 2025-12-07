@@ -23,3 +23,12 @@ targets:
       ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
       TARGETED_DEVICE_FAMILY: "1"
       SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: false
+      CODE_SIGN_ENTITLEMENTS: FlyGen/FlyGen.entitlements
+    entitlements:
+      path: FlyGen/FlyGen.entitlements
+      properties:
+        aps-environment: development
+        com.apple.developer.icloud-container-identifiers:
+          - iCloud.com.flygen.app
+        com.apple.developer.icloud-services:
+          - CloudKit

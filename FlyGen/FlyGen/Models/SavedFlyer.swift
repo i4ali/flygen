@@ -3,13 +3,18 @@ import SwiftData
 
 @Model
 final class SavedFlyer {
-    var id: UUID
-    var projectData: Data  // Encoded FlyerProject
-    var imageData: Data?   // Generated image
-    var prompt: String
-    var model: String
-    var createdAt: Date
-    var updatedAt: Date
+    // CloudKit requires default values for all non-optional properties
+    var id: UUID = UUID()
+    var projectData: Data = Data()  // Encoded FlyerProject
+    @Attribute(.externalStorage) var imageData: Data?  // Generated image - stored externally for large files
+    var prompt: String = ""
+    var model: String = ""
+    var createdAt: Date = Date()
+    var updatedAt: Date = Date()
+
+    init() {
+        // Default initializer required for CloudKit
+    }
 
     init(project: FlyerProject, generatedFlyer: GeneratedFlyer) {
         self.id = UUID()

@@ -3,6 +3,24 @@ import SwiftData
 
 @main
 struct FlyGenApp: App {
+    @StateObject private var cloudKitService = CloudKitService()
+
+    private static let iCloudContainerIdentifier = "iCloud.com.flygen.app"
+
+    var sharedModelContainer: ModelContainer = {
+        let schema = Schema([SavedFlyer.self, UserProfile.self])
+        let modelConfiguration = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: false,
+            cloudKitDatabase: .private(FlyGenApp.iCloudContainerIdentifier)
+        )
+
+        do {
+            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+        } catch {
+            fatalError("Could not create ModelContainer: \(error)")
+        }
+    }()
 
     init() {
         // Set default API key if not already configured
@@ -14,7 +32,8 @@ struct FlyGenApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(cloudKitService)
         }
-        .modelContainer(for: SavedFlyer.self)
+        .modelContainer(sharedModelContainer)
     }
 }

@@ -6,7 +6,7 @@ struct ResultView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @AppStorage("openrouter_api_key") private var apiKey: String = ""
-    @AppStorage("userCredits") private var credits: Int = 3
+    @Query private var userProfiles: [UserProfile]
 
     @State private var showingRefinementSheet = false
     @State private var showingReformatSheet = false
@@ -195,8 +195,9 @@ struct ResultView: View {
             hasSavedToGallery = true
 
             // Deduct a credit after successful generation
-            if credits > 0 {
-                credits -= 1
+            if let profile = userProfiles.first, profile.credits > 0 {
+                profile.credits -= 1
+                try? modelContext.save()
             }
         } catch {
             print("Failed to save flyer to gallery: \(error)")

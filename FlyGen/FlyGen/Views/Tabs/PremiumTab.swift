@@ -1,7 +1,12 @@
 import SwiftUI
+import SwiftData
 
 struct PremiumTab: View {
-    @AppStorage("userCredits") private var credits: Int = 3
+    @Query private var userProfiles: [UserProfile]
+
+    private var credits: Int {
+        userProfiles.first?.credits ?? 3
+    }
 
     var body: some View {
         NavigationStack {

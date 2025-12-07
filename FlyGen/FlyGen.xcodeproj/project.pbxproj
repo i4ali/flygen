@@ -3,26 +3,25 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		000000000001 /* SavedFlyer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000011 /* SavedFlyer.swift */; };
-		000000000002 /* HomeTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000012 /* HomeTab.swift */; };
-		000000000003 /* GalleryTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000013 /* GalleryTab.swift */; };
-		000000000004 /* PremiumTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000014 /* PremiumTab.swift */; };
-		000000000005 /* ProfileTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000015 /* ProfileTab.swift */; };
-		000000000006 /* OnboardingContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000016 /* OnboardingContainerView.swift */; };
 		018C2423C0C86CE01329D1C1 /* PhotoLibraryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C61A47D28D08C6960017130 /* PhotoLibraryService.swift */; };
+		02C7FBC355F6A0B6897904C8 /* ProfileTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92EF130D6F0181711C3C8D15 /* ProfileTab.swift */; };
 		05236A51D1AADA5B81A322C2 /* NegativePrompts.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5F0A68F65B4BF9A1CFA475A /* NegativePrompts.swift */; };
 		0A5F72F3A177D8151F5B70D0 /* ExtrasStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2585C5073F35A6470775B3 /* ExtrasStepView.swift */; };
 		162CEFDA5FFBDD64CAE60392 /* ColorSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F81AFF070A145CF531597E /* ColorSettings.swift */; };
 		1FA1B5762E86758C83CEF517 /* OpenRouterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC1056727B410D483D6F9ADD /* OpenRouterService.swift */; };
 		216C56E6B218DA5C1BF072D8 /* RefinementBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF2FFDC8FE9FB5A25AA9DC55 /* RefinementBuilder.swift */; };
+		23489EA620ACBFB14235A1C4 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB709BFEED3D9A7E60798343 /* UserProfile.swift */; };
 		277B13203FA5FBD8FC6CA8CB /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 730206EB978BE7E39383D4E7 /* Color+Hex.swift */; };
 		3B94A4B396C8D3435B1B7036 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B77BF34CD3B703956CC91DE /* SettingsView.swift */; };
+		41536973C193B227050DE9A3 /* HomeTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28384D20DBD9AA54F572AFFC /* HomeTab.swift */; };
+		41BE920C852DE35AC9785A08 /* PremiumTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = E666E785FFCE08EFA46A79E7 /* PremiumTab.swift */; };
 		449D883F219ADF7D2890DD16 /* PromptBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9579E2430EA7DEC2FA8D87BF /* PromptBuilder.swift */; };
 		51A412CAA71CCC99E9905560 /* BackgroundType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CE5F8A345997A42000089FD /* BackgroundType.swift */; };
+		583C195202B2E418A93257F1 /* GalleryTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 406E392633E0FE2FA6DCA496 /* GalleryTab.swift */; };
 		5FB2D7F993C41590103B4627 /* FlyerCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02FE6F65315FE96A35C34223 /* FlyerCategory.swift */; };
 		64C32D608A4EFC6C72A370D6 /* VisualStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68824529B837896DBABCE0F2 /* VisualStyle.swift */; };
 		6576A29683D25BA73B38F93B /* RefinementSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB654DCA88FF679FBEFB358 /* RefinementSheet.swift */; };
@@ -49,30 +48,31 @@
 		C3BBCCD7150492B2AC6789A0 /* CreationFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A766390A874ED2612B3679 /* CreationFlowView.swift */; };
 		CFBB57982774AF66F39B14FB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1031905BEC715F64F5957DC /* ContentView.swift */; };
 		D2C34BB266AFC53E448E7757 /* VisualSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22AD3ED9139C2DCCA31C6A01 /* VisualSettings.swift */; };
+		D958E07702A0C8EE2FE7C9F1 /* CloudKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77094514BDAD21090480D3A /* CloudKitService.swift */; };
+		D9C9D5796C668A7410E36E2D /* SavedFlyer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CD1653EE523C3DC3B07690 /* SavedFlyer.swift */; };
 		DFE68A36258F14EC52666634 /* Mood.swift in Sources */ = {isa = PBXBuildFile; fileRef = 340B5206B7FAD148FFC4FA90 /* Mood.swift */; };
 		E447D3471E42E86CC0D53039 /* StepProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 456744D560C03FD857118347 /* StepProgressBar.swift */; };
 		E8CA330BA5E4268BC3E03BA4 /* AspectRatio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C085DEEA61D0B6B26BA0AEF /* AspectRatio.swift */; };
+		EBFAD93E52119F13D747BE9D /* iCloudRequiredView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184D25D42BAC7CE7B252BF86 /* iCloudRequiredView.swift */; };
 		EC20C5F38B04D32B74B3626E /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D909C2791FE2A8700E30AA4 /* HomeView.swift */; };
+		ED0F296CFA04BC4D351C95DE /* OnboardingContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5BF0DFD9D644CED8D1DC591 /* OnboardingContainerView.swift */; };
 		F0EFFA9DAEAE066B03059A00 /* OutputSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7753024C905464D110F059D5 /* OutputSettings.swift */; };
 		F315B5B3E510D452B864EFA8 /* MoodStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A5464C24F5B8B13D097698 /* MoodStepView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		000000000011 /* SavedFlyer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedFlyer.swift; sourceTree = "<group>"; };
-		000000000012 /* HomeTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTab.swift; sourceTree = "<group>"; };
-		000000000013 /* GalleryTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryTab.swift; sourceTree = "<group>"; };
-		000000000014 /* PremiumTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumTab.swift; sourceTree = "<group>"; };
-		000000000015 /* ProfileTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileTab.swift; sourceTree = "<group>"; };
-		000000000016 /* OnboardingContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingContainerView.swift; sourceTree = "<group>"; };
 		02FE6F65315FE96A35C34223 /* FlyerCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyerCategory.swift; sourceTree = "<group>"; };
 		06A2021DD0B02DD6E91E8438 /* FormatStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormatStepView.swift; sourceTree = "<group>"; };
 		0B3C4ECDD1E3D317F67F2CE0 /* ColorSchemePreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorSchemePreset.swift; sourceTree = "<group>"; };
 		12BBCEF15B2AF34A5A490D50 /* DynamicTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicTextField.swift; sourceTree = "<group>"; };
-		181849BBD35235AF52FED857 /* FlyGen.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlyGen.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		181849BBD35235AF52FED857 /* FlyGen.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = FlyGen.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		184D25D42BAC7CE7B252BF86 /* iCloudRequiredView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iCloudRequiredView.swift; sourceTree = "<group>"; };
 		1FA816BFB754005DF233AD04 /* PromptDescriptors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptDescriptors.swift; sourceTree = "<group>"; };
 		22AD3ED9139C2DCCA31C6A01 /* VisualSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualSettings.swift; sourceTree = "<group>"; };
+		28384D20DBD9AA54F572AFFC /* HomeTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTab.swift; sourceTree = "<group>"; };
 		340B5206B7FAD148FFC4FA90 /* Mood.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mood.swift; sourceTree = "<group>"; };
 		37D0B5EC3F09F5173CDBA3CE /* GenerationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerationView.swift; sourceTree = "<group>"; };
+		406E392633E0FE2FA6DCA496 /* GalleryTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryTab.swift; sourceTree = "<group>"; };
 		456744D560C03FD857118347 /* StepProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepProgressBar.swift; sourceTree = "<group>"; };
 		48A766390A874ED2612B3679 /* CreationFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreationFlowView.swift; sourceTree = "<group>"; };
 		4C085DEEA61D0B6B26BA0AEF /* AspectRatio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AspectRatio.swift; sourceTree = "<group>"; };
@@ -85,15 +85,18 @@
 		6C0B42D66AE1AED299093D64 /* CategoryStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryStepView.swift; sourceTree = "<group>"; };
 		730206EB978BE7E39383D4E7 /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Hex.swift"; sourceTree = "<group>"; };
 		7753024C905464D110F059D5 /* OutputSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputSettings.swift; sourceTree = "<group>"; };
+		7B6788CB5BD9273879C5F53E /* FlyGen.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FlyGen.entitlements; sourceTree = "<group>"; };
 		7C61A47D28D08C6960017130 /* PhotoLibraryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLibraryService.swift; sourceTree = "<group>"; };
 		802D02689D38132C24042AFA /* ColorsStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorsStepView.swift; sourceTree = "<group>"; };
 		898F624DFE2689054E2A708A /* FlyerCreationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyerCreationViewModel.swift; sourceTree = "<group>"; };
 		8CE5F8A345997A42000089FD /* BackgroundType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundType.swift; sourceTree = "<group>"; };
 		8D909C2791FE2A8700E30AA4 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		91F81AFF070A145CF531597E /* ColorSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorSettings.swift; sourceTree = "<group>"; };
+		92EF130D6F0181711C3C8D15 /* ProfileTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileTab.swift; sourceTree = "<group>"; };
 		9579E2430EA7DEC2FA8D87BF /* PromptBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptBuilder.swift; sourceTree = "<group>"; };
 		A418B28EFEC046775983D673 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		A4E86A123D7FDBB3C7C8AAEF /* TextContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextContent.swift; sourceTree = "<group>"; };
+		A5BF0DFD9D644CED8D1DC591 /* OnboardingContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingContainerView.swift; sourceTree = "<group>"; };
 		A5F0A68F65B4BF9A1CFA475A /* NegativePrompts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NegativePrompts.swift; sourceTree = "<group>"; };
 		A94669CCDA2F09E03E777709 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BAF6F1696F9CC685DEFECA3D /* VisualStyleStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualStyleStepView.swift; sourceTree = "<group>"; };
@@ -101,16 +104,28 @@
 		BF2FFDC8FE9FB5A25AA9DC55 /* RefinementBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefinementBuilder.swift; sourceTree = "<group>"; };
 		C751A204A7CDA258A17B6A21 /* ReviewStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewStepView.swift; sourceTree = "<group>"; };
 		CEB654DCA88FF679FBEFB358 /* RefinementSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefinementSheet.swift; sourceTree = "<group>"; };
+		D77094514BDAD21090480D3A /* CloudKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitService.swift; sourceTree = "<group>"; };
 		E1031905BEC715F64F5957DC /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		E666E785FFCE08EFA46A79E7 /* PremiumTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumTab.swift; sourceTree = "<group>"; };
 		EB04130801C20BE11F94D733 /* TextContentStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextContentStepView.swift; sourceTree = "<group>"; };
 		EDBC65359BBD8F17309A355E /* FlyerProject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyerProject.swift; sourceTree = "<group>"; };
 		F6E4BF8C2207C43A1E6C895F /* SelectionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionCard.swift; sourceTree = "<group>"; };
 		F7A5464C24F5B8B13D097698 /* MoodStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodStepView.swift; sourceTree = "<group>"; };
+		F8CD1653EE523C3DC3B07690 /* SavedFlyer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedFlyer.swift; sourceTree = "<group>"; };
 		FA2585C5073F35A6470775B3 /* ExtrasStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtrasStepView.swift; sourceTree = "<group>"; };
+		FB709BFEED3D9A7E60798343 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		FC1056727B410D483D6F9ADD /* OpenRouterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		049AA4220C8F3787C3DDF5E0 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				A5BF0DFD9D644CED8D1DC591 /* OnboardingContainerView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
 		1864AE8D955C413A93B4C1E1 /* Result */ = {
 			isa = PBXGroup;
 			children = (
@@ -139,6 +154,7 @@
 		2C70975201A47B834F8B9AD4 /* FlyGen */ = {
 			isa = PBXGroup;
 			children = (
+				7B6788CB5BD9273879C5F53E /* FlyGen.entitlements */,
 				A418B28EFEC046775983D673 /* Info.plist */,
 				BFF65681DBA364345778D661 /* App */,
 				D27781E8D031FA2B262F53A2 /* Extensions */,
@@ -196,33 +212,26 @@
 		71E5C35B572C53DB9D271188 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				184D25D42BAC7CE7B252BF86 /* iCloudRequiredView.swift */,
 				98953C86D335F62757263E61 /* Components */,
 				2605283C83C2130F4FC196CC /* Creation */,
 				E4F5D4AD1FA45D96A13F57F6 /* Generation */,
 				F193179322040C4BCCFDF3E9 /* Home */,
-				000000000020 /* Onboarding */,
+				049AA4220C8F3787C3DDF5E0 /* Onboarding */,
 				1864AE8D955C413A93B4C1E1 /* Result */,
 				E2C5627C1AABFC8475D0FCA8 /* Settings */,
-				000000000021 /* Tabs */,
+				91598030DADD7061BC0F47D8 /* Tabs */,
 			);
 			path = Views;
 			sourceTree = "<group>";
 		};
-		000000000020 /* Onboarding */ = {
+		91598030DADD7061BC0F47D8 /* Tabs */ = {
 			isa = PBXGroup;
 			children = (
-				000000000016 /* OnboardingContainerView.swift */,
-			);
-			path = Onboarding;
-			sourceTree = "<group>";
-		};
-		000000000021 /* Tabs */ = {
-			isa = PBXGroup;
-			children = (
-				000000000012 /* HomeTab.swift */,
-				000000000013 /* GalleryTab.swift */,
-				000000000014 /* PremiumTab.swift */,
-				000000000015 /* ProfileTab.swift */,
+				406E392633E0FE2FA6DCA496 /* GalleryTab.swift */,
+				28384D20DBD9AA54F572AFFC /* HomeTab.swift */,
+				E666E785FFCE08EFA46A79E7 /* PremiumTab.swift */,
+				92EF130D6F0181711C3C8D15 /* ProfileTab.swift */,
 			);
 			path = Tabs;
 			sourceTree = "<group>";
@@ -277,8 +286,9 @@
 				91F81AFF070A145CF531597E /* ColorSettings.swift */,
 				EDBC65359BBD8F17309A355E /* FlyerProject.swift */,
 				7753024C905464D110F059D5 /* OutputSettings.swift */,
-				000000000011 /* SavedFlyer.swift */,
+				F8CD1653EE523C3DC3B07690 /* SavedFlyer.swift */,
 				A4E86A123D7FDBB3C7C8AAEF /* TextContent.swift */,
+				FB709BFEED3D9A7E60798343 /* UserProfile.swift */,
 				22AD3ED9139C2DCCA31C6A01 /* VisualSettings.swift */,
 				37B486BD64EA5BB283BD2145 /* Enums */,
 			);
@@ -288,6 +298,7 @@
 		DB7D251A6A98755E7864B64A /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				D77094514BDAD21090480D3A /* CloudKitService.swift */,
 				7C61A47D28D08C6960017130 /* PhotoLibraryService.swift */,
 				ACC1727E2B16FC554D251FA6 /* ImageGeneration */,
 				3E2453B6DBB44B211E937F92 /* PromptBuilder */,
@@ -356,6 +367,11 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					4B5E0270EBC0A6389813315B = {
+						DevelopmentTeam = "";
+					};
+				};
 			};
 			buildConfigurationList = C6788FC10FBFC33B6345EFC3 /* Build configuration list for PBXProject "FlyGen" */;
 			compatibilityVersion = "Xcode 14.0";
@@ -367,6 +383,7 @@
 			);
 			mainGroup = 4E2D5534FBA07A8ED01D9808;
 			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -391,16 +408,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				000000000001 /* SavedFlyer.swift in Sources */,
-				000000000002 /* HomeTab.swift in Sources */,
-				000000000003 /* GalleryTab.swift in Sources */,
-				000000000004 /* PremiumTab.swift in Sources */,
-				000000000005 /* ProfileTab.swift in Sources */,
-				000000000006 /* OnboardingContainerView.swift in Sources */,
 				E8CA330BA5E4268BC3E03BA4 /* AspectRatio.swift in Sources */,
 				51A412CAA71CCC99E9905560 /* BackgroundType.swift in Sources */,
 				A5629E3E2DD610E4FB277467 /* CategoryConfiguration.swift in Sources */,
 				AF8A46FDD739A68963EAE7EE /* CategoryStepView.swift in Sources */,
+				D958E07702A0C8EE2FE7C9F1 /* CloudKitService.swift in Sources */,
 				277B13203FA5FBD8FC6CA8CB /* Color+Hex.swift in Sources */,
 				AF18214E835F054B9D8F49AE /* ColorSchemePreset.swift in Sources */,
 				162CEFDA5FFBDD64CAE60392 /* ColorSettings.swift in Sources */,
@@ -414,30 +426,38 @@
 				C1E4818D4049DED2EA4A4C4D /* FlyerCreationViewModel.swift in Sources */,
 				6C12C05D86292A4CD215C4C6 /* FlyerProject.swift in Sources */,
 				7CD3EBE906F543C25CE7093B /* FormatStepView.swift in Sources */,
+				583C195202B2E418A93257F1 /* GalleryTab.swift in Sources */,
 				C28748394FC9BABE59A6C1DF /* GenerationView.swift in Sources */,
+				41536973C193B227050DE9A3 /* HomeTab.swift in Sources */,
 				EC20C5F38B04D32B74B3626E /* HomeView.swift in Sources */,
 				85E0287D14A5A7FF9C00D9EF /* ImageryType.swift in Sources */,
 				DFE68A36258F14EC52666634 /* Mood.swift in Sources */,
 				F315B5B3E510D452B864EFA8 /* MoodStepView.swift in Sources */,
 				05236A51D1AADA5B81A322C2 /* NegativePrompts.swift in Sources */,
+				ED0F296CFA04BC4D351C95DE /* OnboardingContainerView.swift in Sources */,
 				1FA1B5762E86758C83CEF517 /* OpenRouterService.swift in Sources */,
 				F0EFFA9DAEAE066B03059A00 /* OutputSettings.swift in Sources */,
 				018C2423C0C86CE01329D1C1 /* PhotoLibraryService.swift in Sources */,
+				41BE920C852DE35AC9785A08 /* PremiumTab.swift in Sources */,
+				02C7FBC355F6A0B6897904C8 /* ProfileTab.swift in Sources */,
 				449D883F219ADF7D2890DD16 /* PromptBuilder.swift in Sources */,
 				9FC6E6C9D0FF652459D20F78 /* PromptDescriptors.swift in Sources */,
 				216C56E6B218DA5C1BF072D8 /* RefinementBuilder.swift in Sources */,
 				6576A29683D25BA73B38F93B /* RefinementSheet.swift in Sources */,
 				8B9444F119058A6009D3D5A0 /* ResultView.swift in Sources */,
 				B1AF5D2BC6C1DEA70A386BEF /* ReviewStepView.swift in Sources */,
+				D9C9D5796C668A7410E36E2D /* SavedFlyer.swift in Sources */,
 				7FEF504FA9A80B345EEA6AF1 /* SelectionCard.swift in Sources */,
 				3B94A4B396C8D3435B1B7036 /* SettingsView.swift in Sources */,
 				E447D3471E42E86CC0D53039 /* StepProgressBar.swift in Sources */,
 				8EAC2A0DC868190AA6F1A97B /* TextContent.swift in Sources */,
 				AF0E0F3ACA691B8747193C62 /* TextContentStepView.swift in Sources */,
 				AA81BC3EDC68F5F40B236E37 /* TextProminence.swift in Sources */,
+				23489EA620ACBFB14235A1C4 /* UserProfile.swift in Sources */,
 				D2C34BB266AFC53E448E7757 /* VisualSettings.swift in Sources */,
 				64C32D608A4EFC6C72A370D6 /* VisualStyle.swift in Sources */,
 				7E5251F0DAF882D2A7170827 /* VisualStyleStepView.swift in Sources */,
+				EBFAD93E52119F13D747BE9D /* iCloudRequiredView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -449,8 +469,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = FlyGen/FlyGen.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = 2J2GCJ25MK;
 				INFOPLIST_FILE = FlyGen/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -468,8 +488,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = FlyGen/FlyGen.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = 2J2GCJ25MK;
 				INFOPLIST_FILE = FlyGen/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

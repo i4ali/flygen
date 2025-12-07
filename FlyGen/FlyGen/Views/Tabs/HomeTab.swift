@@ -1,10 +1,15 @@
 import SwiftUI
+import SwiftData
 
 struct HomeTab: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
     @Binding var showingSettings: Bool
     @AppStorage("openrouter_api_key") private var apiKey: String = ""
-    @AppStorage("userCredits") private var credits: Int = 3
+    @Query private var userProfiles: [UserProfile]
+
+    private var credits: Int {
+        userProfiles.first?.credits ?? 3
+    }
 
     var body: some View {
         NavigationStack {
@@ -45,9 +50,11 @@ struct HomeTab: View {
                 // Main content
                 VStack(spacing: 24) {
                     // App icon/logo area
-                    Image(systemName: "doc.richtext")
-                        .font(.system(size: 80))
-                        .foregroundColor(.accentColor)
+                    Image("AppLogo")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 80, height: 80)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
                         .padding(.bottom, 8)
 
                     Text("Create stunning flyers\nwith AI")

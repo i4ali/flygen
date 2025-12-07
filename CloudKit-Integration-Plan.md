@@ -230,5 +230,21 @@ FlyGen/
 
 - **CloudKit Approach:** SwiftData + CloudKit (automatic sync)
 - **iCloud Requirement:** Required - must be signed in to use app
-- **Premium/Profile:** Placeholder UI (will integrate StoreKit later)
-- **Free Credits:** 3 credits for new users
+- **Payment Model:** One-time credit packs (consumable IAP) - Phase 2
+- **Phase 1 (This Plan):** CloudKit sync + free 3 credits
+- **Phase 2 (Future):** StoreKit 2 credit purchases
+
+---
+
+## Phase 2: StoreKit Credit Purchases (Future)
+
+After CloudKit integration is complete, add paid credit packs:
+
+**App Store Connect Setup:**
+- Create consumable IAP products (e.g., 10/25/50 credit packs)
+
+**Implementation:**
+- StoreKitService using StoreKit 2
+- Update PremiumTab with purchase UI
+- On successful purchase: increment `UserProfile.credits`
+- Credits sync across devices via CloudKit
