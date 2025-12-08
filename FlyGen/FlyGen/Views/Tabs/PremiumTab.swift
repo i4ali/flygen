@@ -4,6 +4,7 @@ import StoreKit
 
 struct PremiumTab: View {
     @EnvironmentObject var storeKitService: StoreKitService
+    @EnvironmentObject var cloudKitService: CloudKitService
     @Environment(\.modelContext) private var modelContext
     @Query private var userProfiles: [UserProfile]
 
@@ -198,6 +199,9 @@ struct PremiumTab: View {
                 profile.credits += creditsAdded
                 profile.lastSyncedAt = Date()
                 try? modelContext.save()
+
+                // Sync credits to CloudKit
+                await cloudKitService.saveCredits(profile.credits)
 
                 purchasedCredits = creditsAdded
                 showingPurchaseSuccess = true

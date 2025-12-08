@@ -7,8 +7,13 @@ class CloudKitService: ObservableObject {
     @Published var userRecordID: CKRecord.ID?
     @Published var isSignedIn: Bool = false
     @Published var isChecking: Bool = true
+    @Published var isSyncing: Bool = false
 
     private let container = CKContainer(identifier: "iCloud.com.flygen.app")
+    private let recordType = "UserCredits"
+    private let creditsKey = "credits"
+    private let creditsRecordName = "user-credits-record"  // Fixed ID for all devices
+    private var creditsRecordID: CKRecord.ID?
 
     init() {
         Task {
@@ -70,6 +75,79 @@ class CloudKitService: ObservableObject {
             return "iCloud is temporarily unavailable. Please try again later."
         @unknown default:
             return "Unknown iCloud status."
+        }
+    }
+
+    // MARK: - Credit Sync Methods
+
+    /// Fetches credits from CloudKit using deterministic record ID
+    /// - Returns: The credits stored in CloudKit, or nil if no record exists
+    func fetchCredits() async -> Int? {
+        guard isSignedIn else { return nil }
+
+        let database = container.privateCloudDatabase
+        let recordID = CKRecord.ID(recordName: creditsRecordName)
+
+        do {
+            let record = try await database.record(for: recordID)
+            creditsRecordID = record.recordID
+            return record[creditsKey] as? Int
+        } catch {
+            // Record doesn't exist yet
+            print("CloudKit fetchCredits: No record found")
+            return nil
+        }
+    }
+
+    /// Saves credits to CloudKit using deterministic record ID
+    /// - Parameter credits: The credit amount to save
+    func saveCredits(_ credits: Int) async {
+        guard isSignedIn else { return }
+
+        let database = container.privateCloudDatabase
+        let recordID = CKRecord.ID(recordName: creditsRecordName)
+
+        do {
+            let record: CKRecord
+
+            do {
+                // Try to fetch existing record by known ID
+                record = try await database.record(for: recordID)
+            } catch {
+                // Record doesn't exist, create with this specific ID
+                record = CKRecord(recordType: recordType, recordID: recordID)
+            }
+
+            record[creditsKey] = credits
+
+            let savedRecord = try await database.save(record)
+            creditsRecordID = savedRecord.recordID
+            print("CloudKit: Credits saved successfully (\(credits))")
+        } catch {
+            print("CloudKit saveCredits error: \(error.localizedDescription)")
+        }
+    }
+
+    /// Syncs credits from CloudKit - cloud is the source of truth
+    /// - Parameter localCredits: The current local credit count (used only if no cloud record exists)
+    /// - Returns: The cloud credit count (or local if no cloud record)
+    func syncCredits(localCredits: Int) async -> Int {
+        guard isSignedIn else { return localCredits }
+
+        isSyncing = true
+        defer { isSyncing = false }
+
+        // Fetch credits from CloudKit - cloud is source of truth
+        if let cloudCredits = await fetchCredits() {
+            if cloudCredits != localCredits {
+                print("CloudKit: Syncing local credits from \(localCredits) to \(cloudCredits)")
+            }
+            return cloudCredits
+        } else {
+            // No CloudKit record exists, create one with local credits
+            await saveCredits(localCredits)
+            print("CloudKit: Created new credits record with \(localCredits) credits")
+            return localCredits
         }
     }
 }

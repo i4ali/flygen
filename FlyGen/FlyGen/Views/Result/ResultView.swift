@@ -3,6 +3,7 @@ import SwiftData
 
 struct ResultView: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
+    @EnvironmentObject var cloudKitService: CloudKitService
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @Query private var userProfiles: [UserProfile]
@@ -182,8 +183,14 @@ struct ResultView: View {
     private func deductCredit() {
         if let profile = userProfiles.first, profile.credits > 0 {
             profile.credits -= 1
+            profile.lastSyncedAt = Date()
             try? modelContext.save()
             print("Credit deducted. Remaining credits: \(profile.credits)")
+
+            // Sync credits to CloudKit
+            Task {
+                await cloudKitService.saveCredits(profile.credits)
+            }
         }
     }
 

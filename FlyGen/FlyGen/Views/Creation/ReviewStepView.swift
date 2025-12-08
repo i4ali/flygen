@@ -1,7 +1,11 @@
 import SwiftUI
+import SwiftData
 
 struct ReviewStepView: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
+    @EnvironmentObject var cloudKitService: CloudKitService
+    @Environment(\.modelContext) private var modelContext
+    @Query private var userProfiles: [UserProfile]
 
     var body: some View {
         VStack(spacing: 0) {
@@ -211,6 +215,26 @@ struct ReviewStepView: View {
             generateButtonSection
         }
         .background(FGColors.backgroundPrimary)
+        .onAppear {
+            // Wire up credit deduction callback before generation can be triggered
+            viewModel.onCreditDeduction = {
+                deductCredit()
+            }
+        }
+    }
+
+    private func deductCredit() {
+        if let profile = userProfiles.first, profile.credits > 0 {
+            profile.credits -= 1
+            profile.lastSyncedAt = Date()
+            try? modelContext.save()
+            print("Credit deducted. Remaining credits: \(profile.credits)")
+
+            // Sync credits to CloudKit
+            Task {
+                await cloudKitService.saveCredits(profile.credits)
+            }
+        }
     }
 
     // MARK: - Generate Button Section

@@ -36,17 +36,21 @@ struct ContentView: View {
             }
         }
         .preferredColorScheme(.dark)
-        .onAppear {
-            ensureUserProfileExists()
+        .task {
+            await ensureUserProfileExists()
+            await syncCreditsFromCloud()
         }
         .onChange(of: cloudKitService.isSignedIn) { _, isSignedIn in
             if isSignedIn {
-                ensureUserProfileExists()
+                Task {
+                    await ensureUserProfileExists()
+                    await syncCreditsFromCloud()
+                }
             }
         }
     }
 
-    private func ensureUserProfileExists() {
+    private func ensureUserProfileExists() async {
         // Only create profile if signed in and none exists
         guard cloudKitService.isSignedIn else { return }
 
@@ -58,6 +62,19 @@ struct ContentView: View {
                 profile.credits = existingCredits
             }
             modelContext.insert(profile)
+            try? modelContext.save()
+        }
+    }
+
+    private func syncCreditsFromCloud() async {
+        guard cloudKitService.isSignedIn,
+              let profile = userProfiles.first else { return }
+
+        let syncedCredits = await cloudKitService.syncCredits(localCredits: profile.credits)
+
+        if syncedCredits != profile.credits {
+            profile.credits = syncedCredits
+            profile.lastSyncedAt = Date()
             try? modelContext.save()
         }
     }
