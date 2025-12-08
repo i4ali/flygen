@@ -5,7 +5,6 @@ struct ResultView: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
-    @AppStorage("openrouter_api_key") private var apiKey: String = ""
     @Query private var userProfiles: [UserProfile]
 
     @State private var showingRefinementSheet = false
@@ -124,7 +123,7 @@ struct ResultView: View {
 
                         Button {
                             Task {
-                                await viewModel.generateFlyer(apiKey: apiKey)
+                                await viewModel.generateFlyer()
                             }
                         } label: {
                             Text("Try Again")
@@ -166,10 +165,10 @@ struct ResultView: View {
                 }
             }
             .sheet(isPresented: $showingRefinementSheet) {
-                RefinementSheet(viewModel: viewModel, apiKey: apiKey)
+                RefinementSheet(viewModel: viewModel)
             }
             .sheet(isPresented: $showingReformatSheet) {
-                ReformatSheet(viewModel: viewModel, apiKey: apiKey)
+                ReformatSheet(viewModel: viewModel)
             }
             .onAppear {
                 // Wire up credit deduction callback - called after each successful API call

@@ -173,15 +173,14 @@ class FlyerCreationViewModel: ObservableObject {
     }
 
     /// Generate the flyer
-    func generateFlyer(apiKey: String) async {
+    func generateFlyer() async {
         guard let project = project else { return }
 
         generationState = .generating
 
         do {
             let result = try await openRouterService.generateImage(
-                project: project,
-                apiKey: apiKey
+                project: project
             )
 
             // Store the prompt for potential refinements
@@ -229,7 +228,7 @@ class FlyerCreationViewModel: ObservableObject {
     }
 
     /// Refine the generated flyer with feedback
-    func refineFlyer(feedback: String, apiKey: String) async {
+    func refineFlyer(feedback: String) async {
         guard !lastPrompt.isEmpty else { return }
 
         generationState = .generating
@@ -243,8 +242,7 @@ class FlyerCreationViewModel: ObservableObject {
             let result = try await openRouterService.generateImage(
                 prompt: refinedPrompt,
                 aspectRatio: project?.output.aspectRatio ?? .portrait,
-                logoImageData: project?.logoImageData,
-                apiKey: apiKey
+                logoImageData: project?.logoImageData
             )
 
             lastPrompt = refinedPrompt
@@ -271,7 +269,7 @@ class FlyerCreationViewModel: ObservableObject {
     }
 
     /// Regenerate with a different aspect ratio
-    func reformatFlyer(newRatio: AspectRatio, apiKey: String) async {
+    func reformatFlyer(newRatio: AspectRatio) async {
         guard !lastPrompt.isEmpty else { return }
 
         generationState = .generating
@@ -280,8 +278,7 @@ class FlyerCreationViewModel: ObservableObject {
             let result = try await openRouterService.generateImage(
                 prompt: lastPrompt,
                 aspectRatio: newRatio,
-                logoImageData: project?.logoImageData,
-                apiKey: apiKey
+                logoImageData: project?.logoImageData
             )
 
             project?.output.aspectRatio = newRatio

@@ -2,7 +2,6 @@ import SwiftUI
 
 struct ReviewStepView: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
-    let apiKey: String
 
     var body: some View {
         VStack(spacing: 0) {
@@ -218,25 +217,9 @@ struct ReviewStepView: View {
 
     private var generateButtonSection: some View {
         VStack(spacing: FGSpacing.sm) {
-            if apiKey.isEmpty {
-                HStack(spacing: FGSpacing.xs) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .font(.system(size: 14))
-                        .foregroundColor(FGColors.statusWarning)
-
-                    Text("Add your API key in Settings to generate")
-                        .font(FGTypography.caption)
-                        .foregroundColor(FGColors.statusWarning)
-                }
-                .padding(.horizontal, FGSpacing.md)
-                .padding(.vertical, FGSpacing.xs)
-                .background(FGColors.statusWarning.opacity(0.15))
-                .clipShape(Capsule())
-            }
-
             Button {
                 Task {
-                    await viewModel.generateFlyer(apiKey: apiKey)
+                    await viewModel.generateFlyer()
                 }
             } label: {
                 HStack(spacing: FGSpacing.sm) {
@@ -253,23 +236,15 @@ struct ReviewStepView: View {
                 .foregroundColor(FGColors.textOnAccent)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, FGSpacing.md)
-                .background(
-                    Group {
-                        if apiKey.isEmpty {
-                            FGColors.textTertiary
-                        } else {
-                            FGGradients.accent
-                        }
-                    }
-                )
+                .background(FGGradients.accent)
                 .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
                 .shadow(
-                    color: apiKey.isEmpty ? .clear : FGColors.accentPrimary.opacity(0.4),
+                    color: FGColors.accentPrimary.opacity(0.4),
                     radius: 12,
                     y: 4
                 )
             }
-            .disabled(apiKey.isEmpty || viewModel.generationState == .generating)
+            .disabled(viewModel.generationState == .generating)
             .animation(FGAnimations.spring, value: viewModel.generationState)
 
             if case .error(let message) = viewModel.generationState {
@@ -356,5 +331,5 @@ struct ReviewSection<Content: View>: View {
     vm.startNewFlyer(category: .salePromo)
     vm.project?.textContent.headline = "MEGA SUMMER SALE"
     vm.project?.textContent.subheadline = "Up to 70% off everything"
-    return ReviewStepView(viewModel: vm, apiKey: "test")
+    return ReviewStepView(viewModel: vm)
 }

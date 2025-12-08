@@ -3,7 +3,6 @@ import SwiftUI
 struct CreationFlowView: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
     @Environment(\.dismiss) private var dismiss
-    @AppStorage("openrouter_api_key") private var apiKey: String = ""
 
     var body: some View {
         NavigationStack {
@@ -43,7 +42,7 @@ struct CreationFlowView: View {
                         case .extras:
                             ExtrasStepView(viewModel: viewModel)
                         case .review:
-                            ReviewStepView(viewModel: viewModel, apiKey: apiKey)
+                            ReviewStepView(viewModel: viewModel)
                         }
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)

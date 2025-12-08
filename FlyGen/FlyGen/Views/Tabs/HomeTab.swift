@@ -4,7 +4,6 @@ import SwiftData
 struct HomeTab: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
     @Binding var showingSettings: Bool
-    @AppStorage("openrouter_api_key") private var apiKey: String = ""
     @Query private var userProfiles: [UserProfile]
     @State private var showingTemplates = false
 
@@ -135,15 +134,6 @@ struct HomeTab: View {
                         WarningBanner(
                             icon: "exclamationmark.triangle.fill",
                             message: "No credits remaining. Upgrade to Premium for unlimited flyers!",
-                            color: FGColors.warning
-                        )
-                        .padding(.horizontal, FGSpacing.screenHorizontal)
-                    }
-                    // API key warning
-                    else if apiKey.isEmpty {
-                        WarningBanner(
-                            icon: "exclamationmark.triangle.fill",
-                            message: "Add your OpenRouter API key in Settings to generate flyers",
                             color: FGColors.warning
                         )
                         .padding(.horizontal, FGSpacing.screenHorizontal)

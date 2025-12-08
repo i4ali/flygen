@@ -3,7 +3,6 @@ import SwiftUI
 struct HomeView: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
     @Binding var showingSettings: Bool
-    @AppStorage("openrouter_api_key") private var apiKey: String = ""
 
     var body: some View {
         VStack(spacing: 0) {
@@ -58,21 +57,6 @@ struct HomeView: View {
                 }
                 .padding(.horizontal, 40)
                 .padding(.top, 16)
-
-                // API key warning
-                if apiKey.isEmpty {
-                    HStack {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .foregroundColor(.orange)
-                        Text("Add your OpenRouter API key in Settings to generate flyers")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    .padding()
-                    .background(Color.orange.opacity(0.1))
-                    .cornerRadius(8)
-                    .padding(.horizontal)
-                }
             }
 
             Spacer()

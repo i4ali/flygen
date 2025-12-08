@@ -3,7 +3,6 @@ import UIKit
 
 /// Errors that can occur during image generation
 enum ImageGenerationError: Error, LocalizedError {
-    case noAPIKey
     case invalidURL
     case networkError(Error)
     case invalidResponse
@@ -13,8 +12,6 @@ enum ImageGenerationError: Error, LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .noAPIKey:
-            return "No API key configured. Please add your OpenRouter API key in Settings."
         case .invalidURL:
             return "Invalid API URL."
         case .networkError(let error):
@@ -39,15 +36,14 @@ struct ImageGenerationResult {
     let generationTime: TimeInterval
 }
 
-/// Service for generating images via OpenRouter API
+/// Service for generating images via OpenRouter API through Cloudflare Worker proxy
 actor OpenRouterService {
-    private let baseURL = URL(string: "https://openrouter.ai/api/v1/chat/completions")!
+    private let baseURL = URL(string: "https://flygen-api.ali-muhammadimran.workers.dev")!
     private let model = "google/gemini-2.5-flash-image-preview"
 
     /// Generate an image from a flyer project
     func generateImage(
-        project: FlyerProject,
-        apiKey: String
+        project: FlyerProject
     ) async throws -> ImageGenerationResult {
         let startTime = Date()
 
@@ -65,7 +61,6 @@ actor OpenRouterService {
             prompt: fullPrompt,
             aspectRatio: project.output.aspectRatio,
             logoImageData: project.logoImageData,
-            apiKey: apiKey,
             startTime: startTime
         )
     }
@@ -75,12 +70,8 @@ actor OpenRouterService {
         prompt: String,
         aspectRatio: AspectRatio,
         logoImageData: Data? = nil,
-        apiKey: String,
         startTime: Date = Date()
     ) async throws -> ImageGenerationResult {
-        guard !apiKey.isEmpty else {
-            throw ImageGenerationError.noAPIKey
-        }
 
         // Build request content
         var content: [[String: Any]] = []
@@ -110,13 +101,10 @@ actor OpenRouterService {
             "image_config": ["aspect_ratio": aspectRatio.nanoBananaRatio]
         ]
 
-        // Create request
+        // Create request - API key is handled by Cloudflare Worker proxy
         var request = URLRequest(url: baseURL)
         request.httpMethod = "POST"
-        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("https://flygen.app", forHTTPHeaderField: "HTTP-Referer")
-        request.setValue("FlyGen", forHTTPHeaderField: "X-Title")
         request.timeoutInterval = 120 // 2 minute timeout for image generation
 
         do {

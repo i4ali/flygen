@@ -3,7 +3,6 @@ import SwiftData
 
 struct RefinementSheet: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
-    let apiKey: String
     @Environment(\.dismiss) private var dismiss
     @Query private var userProfiles: [UserProfile]
 
@@ -96,7 +95,7 @@ struct RefinementSheet: View {
                 // Apply button
                 Button {
                     Task {
-                        await viewModel.refineFlyer(feedback: feedback, apiKey: apiKey)
+                        await viewModel.refineFlyer(feedback: feedback)
                         dismiss()
                     }
                 } label: {
@@ -188,7 +187,6 @@ struct FlowLayout: Layout {
 
 struct ReformatSheet: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
-    let apiKey: String
     @Environment(\.dismiss) private var dismiss
     @Query private var userProfiles: [UserProfile]
 
@@ -240,7 +238,7 @@ struct ReformatSheet: View {
                 // Apply button
                 Button {
                     Task {
-                        await viewModel.reformatFlyer(newRatio: selectedRatio, apiKey: apiKey)
+                        await viewModel.reformatFlyer(newRatio: selectedRatio)
                         dismiss()
                     }
                 } label: {
@@ -285,5 +283,5 @@ struct ReformatSheet: View {
 #Preview {
     let vm = FlyerCreationViewModel()
     vm.generationState = .success(UIImage(systemName: "doc.richtext")!)
-    return RefinementSheet(viewModel: vm, apiKey: "test")
+    return RefinementSheet(viewModel: vm)
 }
