@@ -246,8 +246,27 @@ class FlyerCreationViewModel: ObservableObject {
             )
 
             lastPrompt = refinedPrompt
-            generatedImageData = result.imageData
-            generationState = .success(result.image)
+
+            // Apply QR code if enabled (preserve from original generation)
+            var finalImage = result.image
+            var finalImageData = result.imageData
+
+            if let project = project, project.qrSettings.enabled {
+                let qrService = QRCodeService()
+                if let content = await qrService.generateContent(from: project.qrSettings),
+                   let qrImage = await qrService.generateQRCode(from: content),
+                   let composited = await qrService.compositeQRCode(
+                       onto: finalImage,
+                       qrCode: qrImage,
+                       position: project.qrSettings.position
+                   ) {
+                    finalImage = composited
+                    finalImageData = composited.pngData() ?? result.imageData
+                }
+            }
+
+            generatedImageData = finalImageData
+            generationState = .success(finalImage)
 
             // Deduct credit for successful refinement
             onCreditDeduction?()
@@ -256,7 +275,7 @@ class FlyerCreationViewModel: ObservableObject {
             if let projectId = project?.id {
                 generatedFlyer = GeneratedFlyer(
                     projectId: projectId,
-                    imageData: result.imageData,
+                    imageData: finalImageData,
                     prompt: refinedPrompt,
                     negativePrompt: "",
                     model: "flux-schnell"
@@ -282,8 +301,27 @@ class FlyerCreationViewModel: ObservableObject {
             )
 
             project?.output.aspectRatio = newRatio
-            generatedImageData = result.imageData
-            generationState = .success(result.image)
+
+            // Apply QR code if enabled (preserve from original generation)
+            var finalImage = result.image
+            var finalImageData = result.imageData
+
+            if let project = project, project.qrSettings.enabled {
+                let qrService = QRCodeService()
+                if let content = await qrService.generateContent(from: project.qrSettings),
+                   let qrImage = await qrService.generateQRCode(from: content),
+                   let composited = await qrService.compositeQRCode(
+                       onto: finalImage,
+                       qrCode: qrImage,
+                       position: project.qrSettings.position
+                   ) {
+                    finalImage = composited
+                    finalImageData = composited.pngData() ?? result.imageData
+                }
+            }
+
+            generatedImageData = finalImageData
+            generationState = .success(finalImage)
 
             // Deduct credit for successful reformat
             onCreditDeduction?()
@@ -292,7 +330,7 @@ class FlyerCreationViewModel: ObservableObject {
             if let projectId = project?.id {
                 generatedFlyer = GeneratedFlyer(
                     projectId: projectId,
-                    imageData: result.imageData,
+                    imageData: finalImageData,
                     prompt: lastPrompt,
                     negativePrompt: "",
                     model: "flux-schnell"

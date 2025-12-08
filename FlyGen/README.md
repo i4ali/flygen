@@ -91,6 +91,40 @@ FlyGen/
 
 Uses OpenRouter's Gemini Flash model for image generation.
 
+## Important Links & Services
+
+### Cloudflare Worker (API Proxy)
+- **URL:** `https://flygen-api.ali-muhammadimran.workers.dev`
+- **Dashboard:** https://dash.cloudflare.com/ → Workers & Pages → flygen-api
+- **Purpose:** Securely proxies API requests with the OpenRouter API key (key stored as Cloudflare secret)
+- **Config:** `flygen-api/wrangler.toml`
+
+### CloudKit (Credit Sync)
+- **Container ID:** `iCloud.com.flygen.app`
+- **Dashboard:** https://icloud.developer.apple.com/dashboard → Select container
+- **Record Type:** `UserCredits` (stores `credits` field)
+- **Purpose:** Syncs user credits across devices
+
+### OpenRouter (AI Image Generation)
+- **Dashboard:** https://openrouter.ai/keys
+- **Model:** `google/gemini-2.5-flash-preview-image-generation`
+- **Cost:** ~$0.02-0.04 per image
+
+### App Store Connect
+- **URL:** https://appstoreconnect.apple.com
+- **Bundle ID:** `com.flygen.app`
+
+### Apple Developer Portal
+- **URL:** https://developer.apple.com/account
+- **Certificates & Provisioning**
+
+## Credits System
+
+- New users receive **3 free credits**
+- Each generate/refine/resize costs **1 credit**
+- Credits stored locally (SwiftData) + synced to CloudKit
+- Purchase packs: 10, 25, or 50 credits via StoreKit
+
 ## License
 
 Private - All rights reserved.
