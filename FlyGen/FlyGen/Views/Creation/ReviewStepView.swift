@@ -7,6 +7,10 @@ struct ReviewStepView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var userProfiles: [UserProfile]
 
+    private var credits: Int {
+        userProfiles.first?.credits ?? 0
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             ScrollView {
@@ -268,8 +272,25 @@ struct ReviewStepView: View {
                     y: 4
                 )
             }
-            .disabled(viewModel.generationState == .generating)
+            .disabled(viewModel.generationState == .generating || credits < 10)
+            .opacity(credits < 10 ? 0.5 : 1.0)
             .animation(FGAnimations.spring, value: viewModel.generationState)
+
+            // Insufficient credits warning
+            if credits < 10 && viewModel.generationState != .generating {
+                HStack(spacing: FGSpacing.xs) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 14))
+                        .foregroundColor(FGColors.warning)
+
+                    Text("Insufficient credits (\(credits)/10)")
+                        .font(FGTypography.caption)
+                        .foregroundColor(FGColors.warning)
+                }
+                .padding(FGSpacing.sm)
+                .background(FGColors.warning.opacity(0.15))
+                .clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
+            }
 
             if case .error(let message) = viewModel.generationState {
                 HStack(spacing: FGSpacing.xs) {

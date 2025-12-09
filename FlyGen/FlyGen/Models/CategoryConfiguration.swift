@@ -17,6 +17,7 @@ enum TextFieldType: String, CaseIterable, Identifiable {
     case website
     case socialHandle
     case finePrint
+    case scheduleEntries
 
     var id: String { rawValue }
 
@@ -37,6 +38,7 @@ enum TextFieldType: String, CaseIterable, Identifiable {
         case .website: return "Website"
         case .socialHandle: return "Social Handle"
         case .finePrint: return "Fine Print"
+        case .scheduleEntries: return "Schedule"
         }
     }
 
@@ -57,6 +59,7 @@ enum TextFieldType: String, CaseIterable, Identifiable {
         case .website: return "e.g., www.example.com"
         case .socialHandle: return "e.g., @username"
         case .finePrint: return "e.g., Terms and conditions apply"
+        case .scheduleEntries: return "Add dates and activities"
         }
     }
 
@@ -66,6 +69,11 @@ enum TextFieldType: String, CaseIterable, Identifiable {
 
     var isMultiline: Bool {
         self == .bodyText || self == .finePrint
+    }
+
+    /// Returns true if this field requires a custom component instead of a standard text field
+    var isCustomComponent: Bool {
+        self == .scheduleEntries
     }
 
     var keyboardType: KeyboardType {
@@ -85,13 +93,13 @@ enum TextFieldType: String, CaseIterable, Identifiable {
 struct CategoryConfiguration {
     /// Which text fields are relevant for each category
     static let textFields: [FlyerCategory: [TextFieldType]] = [
-        .event: [.headline, .subheadline, .date, .time, .venueName, .address, .price, .ctaText, .website],
+        .event: [.headline, .subheadline, .scheduleEntries, .venueName, .address, .ctaText, .website],
         .salePromo: [.headline, .subheadline, .discountText, .date, .address, .ctaText, .finePrint],
         .announcement: [.headline, .subheadline, .bodyText, .date, .ctaText],
         .restaurantFood: [.headline, .subheadline, .address, .phone, .website, .price],
         .realEstate: [.headline, .price, .address, .bodyText, .phone, .email, .website],
         .jobPosting: [.headline, .subheadline, .bodyText, .ctaText, .email, .website],
-        .classWorkshop: [.headline, .subheadline, .date, .time, .venueName, .price, .ctaText],
+        .classWorkshop: [.headline, .subheadline, .scheduleEntries, .venueName, .price, .ctaText],
         .grandOpening: [.headline, .subheadline, .date, .venueName, .address, .discountText, .ctaText],
         .partyCelebration: [.headline, .subheadline, .date, .time, .venueName, .address, .ctaText],
         .fitnessWellness: [.headline, .subheadline, .date, .time, .venueName, .price, .ctaText],

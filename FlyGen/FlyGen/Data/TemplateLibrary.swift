@@ -43,6 +43,25 @@ struct TemplateLibrary {
             previewDescription: "Professional design for business conferences and seminars"
         ),
 
+        FlyerTemplate(
+            id: "event_multidate",
+            name: "Multi-Date Event Schedule",
+            category: .event,
+            textContent: TextContent(
+                headline: "[Event Series Name]",
+                subheadline: "Multiple Sessions • Various Activities",
+                bodyText: "[Date 1]: [Activities]\n[Date 2]: [Activities]\n[Date 3]: [Activities]",
+                venueName: "[Venue Name]",
+                address: "[Address]",
+                ctaText: "Register Now",
+                website: "[website.com]"
+            ),
+            colors: ColorSettings(preset: .warm, backgroundType: .light),
+            visuals: VisualSettings(style: .playfulFun, mood: .festive),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Perfect for workshop series, camps, festivals, and events spanning multiple dates"
+        ),
+
         // MARK: - Sale Templates
         FlyerTemplate(
             id: "sale_flash",

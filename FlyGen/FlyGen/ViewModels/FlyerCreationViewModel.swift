@@ -455,6 +455,18 @@ class FlyerCreationViewModel: ObservableObject {
         )
     }
 
+    /// Get binding for additionalInfo (used by ScheduleEntriesField)
+    var additionalInfoBinding: Binding<[String]?> {
+        Binding(
+            get: { [weak self] in
+                self?.project?.textContent.additionalInfo
+            },
+            set: { [weak self] newValue in
+                self?.project?.textContent.additionalInfo = newValue
+            }
+        )
+    }
+
     private func getValue(for field: TextFieldType) -> String {
         guard let text = project?.textContent else { return "" }
         switch field {
@@ -473,6 +485,7 @@ class FlyerCreationViewModel: ObservableObject {
         case .website: return text.website ?? ""
         case .socialHandle: return text.socialHandle ?? ""
         case .finePrint: return text.finePrint ?? ""
+        case .scheduleEntries: return "" // Handled by additionalInfoBinding
         }
     }
 
@@ -496,6 +509,7 @@ class FlyerCreationViewModel: ObservableObject {
         case .website: project?.textContent.website = optionalValue
         case .socialHandle: project?.textContent.socialHandle = optionalValue
         case .finePrint: project?.textContent.finePrint = optionalValue
+        case .scheduleEntries: break // Handled by additionalInfoBinding
         }
     }
 }

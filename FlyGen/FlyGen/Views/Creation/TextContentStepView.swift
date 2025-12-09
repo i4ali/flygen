@@ -43,11 +43,23 @@ struct TextContentStepView: View {
                 // Dynamic text fields
                 VStack(spacing: FGSpacing.md) {
                     ForEach(fields) { field in
-                        DynamicTextField(
-                            field: field,
-                            text: viewModel.binding(for: field),
-                            isFocused: $focusedField
-                        )
+                        if field.isCustomComponent {
+                            // Render custom component for special field types
+                            switch field {
+                            case .scheduleEntries:
+                                ScheduleEntriesField(
+                                    entries: viewModel.additionalInfoBinding
+                                )
+                            default:
+                                EmptyView()
+                            }
+                        } else {
+                            DynamicTextField(
+                                field: field,
+                                text: viewModel.binding(for: field),
+                                isFocused: $focusedField
+                            )
+                        }
                     }
                 }
                 .padding(.horizontal, FGSpacing.screenHorizontal)
