@@ -37,6 +37,18 @@ struct RefinementBuilder {
         "cooler": "cooler color tones with blues, greens, and purples"
     ]
 
+    /// Build a prompt that removes all text from the current design
+    static func buildNoTextRefinement(originalPrompt: String) -> String {
+        return """
+            \(originalPrompt)
+
+            CRITICAL CHANGE: Remove ALL text from this design. \
+            Do NOT render any text, letters, words, numbers, or written content of any kind. \
+            Keep the same visual design, colors, layout, and imagery but with NO TEXT whatsoever. \
+            Leave clean space where text was so it can be added later using design tools.
+            """
+    }
+
     /// Build a refinement prompt based on user feedback
     static func buildRefinement(originalPrompt: String, userFeedback: String) -> String {
         let feedbackLower = userFeedback.lowercased()

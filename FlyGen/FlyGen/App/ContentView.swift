@@ -63,6 +63,20 @@ struct ContentView: View {
             }
             modelContext.insert(profile)
             try? modelContext.save()
+        } else if let profile = userProfiles.first {
+            // Migration: Reset users with old credit amounts to new default of 10
+            // This handles users from the old system (1 credit per generation)
+            // who have less than 10 credits - give them the new default
+            if profile.credits < 10 {
+                profile.credits = 10
+                profile.lastSyncedAt = Date()
+                try? modelContext.save()
+
+                // Sync the reset credits to CloudKit
+                Task {
+                    await cloudKitService.saveCredits(profile.credits)
+                }
+            }
         }
     }
 
@@ -83,28 +97,33 @@ struct ContentView: View {
 struct MainTabView: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
     @Binding var showingSettings: Bool
+    @State private var selectedTab: Int = 0
 
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             HomeTab(viewModel: viewModel, showingSettings: $showingSettings)
                 .tabItem {
                     Label("Home", systemImage: "house.fill")
                 }
+                .tag(0)
 
-            GalleryTab()
+            GalleryTab(viewModel: viewModel, selectedTab: $selectedTab)
                 .tabItem {
                     Label("My Flyers", systemImage: "square.grid.2x2.fill")
                 }
+                .tag(1)
 
             PremiumTab()
                 .tabItem {
                     Label("Premium", systemImage: "crown.fill")
                 }
+                .tag(2)
 
             ProfileTab()
                 .tabItem {
                     Label("Profile", systemImage: "person.fill")
                 }
+                .tag(3)
         }
     }
 }

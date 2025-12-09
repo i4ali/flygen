@@ -44,7 +44,7 @@ struct SettingsView: View {
                         .font(FGTypography.body)
                         .foregroundColor(FGColors.textPrimary)
                     Spacer()
-                    Text("Gemini Flash")
+                    Text("Gemini 3 Pro")
                         .font(FGTypography.label)
                         .foregroundColor(FGColors.textSecondary)
                 }

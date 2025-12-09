@@ -119,3 +119,10 @@ subtle hidden pricing, calm muted urgency...
 │  OpenAI API (direct HTTPS calls or SDK)              │
 └─────────────────────────────────────────────────────┘
 ```
+
+## Debugging Links
+
+| Service | Dashboard |
+|---------|-----------|
+| Cloudflare Workers | https://dash.cloudflare.com/ |
+| CloudKit Console | https://icloud.developer.apple.com/dashboard/ |

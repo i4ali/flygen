@@ -112,7 +112,8 @@ FlyGen solves this by guiding users through a structured 7-step intake process t
 | Welcome | App logo, tagline "Professional flyers in seconds" | Continue |
 | Value Props | 3 slides: Speed, Quality, Simplicity | Swipe/Skip |
 | Permissions | Photo library access request | Allow/Deny |
-| Account | Sign up / Sign in options | Apple, Google, Email |
+
+**Note:** Authentication is handled automatically via iCloud/CloudKit. No explicit sign-in UI required.
 
 ### 3.2 Home Dashboard
 
@@ -922,7 +923,7 @@ Total: ~$21K/mo at scale
 - **SwiftUI** - UI framework
 - **SwiftData** - Local persistence
 - **StoreKit 2** - In-app purchases
-- **AuthenticationServices** - Sign in with Apple
+- **CloudKit** - iCloud sync and implicit authentication
 - **PhotosUI** - Photo picker for logos
 
 ### 8.3 Minimum Requirements
@@ -1006,7 +1007,7 @@ Total: ~$21K/mo at scale
 - [ ] Basic refinement (new generation)
 - [ ] Photo library save
 - [ ] Credit system (free tier: 3)
-- [ ] Sign in with Apple
+- [ ] iCloud/CloudKit sync
 
 ### 11.2 v1.1 Features
 

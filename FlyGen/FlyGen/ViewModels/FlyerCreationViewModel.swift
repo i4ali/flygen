@@ -143,6 +143,19 @@ class FlyerCreationViewModel: ObservableObject {
         showingCreationFlow = true
     }
 
+    /// Load a saved flyer's project as a template and start the creation flow
+    func loadFromSavedFlyer(_ savedFlyer: SavedFlyer) {
+        guard let savedProject = savedFlyer.project else { return }
+
+        // Create a copy with new ID and timestamps
+        project = FlyerProject(copyFrom: savedProject)
+        currentStep = .textContent
+        generationState = .idle
+        generatedImageData = nil
+        generatedFlyer = nil
+        showingCreationFlow = true
+    }
+
     /// Move to the next step
     func goToNextStep() {
         if let next = currentStep.next {
@@ -277,6 +290,63 @@ class FlyerCreationViewModel: ObservableObject {
                     projectId: projectId,
                     imageData: finalImageData,
                     prompt: refinedPrompt,
+                    negativePrompt: "",
+                    model: "flux-schnell"
+                )
+            }
+
+        } catch {
+            generationState = .error(error.localizedDescription)
+        }
+    }
+
+    /// Regenerate the flyer without any text
+    func regenerateWithoutText() async {
+        guard !lastPrompt.isEmpty else { return }
+
+        generationState = .generating
+
+        let noTextPrompt = RefinementBuilder.buildNoTextRefinement(originalPrompt: lastPrompt)
+
+        do {
+            let result = try await openRouterService.generateImage(
+                prompt: noTextPrompt,
+                aspectRatio: project?.output.aspectRatio ?? .portrait,
+                logoImageData: project?.logoImageData
+            )
+
+            lastPrompt = noTextPrompt
+
+            // Apply QR code if enabled (preserve from original generation)
+            var finalImage = result.image
+            var finalImageData = result.imageData
+
+            if let project = project, project.qrSettings.enabled {
+                let qrService = QRCodeService()
+                if let content = await qrService.generateContent(from: project.qrSettings),
+                   let qrImage = await qrService.generateQRCode(from: content),
+                   let composited = await qrService.compositeQRCode(
+                       onto: finalImage,
+                       qrCode: qrImage,
+                       position: project.qrSettings.position
+                   ) {
+                    finalImage = composited
+                    finalImageData = composited.pngData() ?? result.imageData
+                }
+            }
+
+            generatedImageData = finalImageData
+            generationState = .success(finalImage)
+
+            // Deduct credit for successful regeneration
+            onCreditDeduction?()
+
+            // Update GeneratedFlyer
+            if let projectId = project?.id {
+                generatedFlyer = GeneratedFlyer(
+                    projectId: projectId,
+                    imageData: finalImageData,
+                    prompt: noTextPrompt,
                     negativePrompt: "",
                     model: "flux-schnell"
                 )

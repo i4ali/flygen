@@ -2,6 +2,8 @@ import SwiftUI
 import SwiftData
 
 struct GalleryTab: View {
+    @ObservedObject var viewModel: FlyerCreationViewModel
+    @Binding var selectedTab: Int
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \SavedFlyer.createdAt, order: .reverse) private var savedFlyers: [SavedFlyer]
     @State private var selectedFlyer: SavedFlyer?
@@ -23,7 +25,11 @@ struct GalleryTab: View {
             .background(FGColors.backgroundPrimary)
             .navigationTitle("My Flyers")
             .sheet(item: $selectedFlyer) { flyer in
-                FlyerDetailSheet(flyer: flyer)
+                FlyerDetailSheet(flyer: flyer) { savedFlyer in
+                    // Use as template callback
+                    viewModel.loadFromSavedFlyer(savedFlyer)
+                    selectedTab = 0  // Switch to Home tab
+                }
             }
         }
     }
@@ -138,6 +144,7 @@ struct FlyerThumbnailView: View {
 struct FlyerDetailSheet: View {
     @Environment(\.dismiss) private var dismiss
     let flyer: SavedFlyer
+    var onUseAsTemplate: ((SavedFlyer) -> Void)?
     @State private var showingShareSheet = false
     @State private var showingSaveSuccess = false
 
@@ -189,7 +196,27 @@ struct FlyerDetailSheet: View {
                         .clipShape(RoundedRectangle(cornerRadius: FGSpacing.chipRadius))
                     }
 
-                    // Actions
+                    // Use as Template button (full width, prominent)
+                    if flyer.project != nil {
+                        Button {
+                            dismiss()
+                            onUseAsTemplate?(flyer)
+                        } label: {
+                            HStack(spacing: FGSpacing.sm) {
+                                Image(systemName: "doc.on.doc")
+                                Text("Use as Template")
+                            }
+                            .font(FGTypography.button)
+                            .foregroundColor(FGColors.textOnAccent)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, FGSpacing.md)
+                            .background(FGColors.accentPrimary)
+                            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+                        }
+                        .padding(.horizontal, FGSpacing.screenHorizontal)
+                    }
+
+                    // Secondary actions
                     HStack(spacing: FGSpacing.md) {
                         Button {
                             saveToPhotos()
@@ -199,11 +226,15 @@ struct FlyerDetailSheet: View {
                                 Text("Save")
                             }
                             .font(FGTypography.button)
-                            .foregroundColor(FGColors.textOnAccent)
+                            .foregroundColor(FGColors.accentPrimary)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, FGSpacing.md)
-                            .background(FGColors.accentPrimary)
+                            .background(FGColors.surfaceDefault)
                             .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: FGSpacing.buttonRadius)
+                                    .stroke(FGColors.accentPrimary, lineWidth: 1.5)
+                            )
                         }
 
                         Button {
@@ -288,5 +319,5 @@ struct ShareSheet: UIViewControllerRepresentable {
 }
 
 #Preview {
-    GalleryTab()
+    GalleryTab(viewModel: FlyerCreationViewModel(), selectedTab: .constant(1))
 }

@@ -9,7 +9,7 @@ struct RefinementSheet: View {
     @State private var feedback: String = ""
 
     private var hasCredits: Bool {
-        (userProfiles.first?.credits ?? 0) > 0
+        (userProfiles.first?.credits ?? 0) >= 10
     }
 
     private let quickSuggestions = [
@@ -106,7 +106,7 @@ struct RefinementSheet: View {
                         } else {
                             Image(systemName: "sparkles")
                         }
-                        Text("Apply Changes (1 credit)")
+                        Text("Apply Changes (10 credits)")
                     }
                     .font(FGTypography.buttonLarge)
                     .foregroundColor(FGColors.textOnAccent)
@@ -193,7 +193,7 @@ struct ReformatSheet: View {
     @State private var selectedRatio: AspectRatio = .portrait
 
     private var hasCredits: Bool {
-        (userProfiles.first?.credits ?? 0) > 0
+        (userProfiles.first?.credits ?? 0) >= 10
     }
 
     private let columns = [
@@ -249,7 +249,7 @@ struct ReformatSheet: View {
                         } else {
                             Image(systemName: "aspectratio")
                         }
-                        Text("Regenerate in \(selectedRatio.displayName) (1 credit)")
+                        Text("Regenerate in \(selectedRatio.displayName) (10 credits)")
                     }
                     .font(FGTypography.buttonLarge)
                     .foregroundColor(FGColors.textOnAccent)

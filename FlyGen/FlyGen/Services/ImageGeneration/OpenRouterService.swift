@@ -39,7 +39,7 @@ struct ImageGenerationResult {
 /// Service for generating images via OpenRouter API through Cloudflare Worker proxy
 actor OpenRouterService {
     private let baseURL = URL(string: "https://flygen-api.ali-muhammadimran.workers.dev")!
-    private let model = "google/gemini-2.5-flash-image-preview"
+    private let model = "google/gemini-3-pro-image-preview"
 
     /// Generate an image from a flyer project
     func generateImage(

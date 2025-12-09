@@ -26,6 +26,22 @@ struct FlyerProject: Codable, Identifiable, Equatable {
         self.updatedAt = Date()
     }
 
+    /// Creates a copy of another project with a new ID and timestamps
+    init(copyFrom source: FlyerProject) {
+        self.id = UUID()
+        self.category = source.category
+        self.textContent = source.textContent
+        self.colors = source.colors
+        self.visuals = source.visuals
+        self.output = source.output
+        self.targetAudience = source.targetAudience
+        self.specialInstructions = source.specialInstructions
+        self.logoImageData = source.logoImageData
+        self.qrSettings = source.qrSettings
+        self.createdAt = Date()
+        self.updatedAt = Date()
+    }
+
     /// Updates the updatedAt timestamp
     mutating func touch() {
         updatedAt = Date()

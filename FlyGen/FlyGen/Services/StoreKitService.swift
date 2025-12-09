@@ -3,31 +3,36 @@ import SwiftUI
 
 /// Credit pack product identifiers
 enum CreditPack: String, CaseIterable {
-    case credits10 = "com.flygen.credits.10"
-    case credits25 = "com.flygen.credits.25"
-    case credits50 = "com.flygen.credits.50"
+    case credits100 = "com.flygen.credits.100"
+    case credits250 = "com.flygen.credits.250"
+    case credits500 = "com.flygen.credits.500"
 
     var creditAmount: Int {
         switch self {
-        case .credits10: return 10
-        case .credits25: return 25
-        case .credits50: return 50
+        case .credits100: return 100
+        case .credits250: return 250
+        case .credits500: return 500
         }
     }
 
     var displayName: String {
         switch self {
-        case .credits10: return "10 Credits"
-        case .credits25: return "25 Credits"
-        case .credits50: return "50 Credits"
+        case .credits100: return "100 Credits"
+        case .credits250: return "250 Credits"
+        case .credits500: return "500 Credits"
         }
+    }
+
+    /// Number of generations this pack provides (10 credits per generation)
+    var generationCount: Int {
+        creditAmount / 10
     }
 
     var badge: String? {
         switch self {
-        case .credits10: return nil
-        case .credits25: return "Save 20%"
-        case .credits50: return "Best Value"
+        case .credits100: return nil
+        case .credits250: return "Save 20%"
+        case .credits500: return "Best Value"
         }
     }
 }
