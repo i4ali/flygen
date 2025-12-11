@@ -94,17 +94,17 @@ struct CategoryConfiguration {
     /// Which text fields are relevant for each category
     static let textFields: [FlyerCategory: [TextFieldType]] = [
         .event: [.headline, .subheadline, .scheduleEntries, .venueName, .address, .ctaText, .website],
-        .salePromo: [.headline, .subheadline, .discountText, .date, .address, .ctaText, .finePrint],
+        .salePromo: [.headline, .subheadline, .discountText, .date, .address, .ctaText, .finePrint, .website],
         .announcement: [.headline, .subheadline, .bodyText, .date, .ctaText],
-        .restaurantFood: [.headline, .subheadline, .address, .phone, .website, .price],
+        .restaurantFood: [.headline, .subheadline, .venueName, .address, .phone, .website, .price, .ctaText],
         .realEstate: [.headline, .price, .address, .bodyText, .phone, .email, .website],
         .jobPosting: [.headline, .subheadline, .bodyText, .ctaText, .email, .website],
         .classWorkshop: [.headline, .subheadline, .scheduleEntries, .venueName, .price, .ctaText],
         .grandOpening: [.headline, .subheadline, .date, .venueName, .address, .discountText, .ctaText],
-        .partyCelebration: [.headline, .subheadline, .date, .time, .venueName, .address, .ctaText],
-        .fitnessWellness: [.headline, .subheadline, .date, .time, .venueName, .price, .ctaText],
+        .partyCelebration: [.headline, .subheadline, .date, .time, .venueName, .address, .ctaText, .phone],
+        .fitnessWellness: [.headline, .subheadline, .date, .time, .venueName, .address, .price, .discountText, .ctaText, .phone],
         .nonprofitCharity: [.headline, .subheadline, .date, .bodyText, .ctaText, .website],
-        .musicConcert: [.headline, .subheadline, .date, .time, .venueName, .price, .ctaText]
+        .musicConcert: [.headline, .subheadline, .date, .time, .venueName, .address, .price, .ctaText, .website]
     ]
 
     /// Suggested visual elements to include by category
