@@ -14,6 +14,10 @@ struct ResultView: View {
     @State private var saveError: String?
     @State private var hasSavedToGallery = false
 
+    private var hasCredits: Bool {
+        (userProfiles.first?.totalCredits ?? 0) >= 10
+    }
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -127,15 +131,23 @@ struct ResultView: View {
                                 await viewModel.generateFlyer()
                             }
                         } label: {
-                            Text("Try Again")
+                            Text("Try Again (10 credits)")
                                 .font(FGTypography.button)
                                 .foregroundColor(FGColors.textOnAccent)
                                 .padding(.horizontal, FGSpacing.xxl)
                                 .padding(.vertical, FGSpacing.md)
-                                .background(FGColors.accentPrimary)
+                                .background(hasCredits ? FGColors.accentPrimary : FGColors.textTertiary)
                                 .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
                         }
+                        .disabled(!hasCredits)
                         .padding(.top, FGSpacing.md)
+
+                        if !hasCredits {
+                            Text("Insufficient credits")
+                                .font(FGTypography.caption)
+                                .foregroundColor(FGColors.warning)
+                                .padding(.top, FGSpacing.xs)
+                        }
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
