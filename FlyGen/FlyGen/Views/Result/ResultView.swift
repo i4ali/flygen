@@ -181,15 +181,14 @@ struct ResultView: View {
     }
 
     private func deductCredit() {
-        if let profile = userProfiles.first, profile.credits >= 10 {
-            profile.credits -= 10
+        if let profile = userProfiles.first, profile.deductCredits(10) {
             profile.lastSyncedAt = Date()
             try? modelContext.save()
-            print("Credit deducted (10 credits). Remaining credits: \(profile.credits)")
+            print("Credit deducted (10 credits). Remaining credits: \(profile.totalCredits)")
 
             // Sync credits to CloudKit
             Task {
-                await cloudKitService.saveCredits(profile.credits)
+                await cloudKitService.saveCredits(profile.totalCredits)
             }
         }
     }

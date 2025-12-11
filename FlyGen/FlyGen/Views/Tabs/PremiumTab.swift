@@ -10,9 +10,21 @@ struct PremiumTab: View {
 
     @State private var showingPurchaseSuccess = false
     @State private var purchasedCredits: Int = 0
+    @State private var showingSubscriptionSuccess = false
+    @State private var subscribedTier: SubscriptionTier?
+    @State private var selectedTab: PurchaseTab = .subscriptions
 
-    private var credits: Int {
-        userProfiles.first?.credits ?? 3
+    enum PurchaseTab: String, CaseIterable {
+        case subscriptions = "Subscribe"
+        case credits = "Credit Packs"
+    }
+
+    private var profile: UserProfile? {
+        userProfiles.first
+    }
+
+    private var totalCredits: Int {
+        profile?.totalCredits ?? 0
     }
 
     var body: some View {
@@ -22,11 +34,18 @@ struct PremiumTab: View {
                     // Header
                     headerSection
 
-                    // Current credits
-                    creditsDisplay
+                    // Current status (subscription or credits)
+                    statusSection
 
-                    // Credit Packs
-                    creditPacksSection
+                    // Tab picker
+                    tabPicker
+
+                    // Content based on selected tab
+                    if selectedTab == .subscriptions {
+                        subscriptionsSection
+                    } else {
+                        creditPacksSection
+                    }
 
                     // Features list
                     featuresSection
@@ -35,11 +54,19 @@ struct PremiumTab: View {
                 }
             }
             .background(FGColors.backgroundPrimary)
-            .navigationTitle("Get Credits")
+            .navigationTitle("FlyGen Premium")
             .alert("Purchase Successful!", isPresented: $showingPurchaseSuccess) {
                 Button("OK", role: .cancel) { }
             } message: {
                 Text("You've received \(purchasedCredits) credits. Happy creating!")
+            }
+            .alert("Welcome to \(subscribedTier?.displayName ?? "Premium")!", isPresented: $showingSubscriptionSuccess) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("You now have \(subscribedTier?.monthlyGenerations ?? 0) flyer generations per month!")
+            }
+            .task {
+                await checkAndRefreshSubscriptionCredits()
             }
         }
     }
@@ -54,7 +81,7 @@ struct PremiumTab: View {
                     .frame(width: 100, height: 100)
                     .blur(radius: 15)
 
-                Image(systemName: "sparkles")
+                Image(systemName: storeKitService.hasActiveSubscription ? "crown.fill" : "sparkles")
                     .font(.system(size: 50))
                     .foregroundStyle(
                         LinearGradient(
@@ -65,11 +92,13 @@ struct PremiumTab: View {
                     )
             }
 
-            Text("Credit Packs")
+            Text(storeKitService.hasActiveSubscription ? "You're a Subscriber!" : "Upgrade to Premium")
                 .font(FGTypography.displaySmall)
                 .foregroundColor(FGColors.textPrimary)
 
-            Text("Purchase credits to create\nmore AI-powered flyers")
+            Text(storeKitService.hasActiveSubscription
+                 ? "Enjoy your monthly flyer generations"
+                 : "Subscribe for monthly generations\nor buy credit packs")
                 .font(FGTypography.body)
                 .foregroundColor(FGColors.textSecondary)
                 .multilineTextAlignment(.center)
@@ -77,18 +106,54 @@ struct PremiumTab: View {
         .padding(.top, FGSpacing.xl)
     }
 
-    // MARK: - Credits Display
+    // MARK: - Status Section
 
-    private var creditsDisplay: some View {
-        HStack(spacing: FGSpacing.sm) {
-            Image(systemName: "sparkles")
-                .foregroundColor(FGColors.accentSecondary)
-            Text("Current Credits:")
-                .font(FGTypography.body)
-                .foregroundColor(FGColors.textSecondary)
-            Text("\(credits)")
-                .font(FGTypography.h3)
-                .foregroundColor(FGColors.textPrimary)
+    private var statusSection: some View {
+        VStack(spacing: FGSpacing.sm) {
+            // Credits display
+            HStack(spacing: FGSpacing.sm) {
+                Image(systemName: "sparkles")
+                    .foregroundColor(FGColors.accentSecondary)
+                Text("Available Credits:")
+                    .font(FGTypography.body)
+                    .foregroundColor(FGColors.textSecondary)
+                Text("\(totalCredits)")
+                    .font(FGTypography.h3)
+                    .foregroundColor(FGColors.textPrimary)
+            }
+
+            // Show credit breakdown for subscribers
+            if let profile = profile, profile.isPremium && profile.subscriptionCredits > 0 {
+                HStack(spacing: FGSpacing.lg) {
+                    Label("\(profile.subscriptionCredits) subscription", systemImage: "arrow.clockwise")
+                        .font(FGTypography.caption)
+                        .foregroundColor(FGColors.accentPrimary)
+
+                    if profile.credits > 0 {
+                        Label("\(profile.credits) purchased", systemImage: "bag")
+                            .font(FGTypography.caption)
+                            .foregroundColor(FGColors.textTertiary)
+                    }
+                }
+            }
+
+            // Subscription status
+            if storeKitService.hasActiveSubscription, let tier = storeKitService.currentTier {
+                HStack(spacing: FGSpacing.sm) {
+                    Image(systemName: tier.icon)
+                        .foregroundColor(FGColors.warning)
+                    Text(tier.displayName)
+                        .font(FGTypography.labelLarge)
+                        .foregroundColor(FGColors.textPrimary)
+
+                    if let renewalDate = storeKitService.subscriptionRenewalDate {
+                        Text("renews \(renewalDate.formatted(date: .abbreviated, time: .omitted))")
+                            .font(FGTypography.caption)
+                            .foregroundColor(FGColors.textTertiary)
+                    }
+                }
+                .padding(.top, FGSpacing.xs)
+            }
         }
         .padding(FGSpacing.md)
         .frame(maxWidth: .infinity)
@@ -96,8 +161,68 @@ struct PremiumTab: View {
         .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
         .overlay(
             RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
-                .stroke(FGColors.accentSecondary.opacity(0.3), lineWidth: 1)
+                .stroke(storeKitService.hasActiveSubscription ? FGColors.warning.opacity(0.5) : FGColors.accentSecondary.opacity(0.3), lineWidth: 1)
         )
+        .padding(.horizontal, FGSpacing.screenHorizontal)
+    }
+
+    // MARK: - Tab Picker
+
+    private var tabPicker: some View {
+        Picker("Purchase Type", selection: $selectedTab) {
+            ForEach(PurchaseTab.allCases, id: \.self) { tab in
+                Text(tab.rawValue).tag(tab)
+            }
+        }
+        .pickerStyle(.segmented)
+        .padding(.horizontal, FGSpacing.screenHorizontal)
+    }
+
+    // MARK: - Subscriptions Section
+
+    private var subscriptionsSection: some View {
+        VStack(spacing: FGSpacing.md) {
+            if storeKitService.isLoading {
+                loadingView
+            } else if storeKitService.subscriptions.isEmpty {
+                emptyProductsView
+            } else {
+                ForEach(SubscriptionTier.allCases, id: \.rawValue) { tier in
+                    if let product = storeKitService.product(for: tier) {
+                        SubscriptionCard(
+                            tier: tier,
+                            product: product,
+                            isCurrentPlan: storeKitService.currentTier == tier,
+                            isLoading: storeKitService.purchaseInProgress
+                        ) {
+                            await purchaseSubscription(product: product, tier: tier)
+                        }
+                    }
+                }
+
+                // Manage subscription link
+                if storeKitService.hasActiveSubscription {
+                    Button {
+                        Task {
+                            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                                try? await AppStore.showManageSubscriptions(in: windowScene)
+                            }
+                        }
+                    } label: {
+                        Text("Manage Subscription")
+                            .font(FGTypography.button)
+                            .foregroundColor(FGColors.accentPrimary)
+                    }
+                    .padding(.top, FGSpacing.sm)
+                }
+            }
+
+            if let error = storeKitService.errorMessage {
+                Text(error)
+                    .font(FGTypography.caption)
+                    .foregroundColor(FGColors.error)
+            }
+        }
         .padding(.horizontal, FGSpacing.screenHorizontal)
     }
 
@@ -105,48 +230,14 @@ struct PremiumTab: View {
 
     private var creditPacksSection: some View {
         VStack(spacing: FGSpacing.md) {
+            Text("One-time purchases, no subscription required")
+                .font(FGTypography.caption)
+                .foregroundColor(FGColors.textTertiary)
+
             if storeKitService.isLoading {
-                VStack(spacing: FGSpacing.sm) {
-                    ProgressView()
-                        .tint(FGColors.accentPrimary)
-                    Text("Loading products...")
-                        .font(FGTypography.body)
-                        .foregroundColor(FGColors.textSecondary)
-                }
-                .padding(FGSpacing.xl)
+                loadingView
             } else if storeKitService.products.isEmpty {
-                VStack(spacing: FGSpacing.md) {
-                    Image(systemName: "exclamationmark.triangle")
-                        .font(.system(size: 40))
-                        .foregroundColor(FGColors.warning)
-
-                    Text("Unable to load products")
-                        .font(FGTypography.h4)
-                        .foregroundColor(FGColors.textPrimary)
-
-                    Text("Please check your connection and try again")
-                        .font(FGTypography.caption)
-                        .foregroundColor(FGColors.textSecondary)
-
-                    Button {
-                        Task {
-                            await storeKitService.loadProducts()
-                        }
-                    } label: {
-                        Text("Retry")
-                            .font(FGTypography.button)
-                            .foregroundColor(FGColors.accentPrimary)
-                            .padding(.horizontal, FGSpacing.lg)
-                            .padding(.vertical, FGSpacing.sm)
-                            .background(FGColors.surfaceDefault)
-                            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: FGSpacing.buttonRadius)
-                                    .stroke(FGColors.accentPrimary, lineWidth: 1)
-                            )
-                    }
-                }
-                .padding(FGSpacing.lg)
+                emptyProductsView
             } else {
                 ForEach(CreditPack.allCases, id: \.rawValue) { pack in
                     if let product = storeKitService.product(for: pack) {
@@ -165,10 +256,57 @@ struct PremiumTab: View {
                 Text(error)
                     .font(FGTypography.caption)
                     .foregroundColor(FGColors.error)
-                    .padding(.horizontal, FGSpacing.screenHorizontal)
             }
         }
         .padding(.horizontal, FGSpacing.screenHorizontal)
+    }
+
+    // MARK: - Helper Views
+
+    private var loadingView: some View {
+        VStack(spacing: FGSpacing.sm) {
+            ProgressView()
+                .tint(FGColors.accentPrimary)
+            Text("Loading products...")
+                .font(FGTypography.body)
+                .foregroundColor(FGColors.textSecondary)
+        }
+        .padding(FGSpacing.xl)
+    }
+
+    private var emptyProductsView: some View {
+        VStack(spacing: FGSpacing.md) {
+            Image(systemName: "exclamationmark.triangle")
+                .font(.system(size: 40))
+                .foregroundColor(FGColors.warning)
+
+            Text("Unable to load products")
+                .font(FGTypography.h4)
+                .foregroundColor(FGColors.textPrimary)
+
+            Text("Please check your connection and try again")
+                .font(FGTypography.caption)
+                .foregroundColor(FGColors.textSecondary)
+
+            Button {
+                Task {
+                    await storeKitService.loadProducts()
+                }
+            } label: {
+                Text("Retry")
+                    .font(FGTypography.button)
+                    .foregroundColor(FGColors.accentPrimary)
+                    .padding(.horizontal, FGSpacing.lg)
+                    .padding(.vertical, FGSpacing.sm)
+                    .background(FGColors.surfaceDefault)
+                    .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: FGSpacing.buttonRadius)
+                            .stroke(FGColors.accentPrimary, lineWidth: 1)
+                    )
+            }
+        }
+        .padding(FGSpacing.lg)
     }
 
     // MARK: - Features Section
@@ -190,23 +328,160 @@ struct PremiumTab: View {
         .padding(.vertical, FGSpacing.md)
     }
 
-    // MARK: - Purchase Action
+    // MARK: - Actions
 
     private func purchaseCredits(product: Product, pack: CreditPack) async {
         if let creditsAdded = await storeKitService.purchase(product) {
-            // Add credits to user profile
-            if let profile = userProfiles.first {
+            if let profile = profile {
                 profile.credits += creditsAdded
                 profile.lastSyncedAt = Date()
                 try? modelContext.save()
 
-                // Sync credits to CloudKit
                 await cloudKitService.saveCredits(profile.credits)
 
                 purchasedCredits = creditsAdded
                 showingPurchaseSuccess = true
             }
         }
+    }
+
+    private func purchaseSubscription(product: Product, tier: SubscriptionTier) async {
+        if let purchasedTier = await storeKitService.purchaseSubscription(product) {
+            if let profile = profile {
+                profile.refreshSubscriptionCredits(tier: purchasedTier.rawValue, monthlyCredits: purchasedTier.monthlyCredits)
+                profile.premiumExpiresAt = storeKitService.subscriptionRenewalDate
+                try? modelContext.save()
+
+                await cloudKitService.saveCredits(profile.totalCredits)
+
+                subscribedTier = purchasedTier
+                showingSubscriptionSuccess = true
+            }
+        }
+    }
+
+    private func checkAndRefreshSubscriptionCredits() async {
+        guard let profile = profile,
+              storeKitService.hasActiveSubscription,
+              let tier = storeKitService.currentTier else {
+            return
+        }
+
+        // Check if we need to refresh credits for a new billing period
+        if profile.shouldRefreshSubscriptionCredits(renewalDate: storeKitService.subscriptionRenewalDate) {
+            profile.refreshSubscriptionCredits(tier: tier.rawValue, monthlyCredits: tier.monthlyCredits)
+            profile.premiumExpiresAt = storeKitService.subscriptionRenewalDate
+            try? modelContext.save()
+
+            await cloudKitService.saveCredits(profile.totalCredits)
+        }
+    }
+}
+
+// MARK: - Subscription Card
+
+struct SubscriptionCard: View {
+    let tier: SubscriptionTier
+    let product: Product
+    let isCurrentPlan: Bool
+    let isLoading: Bool
+    let onPurchase: () async -> Void
+
+    var body: some View {
+        VStack(spacing: FGSpacing.md) {
+            HStack(spacing: FGSpacing.md) {
+                // Icon
+                Image(systemName: tier.icon)
+                    .font(.title)
+                    .foregroundColor(tier == .pro ? FGColors.warning : FGColors.accentPrimary)
+                    .frame(width: 44, height: 44)
+                    .background(
+                        (tier == .pro ? FGColors.warning : FGColors.accentPrimary).opacity(0.15)
+                    )
+                    .clipShape(Circle())
+
+                // Info
+                VStack(alignment: .leading, spacing: FGSpacing.xxs) {
+                    HStack(spacing: FGSpacing.sm) {
+                        Text(tier.displayName)
+                            .font(FGTypography.h4)
+                            .foregroundColor(FGColors.textPrimary)
+
+                        if let badge = tier.badge {
+                            Text(badge)
+                                .font(FGTypography.captionBold)
+                                .foregroundColor(FGColors.textOnAccent)
+                                .padding(.horizontal, FGSpacing.sm)
+                                .padding(.vertical, FGSpacing.xxxs)
+                                .background(tier == .pro ? FGColors.warning : FGColors.accentPrimary)
+                                .clipShape(RoundedRectangle(cornerRadius: FGSpacing.chipRadius))
+                        }
+
+                        if isCurrentPlan {
+                            Text("Current")
+                                .font(FGTypography.captionBold)
+                                .foregroundColor(FGColors.success)
+                                .padding(.horizontal, FGSpacing.sm)
+                                .padding(.vertical, FGSpacing.xxxs)
+                                .background(FGColors.success.opacity(0.15))
+                                .clipShape(RoundedRectangle(cornerRadius: FGSpacing.chipRadius))
+                        }
+                    }
+
+                    Text(tier.description)
+                        .font(FGTypography.caption)
+                        .foregroundColor(FGColors.textSecondary)
+                }
+
+                Spacer()
+            }
+
+            // Price and subscribe button
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(product.displayPrice)
+                        .font(FGTypography.h3)
+                        .foregroundColor(FGColors.textPrimary)
+                    Text("per month")
+                        .font(FGTypography.caption)
+                        .foregroundColor(FGColors.textTertiary)
+                }
+
+                Spacer()
+
+                Button {
+                    Task {
+                        await onPurchase()
+                    }
+                } label: {
+                    if isLoading {
+                        ProgressView()
+                            .tint(FGColors.textOnAccent)
+                            .frame(width: 100)
+                    } else {
+                        Text(isCurrentPlan ? "Subscribed" : "Subscribe")
+                            .font(FGTypography.buttonLarge)
+                            .foregroundColor(isCurrentPlan ? FGColors.textTertiary : FGColors.textOnAccent)
+                            .frame(width: 100)
+                            .padding(.vertical, FGSpacing.sm)
+                            .background(isCurrentPlan ? FGColors.surfaceDefault : FGColors.accentPrimary)
+                            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: FGSpacing.buttonRadius)
+                                    .stroke(isCurrentPlan ? FGColors.borderSubtle : Color.clear, lineWidth: 1)
+                            )
+                    }
+                }
+                .disabled(isLoading || isCurrentPlan)
+            }
+        }
+        .padding(FGSpacing.cardPadding)
+        .background(FGColors.backgroundElevated)
+        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+        .overlay(
+            RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
+                .stroke(isCurrentPlan ? FGColors.success.opacity(0.5) : FGColors.borderSubtle, lineWidth: isCurrentPlan ? 2 : 1)
+        )
     }
 }
 
@@ -238,7 +513,7 @@ struct CreditPackCard: View {
                     }
                 }
 
-                Text(product.description)
+                Text("\(pack.generationCount) flyer generations")
                     .font(FGTypography.caption)
                     .foregroundColor(FGColors.textSecondary)
             }
@@ -313,4 +588,5 @@ struct FeatureRow: View {
 #Preview {
     PremiumTab()
         .environmentObject(StoreKitService())
+        .environmentObject(CloudKitService())
 }

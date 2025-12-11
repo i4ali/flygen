@@ -5,48 +5,48 @@
   ],
   "products" : [
     {
-      "displayPrice" : "1.99",
-      "familyShareable" : false,
-      "internalID" : "credits_10",
-      "localizations" : [
-        {
-          "description" : "Get 10 credits to create flyers",
-          "displayName" : "10 Credits",
-          "locale" : "en_US"
-        }
-      ],
-      "productID" : "com.flygen.credits.10",
-      "referenceName" : "10 Credits",
-      "type" : "Consumable"
-    },
-    {
       "displayPrice" : "3.99",
       "familyShareable" : false,
-      "internalID" : "credits_25",
+      "internalID" : "credits_100",
       "localizations" : [
         {
-          "description" : "Get 25 credits to create flyers - Save 20%!",
-          "displayName" : "25 Credits",
+          "description" : "Get 100 credits for 10 flyer generations",
+          "displayName" : "100 Credits",
           "locale" : "en_US"
         }
       ],
-      "productID" : "com.flygen.credits.25",
-      "referenceName" : "25 Credits",
+      "productID" : "com.flygen.credits.100",
+      "referenceName" : "100 Credits",
       "type" : "Consumable"
     },
     {
-      "displayPrice" : "5.99",
+      "displayPrice" : "9.99",
       "familyShareable" : false,
-      "internalID" : "credits_50",
+      "internalID" : "credits_250",
       "localizations" : [
         {
-          "description" : "Get 50 credits to create flyers - Best Value!",
-          "displayName" : "50 Credits",
+          "description" : "Get 250 credits for 25 flyer generations - Save 20%!",
+          "displayName" : "250 Credits",
           "locale" : "en_US"
         }
       ],
-      "productID" : "com.flygen.credits.50",
-      "referenceName" : "50 Credits",
+      "productID" : "com.flygen.credits.250",
+      "referenceName" : "250 Credits",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "17.99",
+      "familyShareable" : false,
+      "internalID" : "credits_500",
+      "localizations" : [
+        {
+          "description" : "Get 500 credits for 50 flyer generations - Best Value!",
+          "displayName" : "500 Credits",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.flygen.credits.500",
+      "referenceName" : "500 Credits",
       "type" : "Consumable"
     }
   ],
@@ -104,7 +104,69 @@
     ]
   },
   "subscriptionGroups" : [
+    {
+      "id" : "flygen_subscriptions",
+      "localizations" : [
+        {
+          "description" : "FlyGen subscription plans",
+          "displayName" : "FlyGen Subscriptions",
+          "locale" : "en_US"
+        }
+      ],
+      "name" : "FlyGen Subscriptions",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
 
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "6.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "flygen_plus",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "20 flyer generations per month",
+              "displayName" : "FlyGen Plus",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.flygen.subscription.plus",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "FlyGen Plus",
+          "subscriptionGroupID" : "flygen_subscriptions",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "12.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "flygen_pro",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "50 flyer generations per month",
+              "displayName" : "FlyGen Pro",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.flygen.subscription.pro",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "FlyGen Pro",
+          "subscriptionGroupID" : "flygen_subscriptions",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
   ],
   "version" : {
     "major" : 3,

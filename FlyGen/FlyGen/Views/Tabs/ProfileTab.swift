@@ -10,7 +10,7 @@ struct ProfileTab: View {
     @State private var showingSettings = false
 
     private var credits: Int {
-        userProfiles.first?.credits ?? 3
+        userProfiles.first?.totalCredits ?? 3
     }
 
     var body: some View {

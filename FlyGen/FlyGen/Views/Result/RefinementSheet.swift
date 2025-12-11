@@ -9,7 +9,7 @@ struct RefinementSheet: View {
     @State private var feedback: String = ""
 
     private var hasCredits: Bool {
-        (userProfiles.first?.credits ?? 0) >= 10
+        (userProfiles.first?.totalCredits ?? 0) >= 10
     }
 
     private let quickSuggestions = [
@@ -193,7 +193,7 @@ struct ReformatSheet: View {
     @State private var selectedRatio: AspectRatio = .portrait
 
     private var hasCredits: Bool {
-        (userProfiles.first?.credits ?? 0) >= 10
+        (userProfiles.first?.totalCredits ?? 0) >= 10
     }
 
     private let columns = [
