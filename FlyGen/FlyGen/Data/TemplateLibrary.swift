@@ -180,6 +180,45 @@ struct TemplateLibrary {
             visuals: VisualSettings(style: .neonGlow, mood: .exciting),
             output: OutputSettings(aspectRatio: .portrait),
             previewDescription: "Bold design for concerts, shows, and live performances"
+        ),
+
+        // MARK: - Real Estate Templates
+        FlyerTemplate(
+            id: "realestate_financial_services",
+            name: "Financial Services Promotion",
+            category: .realEstate,
+            textContent: TextContent(
+                headline: "[Service Name] Now Available",
+                subheadline: "Calculate how much you could get",
+                bodyText: "Choose your amount:\n• $50,000\n• $75,000\n• $100,000\n• $200,000",
+                ctaText: "Get Started Today",
+                website: "[yourcompany.com]",
+                finePrint: "[Company Name] • NMLS #[Number]"
+            ),
+            colors: ColorSettings(preset: .warm, backgroundType: .light),
+            visuals: VisualSettings(style: .modernMinimal, mood: .friendly),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Clean design for mortgage, loans, and financial services promotions"
+        ),
+
+        FlyerTemplate(
+            id: "realestate_property_listing",
+            name: "Property Listing",
+            category: .realEstate,
+            textContent: TextContent(
+                headline: "[Property Type] For Sale",
+                subheadline: "[Number] Bed • [Number] Bath • [Sq Ft] sqft",
+                bodyText: "[Key features and highlights of the property]",
+                address: "[Property Address]",
+                price: "$[Price]",
+                ctaText: "Schedule a Viewing",
+                phone: "[Agent Phone]",
+                email: "[agent@email.com]"
+            ),
+            colors: ColorSettings(preset: .cool, backgroundType: .light),
+            visuals: VisualSettings(style: .elegantLuxury, mood: .professional, imageryType: .photoRealistic),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Professional listing design for homes and properties"
         )
     ]
 
