@@ -136,6 +136,11 @@ class FlyerCreationViewModel: ObservableObject {
     /// Load a template and start the creation flow at Text Content step
     func loadTemplate(_ template: FlyerTemplate) {
         project = template.toProject()
+
+        // Clear fields that won't be visible in the form for this category
+        // This prevents hidden data from appearing in the generated flyer
+        clearNonVisibleFields()
+
         currentStep = .textContent
         generationState = .idle
         generatedImageData = nil
@@ -149,6 +154,11 @@ class FlyerCreationViewModel: ObservableObject {
 
         // Create a copy with new ID and timestamps
         project = FlyerProject(copyFrom: savedProject)
+
+        // Clear fields that won't be visible in the form for this category
+        // This prevents hidden data from appearing in the generated flyer
+        clearNonVisibleFields()
+
         currentStep = .textContent
         generationState = .idle
         generatedImageData = nil
@@ -442,6 +452,65 @@ class FlyerCreationViewModel: ObservableObject {
     }
 
     // MARK: - Text Content Helpers
+
+    /// Clear text fields that won't be visible in the form for the current category
+    /// This prevents hidden data from the original flyer from appearing in the generated output
+    private func clearNonVisibleFields() {
+        guard let category = project?.category else { return }
+
+        let visibleFields = Set(CategoryConfiguration.fieldsFor(category))
+
+        // Clear date/time if not visible (category uses scheduleEntries instead)
+        if !visibleFields.contains(.date) {
+            project?.textContent.date = nil
+        }
+        if !visibleFields.contains(.time) {
+            project?.textContent.time = nil
+        }
+
+        // Clear scheduleEntries (additionalInfo) if not visible
+        if !visibleFields.contains(.scheduleEntries) {
+            project?.textContent.additionalInfo = nil
+        }
+
+        // Clear other optional fields if not visible
+        if !visibleFields.contains(.subheadline) {
+            project?.textContent.subheadline = nil
+        }
+        if !visibleFields.contains(.bodyText) {
+            project?.textContent.bodyText = nil
+        }
+        if !visibleFields.contains(.venueName) {
+            project?.textContent.venueName = nil
+        }
+        if !visibleFields.contains(.address) {
+            project?.textContent.address = nil
+        }
+        if !visibleFields.contains(.price) {
+            project?.textContent.price = nil
+        }
+        if !visibleFields.contains(.discountText) {
+            project?.textContent.discountText = nil
+        }
+        if !visibleFields.contains(.ctaText) {
+            project?.textContent.ctaText = nil
+        }
+        if !visibleFields.contains(.phone) {
+            project?.textContent.phone = nil
+        }
+        if !visibleFields.contains(.email) {
+            project?.textContent.email = nil
+        }
+        if !visibleFields.contains(.website) {
+            project?.textContent.website = nil
+        }
+        if !visibleFields.contains(.socialHandle) {
+            project?.textContent.socialHandle = nil
+        }
+        if !visibleFields.contains(.finePrint) {
+            project?.textContent.finePrint = nil
+        }
+    }
 
     /// Get binding for a text field
     func binding(for field: TextFieldType) -> Binding<String> {
