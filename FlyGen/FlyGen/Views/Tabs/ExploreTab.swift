@@ -18,7 +18,7 @@ struct ExploreTab: View {
         SampleFlyer(imageName: "sample_tech_conference", title: "Tech Conference", category: "Event"),
         SampleFlyer(imageName: "sample_educational_newsletter", title: "Educational Newsletter", category: "Announcement"),
         SampleFlyer(imageName: "sample_mega_sale", title: "Mega Sale", category: "Sale / Promotion"),
-        SampleFlyer(imageName: "sample_fitness_challenge", title: "New Year Fitness Challenge", category: "Fitness / Wellness"),
+        SampleFlyer(imageName: "sample_brake_service", title: "Brake Service Special", category: "Sale / Promotion"),
         SampleFlyer(imageName: "sample_no_registration", title: "No Registration Fees", category: "Promotion"),
     ]
 
