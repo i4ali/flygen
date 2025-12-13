@@ -62,6 +62,24 @@ struct TemplateLibrary {
             previewDescription: "Perfect for workshop series, camps, festivals, and events spanning multiple dates"
         ),
 
+        // MARK: - Announcement Templates
+        FlyerTemplate(
+            id: "announcement_newsletter",
+            name: "Educational Newsletter",
+            category: .announcement,
+            textContent: TextContent(
+                headline: "[Newsletter Title]",
+                subheadline: "By [Author Name], [Title/Credentials]",
+                bodyText: "[Section 1 Title]\n[Content with bullet points...]\n\n[Section 2 Title]\n[More content...]\n\n[Section 3 Title]\n[Additional content...]",
+                venueName: "[Organization Name]",
+                website: "[website.com]"
+            ),
+            colors: ColorSettings(preset: .pastel, backgroundType: .light),
+            visuals: VisualSettings(style: .watercolorArtistic, mood: .friendly),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Perfect for health tips, educational content, newsletters, and informational flyers"
+        ),
+
         // MARK: - Sale Templates
         FlyerTemplate(
             id: "sale_flash",
@@ -219,6 +237,200 @@ struct TemplateLibrary {
             visuals: VisualSettings(style: .elegantLuxury, mood: .professional, imageryType: .photoRealistic),
             output: OutputSettings(aspectRatio: .portrait),
             previewDescription: "Professional listing design for homes and properties"
+        ),
+
+        // MARK: - Job Posting Templates
+        FlyerTemplate(
+            id: "job_hiring",
+            name: "We're Hiring",
+            category: .jobPosting,
+            textContent: TextContent(
+                headline: "We're Hiring!",
+                subheadline: "[Job Title]",
+                bodyText: "What we're looking for:\n• [Requirement 1]\n• [Requirement 2]\n• [Requirement 3]\n\nWhat we offer:\n• [Benefit 1]\n• [Benefit 2]\n• [Benefit 3]",
+                venueName: "[Company Name]",
+                address: "[Location / Remote]",
+                ctaText: "Apply Now",
+                email: "[careers@company.com]",
+                website: "[company.com/careers]"
+            ),
+            colors: ColorSettings(preset: .cool, backgroundType: .light),
+            visuals: VisualSettings(style: .corporateProfessional, mood: .professional),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Professional design for job postings and recruitment"
+        ),
+
+        FlyerTemplate(
+            id: "job_career_fair",
+            name: "Career Fair",
+            category: .jobPosting,
+            textContent: TextContent(
+                headline: "Career Fair",
+                subheadline: "Your Future Starts Here",
+                bodyText: "Meet top employers\n• [Industry 1]\n• [Industry 2]\n• [Industry 3]\n\nBring your resume!",
+                date: "[Date]",
+                time: "[Time]",
+                venueName: "[Venue Name]",
+                address: "[Address]",
+                ctaText: "Register Free",
+                website: "[registration-link.com]"
+            ),
+            colors: ColorSettings(preset: .warm, backgroundType: .light),
+            visuals: VisualSettings(style: .modernMinimal, mood: .exciting),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Engaging design for career fairs and recruiting events"
+        ),
+
+        // MARK: - Class / Workshop Templates
+        FlyerTemplate(
+            id: "class_workshop",
+            name: "Workshop Session",
+            category: .classWorkshop,
+            textContent: TextContent(
+                headline: "[Workshop Title]",
+                subheadline: "Learn • Practice • Master",
+                bodyText: "What you'll learn:\n• [Topic 1]\n• [Topic 2]\n• [Topic 3]\n\nPerfect for beginners and intermediate levels.",
+                date: "[Date]",
+                time: "[Time]",
+                venueName: "[Location / Online]",
+                price: "$[Price]",
+                ctaText: "Reserve Your Spot",
+                phone: "[Phone]",
+                website: "[registration-link.com]"
+            ),
+            colors: ColorSettings(preset: .warm, backgroundType: .light),
+            visuals: VisualSettings(style: .modernMinimal, mood: .inspirational),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Clean design for workshops, courses, and training sessions"
+        ),
+
+        FlyerTemplate(
+            id: "class_tutoring",
+            name: "Tutoring Services",
+            category: .classWorkshop,
+            textContent: TextContent(
+                headline: "[Subject] Tutoring",
+                subheadline: "Personalized Learning for Success",
+                bodyText: "Subjects offered:\n• [Subject 1]\n• [Subject 2]\n• [Subject 3]\n\nAll grade levels welcome",
+                venueName: "[Tutor/Company Name]",
+                price: "Starting at $[XX]/hour",
+                ctaText: "Book a Session",
+                phone: "[Phone]",
+                email: "[email@example.com]"
+            ),
+            colors: ColorSettings(preset: .cool, backgroundType: .light),
+            visuals: VisualSettings(style: .handDrawnOrganic, mood: .friendly),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Friendly design for tutoring and educational services"
+        ),
+
+        // MARK: - Grand Opening Templates
+        FlyerTemplate(
+            id: "grandopening_store",
+            name: "Store Grand Opening",
+            category: .grandOpening,
+            textContent: TextContent(
+                headline: "Grand Opening!",
+                subheadline: "[Business Name]",
+                bodyText: "Join us for our grand opening celebration!\n\n• Special discounts\n• Free giveaways\n• Refreshments",
+                date: "[Date]",
+                time: "[Time]",
+                venueName: "[Business Name]",
+                address: "[Address]",
+                discountText: "[XX]% Off Opening Day",
+                ctaText: "See You There!",
+                phone: "[Phone]"
+            ),
+            colors: ColorSettings(preset: .warm, backgroundType: .light),
+            visuals: VisualSettings(style: .boldVibrant, mood: .festive),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Celebratory design for store and business grand openings"
+        ),
+
+        FlyerTemplate(
+            id: "grandopening_restaurant",
+            name: "Restaurant Grand Opening",
+            category: .grandOpening,
+            textContent: TextContent(
+                headline: "Now Open!",
+                subheadline: "[Restaurant Name]",
+                bodyText: "Experience [cuisine type] like never before\n\n• Signature dishes\n• Craft cocktails\n• Warm atmosphere",
+                date: "Opening [Date]",
+                time: "Hours: [Opening Hours]",
+                address: "[Address]",
+                ctaText: "Make a Reservation",
+                phone: "[Phone]",
+                website: "[website.com]"
+            ),
+            colors: ColorSettings(preset: .earthTones, backgroundType: .dark),
+            visuals: VisualSettings(style: .elegantLuxury, mood: .elegant, imageryType: .photoRealistic),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Elegant design for restaurant and food establishment openings"
+        ),
+
+        // MARK: - Nonprofit / Community Templates
+        FlyerTemplate(
+            id: "nonprofit_fundraiser",
+            name: "Fundraiser Event",
+            category: .nonprofitCharity,
+            textContent: TextContent(
+                headline: "[Cause/Event Name]",
+                subheadline: "Together We Can Make a Difference",
+                bodyText: "Your support helps us:\n• [Impact 1]\n• [Impact 2]\n• [Impact 3]\n\nEvery donation counts!",
+                date: "[Date]",
+                time: "[Time]",
+                venueName: "[Organization Name]",
+                address: "[Venue/Address]",
+                ctaText: "Donate Now",
+                website: "[donation-link.com]"
+            ),
+            colors: ColorSettings(preset: .warm, backgroundType: .light),
+            visuals: VisualSettings(style: .handDrawnOrganic, mood: .inspirational),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Heartfelt design for fundraisers and charitable causes"
+        ),
+
+        FlyerTemplate(
+            id: "nonprofit_community_service",
+            name: "Community Service",
+            category: .nonprofitCharity,
+            textContent: TextContent(
+                headline: "[Service/Event Name]",
+                subheadline: "Serving Our Community",
+                bodyText: "Join us as we:\n• [Activity 1]\n• [Activity 2]\n• [Activity 3]\n\nAll are welcome!",
+                date: "[Date]",
+                time: "[Time]",
+                venueName: "[Organization Name]",
+                address: "[Location]",
+                ctaText: "Volunteer With Us",
+                phone: "[Phone]",
+                email: "[email@organization.org]"
+            ),
+            colors: ColorSettings(preset: .pastel, backgroundType: .light),
+            visuals: VisualSettings(style: .watercolorArtistic, mood: .friendly),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Warm design for community service and volunteer events"
+        ),
+
+        FlyerTemplate(
+            id: "nonprofit_faith_gathering",
+            name: "Faith & Community Gathering",
+            category: .nonprofitCharity,
+            textContent: TextContent(
+                headline: "[Event/Service Name]",
+                subheadline: "[Theme or Message]",
+                bodyText: "Join us for:\n• [Activity 1]\n• [Activity 2]\n• [Activity 3]\n\nAll faiths and backgrounds welcome.",
+                date: "[Day/Date]",
+                time: "[Time]",
+                venueName: "[Organization/Place of Worship]",
+                address: "[Address]",
+                ctaText: "Join Us",
+                phone: "[Phone]"
+            ),
+            colors: ColorSettings(preset: .cool, backgroundType: .light),
+            visuals: VisualSettings(style: .elegantLuxury, mood: .calm),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Serene design for religious services and faith-based gatherings"
         )
     ]
 
