@@ -62,6 +62,24 @@ struct TemplateLibrary {
             previewDescription: "Perfect for workshop series, camps, festivals, and events spanning multiple dates"
         ),
 
+        // MARK: - Announcement Templates
+        FlyerTemplate(
+            id: "announcement_newsletter",
+            name: "Educational Newsletter",
+            category: .announcement,
+            textContent: TextContent(
+                headline: "[Newsletter Title]",
+                subheadline: "By [Author Name], [Title/Credentials]",
+                bodyText: "[Section 1 Title]\n[Content with bullet points...]\n\n[Section 2 Title]\n[More content...]\n\n[Section 3 Title]\n[Additional content...]",
+                venueName: "[Organization Name]",
+                website: "[website.com]"
+            ),
+            colors: ColorSettings(preset: .pastel, backgroundType: .light),
+            visuals: VisualSettings(style: .watercolorArtistic, mood: .friendly),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Perfect for health tips, educational content, newsletters, and informational flyers"
+        ),
+
         // MARK: - Sale Templates
         FlyerTemplate(
             id: "sale_flash",
