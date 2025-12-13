@@ -88,7 +88,7 @@ struct SettingsView: View {
                     .font(FGTypography.body)
                     .foregroundColor(FGColors.textPrimary)
                 Spacer()
-                Text("1.0.0")
+                Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown")
                     .font(FGTypography.label)
                     .foregroundColor(FGColors.textSecondary)
             }

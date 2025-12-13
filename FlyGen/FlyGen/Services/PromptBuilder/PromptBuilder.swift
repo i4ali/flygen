@@ -207,6 +207,20 @@ struct PromptBuilder {
             }
         }
 
+        // Body text - chunk long text for better accuracy
+        if let bodyText = text.bodyText, !bodyText.isEmpty {
+            if bodyText.split(separator: " ").count > 10 {
+                parts.append("Body content (display across multiple lines/sections):")
+                for chunk in chunkText(bodyText, maxWords: 8) {
+                    let spelled = spellOut(chunk)
+                    parts.append("  Section: \"\(chunk)\" (SPELLING: \(spelled)).")
+                }
+            } else {
+                let spelled = spellOut(bodyText)
+                parts.append("Body text must read EXACTLY: \"\(bodyText)\" (SPELLING: \(spelled)).")
+            }
+        }
+
         // Date and time
         if let date = text.date, !date.isEmpty, let time = text.time, !time.isEmpty {
             let combined = "\(date) | \(time)"

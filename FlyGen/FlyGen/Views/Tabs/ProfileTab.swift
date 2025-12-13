@@ -6,7 +6,6 @@ struct ProfileTab: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var savedFlyers: [SavedFlyer]
     @Query private var userProfiles: [UserProfile]
-    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = true
     @State private var showingSettings = false
 
     private var credits: Int {
@@ -197,28 +196,6 @@ struct ProfileTab: View {
                     .padding(FGSpacing.cardPadding)
                 }
 
-                Divider()
-                    .background(FGColors.borderSubtle)
-
-                Button {
-                    hasCompletedOnboarding = false
-                } label: {
-                    HStack {
-                        Label {
-                            Text("Show Onboarding Again")
-                                .font(FGTypography.body)
-                                .foregroundColor(FGColors.textPrimary)
-                        } icon: {
-                            Image(systemName: "arrow.counterclockwise")
-                                .foregroundColor(FGColors.accentPrimary)
-                        }
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .font(.caption)
-                            .foregroundColor(FGColors.textTertiary)
-                    }
-                    .padding(FGSpacing.cardPadding)
-                }
             }
             .background(FGColors.backgroundElevated)
             .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
@@ -245,7 +222,7 @@ struct ProfileTab: View {
                         .font(FGTypography.body)
                         .foregroundColor(FGColors.textPrimary)
                     Spacer()
-                    Text("1.0.0")
+                    Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown")
                         .font(FGTypography.label)
                         .foregroundColor(FGColors.textSecondary)
                 }
