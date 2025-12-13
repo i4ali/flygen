@@ -445,6 +445,17 @@ class FlyerPromptBuilder:
                 spelled = self._spell_out(text.subheadline)
                 parts.append(f'Secondary headline must read EXACTLY: "{text.subheadline}" (SPELLING: {spelled}).')
 
+        # Body text - chunk long text for better accuracy
+        if text.body_text:
+            if len(text.body_text.split()) > 10:
+                parts.append('Body content (display across multiple lines/sections):')
+                for chunk in self._chunk_text(text.body_text, 8):
+                    spelled = self._spell_out(chunk)
+                    parts.append(f'  Section: "{chunk}" (SPELLING: {spelled}).')
+            else:
+                spelled = self._spell_out(text.body_text)
+                parts.append(f'Body text must read EXACTLY: "{text.body_text}" (SPELLING: {spelled}).')
+
         # Date and time
         if text.date and text.time:
             combined = f"{text.date} | {text.time}"

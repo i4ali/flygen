@@ -200,6 +200,13 @@ class OutputSettings:
 
 
 @dataclass
+class QRCodeSettings:
+    """QR code configuration for flyer"""
+    enabled: bool = False
+    url: str = ""  # URL to encode in QR code
+
+
+@dataclass
 class FlyerProject:
     """Complete flyer project specification"""
     category: FlyerCategory
@@ -210,6 +217,7 @@ class FlyerProject:
     target_audience: Optional[str] = None
     special_instructions: Optional[str] = None
     logo_path: Optional[str] = None  # Path to brand logo image
+    qr_settings: Optional[QRCodeSettings] = None  # QR code configuration
 
 
 # =============================================================================

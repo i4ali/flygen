@@ -113,9 +113,9 @@ struct MainTabView: View {
                 }
                 .tag(1)
 
-            PremiumTab()
+            ExploreTab()
                 .tabItem {
-                    Label("Premium", systemImage: "crown.fill")
+                    Label("Explore", systemImage: "sparkles")
                 }
                 .tag(2)
 

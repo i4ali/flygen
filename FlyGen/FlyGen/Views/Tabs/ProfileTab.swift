@@ -7,6 +7,7 @@ struct ProfileTab: View {
     @Query private var savedFlyers: [SavedFlyer]
     @Query private var userProfiles: [UserProfile]
     @State private var showingSettings = false
+    @State private var showingCreditPurchase = false
 
     private var credits: Int {
         userProfiles.first?.credits ?? 3
@@ -40,6 +41,9 @@ struct ProfileTab: View {
             .navigationTitle("Profile")
             .sheet(isPresented: $showingSettings) {
                 SettingsView()
+            }
+            .sheet(isPresented: $showingCreditPurchase) {
+                CreditPurchaseSheet()
             }
         }
     }
@@ -262,8 +266,8 @@ struct ProfileTab: View {
     // MARK: - Credits Promo Section
 
     private var creditsPromoSection: some View {
-        NavigationLink {
-            PremiumTab()
+        Button {
+            showingCreditPurchase = true
         } label: {
             HStack(spacing: FGSpacing.md) {
                 ZStack {

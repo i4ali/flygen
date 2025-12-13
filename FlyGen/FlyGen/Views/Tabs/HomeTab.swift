@@ -6,6 +6,7 @@ struct HomeTab: View {
     @Binding var showingSettings: Bool
     @Query private var userProfiles: [UserProfile]
     @State private var showingTemplates = false
+    @State private var showingCreditPurchase = false
 
     private var credits: Int {
         userProfiles.first?.credits ?? 3
@@ -22,22 +23,26 @@ struct HomeTab: View {
 
                     Spacer()
 
-                    // Credits display
-                    HStack(spacing: FGSpacing.xs) {
-                        Image(systemName: "sparkles")
-                            .foregroundColor(FGColors.accentSecondary)
-                        Text("\(credits)")
-                            .font(FGTypography.labelLarge)
-                            .foregroundColor(FGColors.textPrimary)
+                    // Credits display (tappable to purchase)
+                    Button {
+                        showingCreditPurchase = true
+                    } label: {
+                        HStack(spacing: FGSpacing.xs) {
+                            Image(systemName: "sparkles")
+                                .foregroundColor(FGColors.accentSecondary)
+                            Text("\(credits)")
+                                .font(FGTypography.labelLarge)
+                                .foregroundColor(FGColors.textPrimary)
+                        }
+                        .padding(.horizontal, FGSpacing.sm)
+                        .padding(.vertical, FGSpacing.xs)
+                        .background(FGColors.surfaceDefault)
+                        .clipShape(Capsule())
+                        .overlay(
+                            Capsule()
+                                .stroke(FGColors.borderSubtle, lineWidth: 1)
+                        )
                     }
-                    .padding(.horizontal, FGSpacing.sm)
-                    .padding(.vertical, FGSpacing.xs)
-                    .background(FGColors.surfaceDefault)
-                    .clipShape(Capsule())
-                    .overlay(
-                        Capsule()
-                            .stroke(FGColors.borderSubtle, lineWidth: 1)
-                    )
 
                     Button {
                         showingSettings = true
@@ -152,6 +157,9 @@ struct HomeTab: View {
             }
             .sheet(isPresented: $showingTemplates) {
                 TemplatePickerView(viewModel: viewModel)
+            }
+            .sheet(isPresented: $showingCreditPurchase) {
+                CreditPurchaseSheet()
             }
         }
     }

@@ -2,10 +2,11 @@ import SwiftUI
 import SwiftData
 import StoreKit
 
-struct PremiumTab: View {
+struct CreditPurchaseSheet: View {
     @EnvironmentObject var storeKitService: StoreKitService
     @EnvironmentObject var cloudKitService: CloudKitService
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
     @Query private var userProfiles: [UserProfile]
 
     @State private var showingPurchaseSuccess = false
@@ -28,16 +29,27 @@ struct PremiumTab: View {
                     // Credit Packs
                     creditPacksSection
 
-                    // Features list
-                    featuresSection
-
                     Spacer(minLength: FGSpacing.xl)
                 }
             }
             .background(FGColors.backgroundPrimary)
             .navigationTitle("Get Credits")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.title2)
+                            .foregroundStyle(FGColors.textTertiary)
+                    }
+                }
+            }
             .alert("Purchase Successful!", isPresented: $showingPurchaseSuccess) {
-                Button("OK", role: .cancel) { }
+                Button("OK", role: .cancel) {
+                    dismiss()
+                }
             } message: {
                 Text("You've received \(purchasedCredits) credits. Happy creating!")
             }
@@ -74,7 +86,7 @@ struct PremiumTab: View {
                 .foregroundColor(FGColors.textSecondary)
                 .multilineTextAlignment(.center)
         }
-        .padding(.top, FGSpacing.xl)
+        .padding(.top, FGSpacing.lg)
     }
 
     // MARK: - Credits Display
@@ -171,25 +183,6 @@ struct PremiumTab: View {
         .padding(.horizontal, FGSpacing.screenHorizontal)
     }
 
-    // MARK: - Features Section
-
-    private var featuresSection: some View {
-        VStack(alignment: .leading, spacing: FGSpacing.md) {
-            Text("What You Get")
-                .font(FGTypography.h3)
-                .foregroundColor(FGColors.textPrimary)
-                .padding(.horizontal, FGSpacing.screenHorizontal)
-
-            VStack(spacing: FGSpacing.sm) {
-                FeatureRow(icon: "wand.and.stars", title: "AI-Powered Design", description: "Professional flyers in seconds")
-                FeatureRow(icon: "arrow.triangle.2.circlepath", title: "Unlimited Refinements", description: "Perfect your design with feedback")
-                FeatureRow(icon: "icloud", title: "Cloud Sync", description: "Access flyers on all your devices")
-                FeatureRow(icon: "square.and.arrow.up", title: "Easy Sharing", description: "Share directly to social media")
-            }
-        }
-        .padding(.vertical, FGSpacing.md)
-    }
-
     // MARK: - Purchase Action
 
     private func purchaseCredits(product: Product, pack: CreditPack) async {
@@ -277,40 +270,8 @@ struct CreditPackCard: View {
     }
 }
 
-// MARK: - Feature Row
-
-struct FeatureRow: View {
-    let icon: String
-    let title: String
-    let description: String
-
-    var body: some View {
-        HStack(spacing: FGSpacing.md) {
-            Image(systemName: icon)
-                .font(.title2)
-                .foregroundColor(FGColors.accentPrimary)
-                .frame(width: 40)
-
-            VStack(alignment: .leading, spacing: FGSpacing.xxxs) {
-                Text(title)
-                    .font(FGTypography.labelLarge)
-                    .foregroundColor(FGColors.textPrimary)
-
-                Text(description)
-                    .font(FGTypography.caption)
-                    .foregroundColor(FGColors.textSecondary)
-            }
-
-            Spacer()
-
-            Image(systemName: "checkmark.circle.fill")
-                .foregroundColor(FGColors.success)
-        }
-        .padding(.horizontal, FGSpacing.screenHorizontal)
-    }
-}
-
 #Preview {
-    PremiumTab()
+    CreditPurchaseSheet()
         .environmentObject(StoreKitService())
+        .environmentObject(CloudKitService())
 }
