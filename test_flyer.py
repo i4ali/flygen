@@ -18,7 +18,7 @@ from models import (
     FlyerProject, FlyerCategory, TextContent, ColorSettings,
     VisualSettings, OutputSettings, QRCodeSettings,
     VisualStyle, Mood, ColorSchemePreset, BackgroundType,
-    TextProminence, AspectRatio
+    TextProminence, AspectRatio, FlyerLanguage
 )
 from prompt_builder import FlyerPromptBuilder
 from image_generator import create_generator
@@ -37,12 +37,11 @@ TEST_CASES = {
             category=FlyerCategory.REAL_ESTATE,
             text_content=TextContent(
                 headline="OPEN HOUSE",
-                subheadline="Your Dream Home Awaits",
+                body_text="Your Dream Home Awaits\nSaturday, December 21st | 10 AM - 4 PM\nSchedule a Tour Today!",
                 address="17710 S Cypress Villas Dr, Spring, TX 77379, United States",
-                date="Saturday, December 21st",
-                time="10 AM - 4 PM",
                 price="$450,000",
-                cta_text="Schedule a Tour Today!"
+                phone="(555) 123-4567",
+                website="example.com/property/17710-cypress-villas"
             ),
             colors=ColorSettings(preset=ColorSchemePreset.EARTH_TONES),
             visuals=VisualSettings(
@@ -66,10 +65,8 @@ TEST_CASES = {
                 headline="COMMUNITY MEETUP",
                 subheadline="Join Us for an Evening of Connection",
                 venue_name="Cypress Community Center",
-                date="January 15, 2025",
-                time="6:30 PM - 9:00 PM",
-                phone="(713) 555-0199",
-                email="events@cypressvillas.com",
+                date="January 15, 2025 | 6:30 PM - 9:00 PM",
+                address="1234 Community Drive, Cypress TX",
                 website="www.cypressvillas.com/openhouse",
                 cta_text="RSVP Now!"
             ),
@@ -94,9 +91,9 @@ TEST_CASES = {
             text_content=TextContent(
                 headline="GRAND OPENING DECEMBER 21ST 2024",
                 subheadline="Celebrate With Us - 50% Off Everything!",
+                date="December 21, 2024 | 9 AM - 9 PM",
                 venue_name="MegaStore Plaza",
                 address="4521 Commerce Blvd, Houston, TX",
-                time="9 AM - 9 PM",
                 discount_text="50% OFF ALL ITEMS",
                 cta_text="Don't Miss Out!"
             ),
@@ -115,21 +112,16 @@ TEST_CASES = {
 
     4: {
         "name": "All Fields Stress Test",
-        "description": "All text fields populated - maximum text content",
+        "description": "All text fields populated - maximum text content for SALE_PROMO category",
         "project": FlyerProject(
             category=FlyerCategory.SALE_PROMO,
             text_content=TextContent(
                 headline="MEGA WEEKEND SALE",
                 subheadline="The Biggest Sale of the Year",
-                date="December 14-15, 2024",
-                time="10:00 AM - 8:00 PM",
-                venue_name="Fashion District Mall",
-                address="8899 Retail Row, Suite 200, Dallas, TX 75201",
-                price="Starting at $9.99",
+                date="December 14-15, 2024 | 10:00 AM - 8:00 PM",
+                address="Fashion District Mall, 8899 Retail Row, Suite 200, Dallas, TX 75201",
                 discount_text="UP TO 70% OFF",
                 cta_text="Shop Now - Limited Time!",
-                phone="1-800-555-SALE",
-                email="deals@fashiondistrict.com",
                 website="www.fashiondistrict.com/mega-sale",
                 fine_print="While supplies last. Some exclusions apply."
             ),
@@ -159,8 +151,7 @@ TEST_CASES = {
             text_content=TextContent(
                 headline="PHOTOGRAPHY MASTERCLASS",
                 subheadline="Learn professional photography techniques from award-winning photographers in this comprehensive hands-on workshop series",
-                date="Every Saturday in January",
-                time="2:00 PM - 5:00 PM",
+                date="Every Saturday in January | 2:00 PM - 5:00 PM",
                 venue_name="Creative Arts Studio",
                 price="$299 for full series",
                 cta_text="Register Now - Limited Spots!"
@@ -219,14 +210,10 @@ TEST_CASES = {
             text_content=TextContent(
                 headline="WINTER CODING CAMP",
                 subheadline="Learn to Code This Holiday Season!",
-                date="December 26-30, 2024",
-                time="9:00 AM - 3:00 PM",
+                date="December 26-30, 2024 | 9:00 AM - 3:00 PM",
                 venue_name="TechKids Academy",
-                address="2847 Innovation Drive, Austin, TX 78701",
                 price="$299 per week",
-                discount_text="EARLY BIRD: 20% OFF",
-                cta_text="Register Now - Limited Spots!",
-                website="www.techkidsaustin.com"
+                cta_text="Register Now - Limited Spots!"
             ),
             colors=ColorSettings(
                 preset=ColorSchemePreset.COOL,
@@ -256,14 +243,11 @@ TEST_CASES = {
             text_content=TextContent(
                 headline="GRAND OPENING",
                 subheadline="Experience Modern Italian Cuisine",
-                date="Friday, January 10th, 2025",
-                time="5:00 PM - 11:00 PM",
+                date="Friday, January 10th, 2025 | 5:00 PM - 11:00 PM",
                 venue_name="Bella Vista Ristorante",
                 address="445 Main Street, Downtown Seattle",
                 discount_text="COMPLIMENTARY CHAMPAGNE",
-                cta_text="Reserve Your Table",
-                phone="(206) 555-8832",
-                website="www.bellavistarestaurant.com"
+                cta_text="Reserve Your Table"
             ),
             colors=ColorSettings(
                 preset=ColorSchemePreset.BLACK_GOLD,
@@ -301,8 +285,7 @@ TEST_CASES = {
                 price="$149 for 30 days",
                 discount_text="FIRST 50 SIGN-UPS: 40% OFF",
                 cta_text="Join the Challenge Today!",
-                phone="(303) 555-7890",
-                website="www.peakperformancegym.com"
+                phone="(303) 555-7890"
             ),
             colors=ColorSettings(
                 preset=ColorSchemePreset.NEON,
@@ -332,11 +315,9 @@ TEST_CASES = {
             text_content=TextContent(
                 headline="DOWNTOWN HOLIDAY MARKET",
                 subheadline="Three Weekends of Holiday Magic!",
-                body_text="DEC 14-15: Artisan Crafts & Live Music\nDEC 21-22: Santa Meet & Greet & Cookie Decorating\nDEC 28-29: New Year Countdown & Fireworks Show",
-                time="Saturdays 10AM-9PM | Sundays 11AM-6PM",
+                date="DEC 14-15, 21-22, 28-29 | Sat 10AM-9PM, Sun 11AM-6PM",
                 venue_name="Riverside Plaza",
                 address="500 Commerce Street, Portland, OR 97204",
-                price="FREE Admission | VIP $25",
                 cta_text="Get Your VIP Pass!",
                 website="www.portlandholidaymarket.com"
             ),
@@ -368,18 +349,11 @@ TEST_CASES = {
             text_content=TextContent(
                 headline="TECHSUMMIT 2025",
                 subheadline="The Premier Technology Conference for Developers & Entrepreneurs",
-                body_text="KEYNOTE SPEAKERS: Sarah Chen (Google AI) • Marcus Williams (Tesla) • Dr. Elena Rodriguez (MIT)\nWORKSHOPS: Machine Learning Fundamentals • Cloud Architecture • Mobile Development • Cybersecurity Best Practices\nNETWORKING: 500+ Industry Professionals • Startup Showcase • Career Fair",
-                date="March 15-17, 2025",
-                time="Registration 8:00 AM | Sessions 9:00 AM - 6:00 PM | Networking 6:00 PM - 9:00 PM",
+                date="March 15-17, 2025 | 9:00 AM - 6:00 PM",
                 venue_name="Austin Convention Center",
                 address="500 E Cesar Chavez Street, Austin, TX 78701",
-                price="Early Bird $299 | Standard $449 | VIP $899",
-                discount_text="STUDENTS: 50% OFF WITH VALID ID",
                 cta_text="Register Now at TechSummit2025.com",
-                phone="(512) 555-TECH",
-                email="info@techsummit2025.com",
-                website="www.techsummit2025.com",
-                fine_print="Includes lunch, conference materials, and access to all sessions. Hotel accommodations not included."
+                website="www.techsummit2025.com"
             ),
             colors=ColorSettings(
                 preset=ColorSchemePreset.COOL,
@@ -399,24 +373,19 @@ TEST_CASES = {
 
     12: {
         "name": "Ultra Text-Dense Music Festival",
-        "description": "Showcase: Extreme text density to stress-test text rendering limits",
+        "description": "Showcase: Text density stress-test for MUSIC_CONCERT category",
         "project": FlyerProject(
             category=FlyerCategory.MUSIC_CONCERT,
             text_content=TextContent(
                 headline="SOUNDWAVE MUSIC FESTIVAL 2025",
                 subheadline="3 Days • 5 Stages • 50+ Artists • The Ultimate Music Experience",
-                body_text="FRIDAY JUNE 13: The Midnight Echo • Neon Dreamers • Crystal Waves • DJ Phoenix Rising • The Velvet Underground Revival\nSATURDAY JUNE 14: Stellar Collision • The Black Keys Tribute • Aurora Borealis • Electric Symphony Orchestra • MC Thunder & The Storm Chasers\nSUNDAY JUNE 15: Cosmic Wanderers • The Jazz Fusion Collective • Acoustic Sunset Sessions • Grand Finale Fireworks Show featuring Symphony Orchestra",
                 date="June 13-15, 2025",
                 time="Gates 11AM | Music 12PM-12AM | Camping Available",
                 venue_name="Riverside Amphitheater & Festival Grounds",
                 address="12500 Festival Drive, Austin, TX 78701",
-                price="Single Day $89 | Weekend Pass $199 | VIP Weekend $449 | Platinum All-Access $899",
-                discount_text="EARLY BIRD ENDS MAY 1ST - SAVE 30%",
-                cta_text="Get Tickets Now at SoundwaveFest.com - Don't Miss Out!",
-                phone="1-888-SOUNDWV",
-                email="tickets@soundwavefest.com",
-                website="www.soundwavefest.com",
-                fine_print="Rain or shine event. No refunds. Must be 18+ for general admission, 21+ for VIP areas. Bag policy enforced. Professional cameras prohibited. Food and beverages available on-site. Free parking with weekend pass."
+                price="Single Day $89 | Weekend $199 | VIP $449",
+                cta_text="Get Tickets Now - Don't Miss Out!",
+                website="www.soundwavefest.com"
             ),
             colors=ColorSettings(
                 preset=ColorSchemePreset.NEON,
@@ -445,19 +414,12 @@ TEST_CASES = {
             category=FlyerCategory.EVENT,
             text_content=TextContent(
                 headline="SPRING VALLEY COMMUNITY BUSINESS FAIR 2025",
-                subheadline="Shop Local • Support Local • 75+ Vendors • Live Entertainment • Free Parking",
-                body_text="FOOD & DINING: Maria's Mexican Kitchen • Golden Dragon Chinese • Joe's BBQ Pit • Sweet Treats Bakery • Sunrise Coffee Roasters\nHOME SERVICES: AAA Plumbing & HVAC • Bright Future Solar • CleanPro Carpet Cleaning • GreenThumb Landscaping • SecureHome Alarms\nHEALTH & WELLNESS: Valley Family Dental • Peak Fitness Studio • Serenity Day Spa • Dr. Chen's Acupuncture • PetCare Veterinary Clinic\nPROFESSIONAL SERVICES: First National Bank • State Farm Insurance • Liberty Tax Prep • Anderson & Associates Law Firm • TechFix Computer Repair\nLIVE ENTERTAINMENT: 10AM DJ Mike's Morning Mix • 12PM Spring Valley High School Band • 2PM The Acoustic Duo • 4PM Mariachi Los Amigos • 6PM Headliner: The Blue Notes",
-                date="Saturday & Sunday, April 12-13, 2025",
-                time="Saturday 9AM-8PM | Sunday 10AM-6PM | Food Court Opens 11AM Daily",
+                subheadline="Shop Local • Support Local • 75+ Vendors • Live Entertainment",
+                date="April 12-13, 2025 | Sat 9AM-8PM, Sun 10AM-6PM",
                 venue_name="Spring Valley Town Center & Civic Plaza",
-                address="1250 Main Street, Spring Valley, TX 77386 (Corner of Main & Oak Avenue)",
-                price="General Admission FREE | VIP Lounge $35 | Vendor Booth $150-$500",
-                discount_text="EARLY BIRD VENDOR REGISTRATION: 25% OFF UNTIL MARCH 1ST",
+                address="1250 Main Street, Spring Valley, TX 77386",
                 cta_text="Register Your Business Today at SpringValleyFair.com!",
-                phone="(281) 555-FAIR | Vendor Hotline: (281) 555-0199",
-                email="info@springvalleyfair.com | vendors@springvalleyfair.com",
-                website="www.springvalleyfair.com",
-                fine_print="Presented by Spring Valley Chamber of Commerce. Platinum Sponsors: First National Bank, Valley Medical Center, AutoNation Honda. Gold Sponsors: HEB, Kroger, Chick-fil-A. Rain date: April 19-20. Service animals only. ATM on-site. Children's activities in Family Fun Zone. Food vendors cash & card accepted."
+                website="www.springvalleyfair.com"
             ),
             colors=ColorSettings(
                 preset=ColorSchemePreset.WARM,
@@ -506,8 +468,10 @@ Ages 6+: Set clear, consistent limits as a family
 
 Islamic Perspective:
 Islam teaches us to protect the heart and mind from harmful influences.
-"A child is raised upon what he is exposed to." - Al-Kāfī""",
-                website="www.nwsaturdayschool.org"
+"A child is raised upon what he is exposed to." - Al-Kāfī
+
+Visit: www.nwsaturdayschool.org""",
+                cta_text="Learn More"
             ),
             colors=ColorSettings(
                 preset=ColorSchemePreset.PASTEL,
@@ -517,6 +481,378 @@ Islam teaches us to protect the heart and mind from harmful influences.
                 style=VisualStyle.WATERCOLOR_ARTISTIC,
                 mood=Mood.FRIENDLY,
                 text_prominence=TextProminence.DOMINANT
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            )
+        )
+    },
+
+    # =========================================================================
+    # MULTI-LANGUAGE FLYERS - Testing Urdu and Chinese rendering
+    # =========================================================================
+
+    15: {
+        "name": "Urdu Event Flyer - Urdu Input",
+        "description": "Tests Urdu language rendering with native Urdu text input",
+        "project": FlyerProject(
+            category=FlyerCategory.EVENT,
+            language=FlyerLanguage.URDU,
+            text_content=TextContent(
+                headline="کمیونٹی میلا",
+                subheadline="آئیں اور خاندان کے ساتھ مزے کریں",
+                date="15 جنوری 2025 | شام 5 بجے سے رات 9 بجے تک",
+                venue_name="اسلامک سینٹر",
+                address="123 Main Street, Houston TX",
+                cta_text="ابھی رجسٹر کریں!"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.WARM,
+                background_type=BackgroundType.GRADIENT
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.ELEGANT_LUXURY,
+                mood=Mood.FESTIVE,
+                text_prominence=TextProminence.DOMINANT
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            )
+        )
+    },
+
+    16: {
+        "name": "Chinese Restaurant Flyer - Chinese Input",
+        "description": "Tests Chinese character rendering with native Chinese text input",
+        "project": FlyerProject(
+            category=FlyerCategory.RESTAURANT_FOOD,
+            language=FlyerLanguage.CHINESE,
+            text_content=TextContent(
+                headline="金龙餐厅",
+                subheadline="正宗川菜 · 美味可口",
+                address="北京路123号",
+                phone="010-1234-5678",
+                price="人均 ¥80-120",
+                cta_text="欢迎光临!"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.WARM,
+                background_type=BackgroundType.DARK
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.ELEGANT_LUXURY,
+                mood=Mood.FRIENDLY,
+                text_prominence=TextProminence.BALANCED
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            )
+        )
+    },
+
+    17: {
+        "name": "Urdu Sale Flyer - Urdu Input",
+        "description": "Tests Urdu language with sale/promo category - native Urdu text input",
+        "project": FlyerProject(
+            category=FlyerCategory.SALE_PROMO,
+            language=FlyerLanguage.URDU,
+            text_content=TextContent(
+                headline="بڑی سیل",
+                subheadline="سال کی سب سے بڑی چھوٹ",
+                date="14-15 دسمبر 2024",
+                discount_text="70% تک چھوٹ",
+                cta_text="ابھی خریداری کریں!",
+                fine_print="سٹاک ختم ہونے تک۔ شرائط لاگو۔"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.NEON,
+                background_type=BackgroundType.DARK
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.BOLD_VIBRANT,
+                mood=Mood.URGENT,
+                text_prominence=TextProminence.DOMINANT
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            )
+        )
+    },
+
+    18: {
+        "name": "Chinese Fitness Class - Chinese Input",
+        "description": "Tests Chinese with fitness/wellness category - native Chinese text input",
+        "project": FlyerProject(
+            category=FlyerCategory.FITNESS_WELLNESS,
+            language=FlyerLanguage.CHINESE,
+            text_content=TextContent(
+                headline="30天健身挑战",
+                subheadline="新年新气象 · 改变从今天开始",
+                date="2025年1月6日起",
+                time="每日课程: 早6点, 中午12点, 晚6点",
+                venue_name="巅峰健身中心",
+                price="30天仅需¥499",
+                discount_text="前50名报名享6折优惠",
+                cta_text="立即加入挑战!"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.NEON,
+                background_type=BackgroundType.DARK
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.BOLD_VIBRANT,
+                mood=Mood.EXCITING,
+                text_prominence=TextProminence.DOMINANT
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            )
+        )
+    },
+
+    19: {
+        "name": "Urdu Niaz Invitation - Urdu Input",
+        "description": "Tests Urdu religious event invitation - native Urdu text input",
+        "project": FlyerProject(
+            category=FlyerCategory.EVENT,
+            language=FlyerLanguage.URDU,
+            text_content=TextContent(
+                headline="نیاز امام جعفر صادق (علیہ السلام)",
+                subheadline="براہ کرم ہمارے ساتھ شامل ہوں",
+                date="یکم جنوری 2026 | شام 6 بجے سے رات 10 بجے تک",
+                address="4521 Meadow Brook Drive, Houston TX 77084",
+                cta_text="فاطمہ اور علی کی طرف سے دعوت"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.PASTEL,
+                background_type=BackgroundType.GRADIENT
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.ELEGANT_LUXURY,
+                mood=Mood.ELEGANT,
+                text_prominence=TextProminence.DOMINANT
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            )
+        )
+    },
+
+    20: {
+        "name": "Spanish Restaurant Flyer - Spanish Input",
+        "description": "Tests Spanish language rendering with native Spanish text input",
+        "project": FlyerProject(
+            category=FlyerCategory.RESTAURANT_FOOD,
+            language=FlyerLanguage.SPANISH,
+            text_content=TextContent(
+                headline="Taquería El Sol",
+                subheadline="Auténtica Comida Mexicana",
+                address="2547 Main Street, Houston TX 77002",
+                phone="(713) 555-1234",
+                price="Tacos desde $2.50",
+                cta_text="¡Visítanos Hoy!"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.WARM,
+                background_type=BackgroundType.LIGHT
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.BOLD_VIBRANT,
+                mood=Mood.FRIENDLY,
+                text_prominence=TextProminence.BALANCED
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            )
+        )
+    },
+
+    21: {
+        "name": "Arabic Eid Event Flyer - Arabic Input",
+        "description": "Tests Arabic language rendering with native Arabic text input",
+        "project": FlyerProject(
+            category=FlyerCategory.EVENT,
+            language=FlyerLanguage.ARABIC,
+            text_content=TextContent(
+                headline="عيد مبارك",
+                subheadline="احتفال عيد الفطر المبارك",
+                date="٣٠ مارس ٢٠٢٥ | بعد صلاة العشاء",
+                venue_name="المركز الإسلامي",
+                address="1234 Islamic Center Drive, Houston TX",
+                cta_text="الدعوة عامة للجميع"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.PASTEL,
+                background_type=BackgroundType.GRADIENT
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.ELEGANT_LUXURY,
+                mood=Mood.FESTIVE,
+                text_prominence=TextProminence.DOMINANT
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            )
+        )
+    },
+
+    # =========================================================================
+    # ENGLISH INPUT TESTS - Testing auto-translation from English
+    # =========================================================================
+
+    22: {
+        "name": "Urdu Event Flyer - English Input",
+        "description": "Tests Urdu translation from English input - Community Fair",
+        "project": FlyerProject(
+            category=FlyerCategory.EVENT,
+            language=FlyerLanguage.URDU,
+            text_content=TextContent(
+                headline="Community Fair",
+                subheadline="Come and have fun with family",
+                date="January 15, 2025 | 5 PM to 9 PM",
+                venue_name="Islamic Center",
+                address="123 Main Street, Houston TX",
+                cta_text="Register Now!"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.WARM,
+                background_type=BackgroundType.GRADIENT
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.ELEGANT_LUXURY,
+                mood=Mood.FESTIVE,
+                text_prominence=TextProminence.DOMINANT
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            )
+        )
+    },
+
+    23: {
+        "name": "Chinese Restaurant Flyer - English Input",
+        "description": "Tests Chinese translation from English input - Golden Dragon",
+        "project": FlyerProject(
+            category=FlyerCategory.RESTAURANT_FOOD,
+            language=FlyerLanguage.CHINESE,
+            text_content=TextContent(
+                headline="Golden Dragon Restaurant",
+                subheadline="Authentic Sichuan Cuisine - Delicious",
+                address="123 Beijing Road",
+                phone="010-1234-5678",
+                price="Average ¥80-120 per person",
+                cta_text="Welcome!"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.WARM,
+                background_type=BackgroundType.DARK
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.ELEGANT_LUXURY,
+                mood=Mood.FRIENDLY,
+                text_prominence=TextProminence.BALANCED
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            )
+        )
+    },
+
+    24: {
+        "name": "Spanish Restaurant Flyer - English Input",
+        "description": "Tests Spanish translation from English input - Taqueria",
+        "project": FlyerProject(
+            category=FlyerCategory.RESTAURANT_FOOD,
+            language=FlyerLanguage.SPANISH,
+            text_content=TextContent(
+                headline="The Sun Taqueria",
+                subheadline="Authentic Mexican Food",
+                address="2547 Main Street, Houston TX 77002",
+                phone="(713) 555-1234",
+                price="Tacos from $2.50",
+                cta_text="Visit Us Today!"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.WARM,
+                background_type=BackgroundType.LIGHT
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.BOLD_VIBRANT,
+                mood=Mood.FRIENDLY,
+                text_prominence=TextProminence.BALANCED
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            )
+        )
+    },
+
+    25: {
+        "name": "Arabic Eid Event Flyer - English Input",
+        "description": "Tests Arabic translation from English input - Eid celebration",
+        "project": FlyerProject(
+            category=FlyerCategory.EVENT,
+            language=FlyerLanguage.ARABIC,
+            text_content=TextContent(
+                headline="Eid Mubarak",
+                subheadline="Eid Al-Fitr Celebration",
+                date="March 30, 2025 | After Isha Prayer",
+                venue_name="Islamic Center",
+                address="1234 Islamic Center Drive, Houston TX",
+                cta_text="Everyone is welcome!"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.PASTEL,
+                background_type=BackgroundType.GRADIENT
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.ELEGANT_LUXURY,
+                mood=Mood.FESTIVE,
+                text_prominence=TextProminence.DOMINANT
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            )
+        )
+    },
+
+    26: {
+        "name": "Urdu Majlis Imam Hussain - English Input",
+        "description": "Tests Urdu translation from English input - Somber religious gathering",
+        "project": FlyerProject(
+            category=FlyerCategory.EVENT,
+            language=FlyerLanguage.URDU,
+            text_content=TextContent(
+                headline="Majlis Imam Hussain",
+                subheadline="Commemorating the Sacrifice of Karbala",
+                date="July 15, 2025 | After Maghrib Prayer",
+                venue_name="Hussaini Center",
+                address="5678 Ashura Lane, Houston TX",
+                cta_text="All are welcome to attend"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.MONOCHROME,
+                primary_color="black",
+                accent_color="dark green",
+                background_type=BackgroundType.DARK
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.ELEGANT_LUXURY,
+                mood=Mood.SERIOUS,
+                text_prominence=TextProminence.DOMINANT,
+                include_elements=["Islamic geometric patterns", "crescent moon"]
             ),
             output=OutputSettings(
                 aspect_ratio=AspectRatio.PORTRAIT_4_5,
@@ -710,7 +1046,7 @@ Examples:
             )
         except ValueError:
             print(f"❌ Invalid test number: {args.test}")
-            print("   Use a number (1-13) or 'all'")
+            print("   Use a number (1-18) or 'all'")
 
 
 if __name__ == "__main__":

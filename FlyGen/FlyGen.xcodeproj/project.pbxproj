@@ -28,6 +28,7 @@
 		6576A29683D25BA73B38F93B /* RefinementSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB654DCA88FF679FBEFB358 /* RefinementSheet.swift */; };
 		66727D08C7345522F2AE16F8 /* DynamicTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12BBCEF15B2AF34A5A490D50 /* DynamicTextField.swift */; };
 		6C12C05D86292A4CD215C4C6 /* FlyerProject.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDBC65359BBD8F17309A355E /* FlyerProject.swift */; };
+		AALANG00000000001 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = LANG00000000000001 /* Language.swift */; };
 		7AA28B261F949897D5FC2C5E /* FlyerTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCFDACA03D378A28BF9670D9 /* FlyerTemplate.swift */; };
 		7CD3EBE906F543C25CE7093B /* FormatStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06A2021DD0B02DD6E91E8438 /* FormatStepView.swift */; };
 		7E5251F0DAF882D2A7170827 /* VisualStyleStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF6F1696F9CC685DEFECA3D /* VisualStyleStepView.swift */; };
@@ -181,6 +182,7 @@
 		BBCREDIT000000001 /* CreditPurchaseSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditPurchaseSheet.swift; sourceTree = "<group>"; };
 		EB04130801C20BE11F94D733 /* TextContentStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextContentStepView.swift; sourceTree = "<group>"; };
 		EDBC65359BBD8F17309A355E /* FlyerProject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyerProject.swift; sourceTree = "<group>"; };
+		LANG00000000000001 /* Language.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
 		F6E4BF8C2207C43A1E6C895F /* SelectionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionCard.swift; sourceTree = "<group>"; };
 		F7A5464C24F5B8B13D097698 /* MoodStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodStepView.swift; sourceTree = "<group>"; };
 		F8CD1653EE523C3DC3B07690 /* SavedFlyer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedFlyer.swift; sourceTree = "<group>"; };
@@ -449,6 +451,7 @@
 				91F81AFF070A145CF531597E /* ColorSettings.swift */,
 				EDBC65359BBD8F17309A355E /* FlyerProject.swift */,
 				FCFDACA03D378A28BF9670D9 /* FlyerTemplate.swift */,
+				LANG00000000000001 /* Language.swift */,
 				7753024C905464D110F059D5 /* OutputSettings.swift */,
 				827EC63DDC6A4957895A8B11 /* QRCodeSettings.swift */,
 				F8CD1653EE523C3DC3B07690 /* SavedFlyer.swift */,
@@ -621,6 +624,7 @@
 				C1E4818D4049DED2EA4A4C4D /* FlyerCreationViewModel.swift in Sources */,
 				6C12C05D86292A4CD215C4C6 /* FlyerProject.swift in Sources */,
 				7AA28B261F949897D5FC2C5E /* FlyerTemplate.swift in Sources */,
+				AALANG00000000001 /* Language.swift in Sources */,
 				7CD3EBE906F543C25CE7093B /* FormatStepView.swift in Sources */,
 				583C195202B2E418A93257F1 /* GalleryTab.swift in Sources */,
 				C28748394FC9BABE59A6C1DF /* GenerationView.swift in Sources */,

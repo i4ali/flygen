@@ -143,6 +143,37 @@ class ImageryType(Enum):
     NO_TEXT = "no_text"  # Generate without text for manual overlay
 
 
+class FlyerLanguage(Enum):
+    """Output language for flyer text"""
+    ENGLISH = "en"
+    SPANISH = "es"
+    URDU = "ur"
+    ARABIC = "ar"
+    CHINESE = "zh"
+
+    @property
+    def display_name(self) -> str:
+        names = {
+            "en": "English",
+            "es": "Español (Spanish)",
+            "ur": "اردو (Urdu)",
+            "ar": "العربية (Arabic)",
+            "zh": "中文 (Chinese)",
+        }
+        return names.get(self.value, self.value)
+
+    @property
+    def prompt_instruction(self) -> str:
+        instructions = {
+            "en": "Generate all text content in English.",
+            "es": "Generate all text content in Spanish (Español). Translate headlines, descriptions, and calls-to-action to Spanish. DO NOT translate addresses, phone numbers, emails, or URLs - keep them exactly as provided. If the user provides text in another language, translate it to Spanish while preserving the intended meaning and tone.",
+            "ur": "Generate all text content in Urdu (اردو). Use Nastaliq script. Render Urdu text right-to-left. Translate headlines, descriptions, and calls-to-action to Urdu. DO NOT translate addresses, phone numbers, emails, or URLs - keep them exactly as provided in left-to-right order. If the user provides text in another language, translate it to Urdu while preserving the intended meaning and tone.",
+            "ar": "Generate all text content in Arabic (العربية). Render Arabic text right-to-left. Translate headlines, descriptions, and calls-to-action to Arabic. DO NOT translate addresses, phone numbers, emails, or URLs - keep them exactly as provided in left-to-right order. If the user provides text in another language, translate it to Arabic while preserving the intended meaning and tone.",
+            "zh": "Generate all text content in Simplified Chinese (简体中文). Translate headlines, descriptions, and calls-to-action to Chinese. DO NOT translate addresses, phone numbers, emails, or URLs - keep them exactly as provided. If the user provides text in another language, translate it to Chinese while preserving the intended meaning and tone.",
+        }
+        return instructions.get(self.value, "")
+
+
 # =============================================================================
 # DATA CLASSES - Structured data collected from user
 # =============================================================================
@@ -210,6 +241,7 @@ class QRCodeSettings:
 class FlyerProject:
     """Complete flyer project specification"""
     category: FlyerCategory
+    language: FlyerLanguage = FlyerLanguage.ENGLISH
     text_content: TextContent = field(default_factory=TextContent)
     colors: ColorSettings = field(default_factory=ColorSettings)
     visuals: VisualSettings = field(default_factory=VisualSettings)
@@ -225,19 +257,20 @@ class FlyerProject:
 # =============================================================================
 
 # Which text fields are relevant for each category
+# NOTE: iOS uses scheduleEntries for EVENT/CLASS_WORKSHOP; Python uses date as equivalent
 CATEGORY_TEXT_FIELDS: Dict[FlyerCategory, List[str]] = {
-    FlyerCategory.EVENT: ["headline", "subheadline", "date", "time", "venue_name", "address", "price", "cta_text", "website"],
-    FlyerCategory.SALE_PROMO: ["headline", "subheadline", "date", "discount_text", "address", "cta_text", "fine_print"],
+    FlyerCategory.EVENT: ["headline", "subheadline", "date", "venue_name", "address", "cta_text", "website"],
+    FlyerCategory.SALE_PROMO: ["headline", "subheadline", "discount_text", "date", "address", "cta_text", "fine_print", "website"],
     FlyerCategory.ANNOUNCEMENT: ["headline", "subheadline", "body_text", "date", "cta_text"],
-    FlyerCategory.RESTAURANT_FOOD: ["headline", "subheadline", "address", "phone", "website", "price"],
+    FlyerCategory.RESTAURANT_FOOD: ["headline", "subheadline", "venue_name", "address", "phone", "website", "price", "cta_text"],
     FlyerCategory.REAL_ESTATE: ["headline", "price", "address", "body_text", "phone", "email", "website"],
     FlyerCategory.JOB_POSTING: ["headline", "subheadline", "body_text", "cta_text", "email", "website"],
-    FlyerCategory.CLASS_WORKSHOP: ["headline", "subheadline", "date", "time", "venue_name", "price", "cta_text"],
-    FlyerCategory.GRAND_OPENING: ["headline", "subheadline", "date", "venue_name", "address", "discount_text", "cta_text"],
-    FlyerCategory.PARTY_CELEBRATION: ["headline", "subheadline", "date", "time", "venue_name", "address", "cta_text"],
-    FlyerCategory.FITNESS_WELLNESS: ["headline", "subheadline", "date", "time", "venue_name", "price", "cta_text"],
-    FlyerCategory.NONPROFIT_CHARITY: ["headline", "subheadline", "date", "body_text", "cta_text", "website"],
-    FlyerCategory.MUSIC_CONCERT: ["headline", "subheadline", "date", "time", "venue_name", "price", "cta_text"],
+    FlyerCategory.CLASS_WORKSHOP: ["headline", "subheadline", "date", "venue_name", "price", "cta_text"],
+    FlyerCategory.GRAND_OPENING: ["headline", "subheadline", "body_text", "date", "time", "venue_name", "address", "discount_text", "cta_text", "phone", "website"],
+    FlyerCategory.PARTY_CELEBRATION: ["headline", "subheadline", "date", "time", "venue_name", "address", "cta_text", "phone"],
+    FlyerCategory.FITNESS_WELLNESS: ["headline", "subheadline", "date", "time", "venue_name", "address", "price", "discount_text", "cta_text", "phone"],
+    FlyerCategory.NONPROFIT_CHARITY: ["headline", "subheadline", "body_text", "date", "time", "venue_name", "address", "cta_text", "phone", "email", "website"],
+    FlyerCategory.MUSIC_CONCERT: ["headline", "subheadline", "date", "time", "venue_name", "address", "price", "cta_text", "website"],
 }
 
 # Suggested visual elements by category

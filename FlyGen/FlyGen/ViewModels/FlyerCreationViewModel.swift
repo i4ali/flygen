@@ -536,6 +536,18 @@ class FlyerCreationViewModel: ObservableObject {
         )
     }
 
+    /// Get binding for language selection
+    var languageBinding: Binding<FlyerLanguage> {
+        Binding(
+            get: { [weak self] in
+                self?.project?.language ?? .english
+            },
+            set: { [weak self] newValue in
+                self?.project?.language = newValue
+            }
+        )
+    }
+
     private func getValue(for field: TextFieldType) -> String {
         guard let text = project?.textContent else { return "" }
         switch field {

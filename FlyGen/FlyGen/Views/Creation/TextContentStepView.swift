@@ -40,6 +40,10 @@ struct TextContentStepView: View {
                     .padding(.horizontal, FGSpacing.screenHorizontal)
                 }
 
+                // Language picker
+                LanguagePicker(selection: viewModel.languageBinding)
+                    .padding(.horizontal, FGSpacing.screenHorizontal)
+
                 // Dynamic text fields
                 VStack(spacing: FGSpacing.md) {
                     ForEach(fields) { field in

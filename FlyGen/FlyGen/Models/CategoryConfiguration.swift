@@ -100,10 +100,10 @@ struct CategoryConfiguration {
         .realEstate: [.headline, .price, .address, .bodyText, .phone, .email, .website],
         .jobPosting: [.headline, .subheadline, .bodyText, .ctaText, .email, .website],
         .classWorkshop: [.headline, .subheadline, .scheduleEntries, .venueName, .price, .ctaText],
-        .grandOpening: [.headline, .subheadline, .date, .venueName, .address, .discountText, .ctaText],
+        .grandOpening: [.headline, .subheadline, .bodyText, .date, .time, .venueName, .address, .discountText, .ctaText, .phone, .website],
         .partyCelebration: [.headline, .subheadline, .date, .time, .venueName, .address, .ctaText, .phone],
         .fitnessWellness: [.headline, .subheadline, .date, .time, .venueName, .address, .price, .discountText, .ctaText, .phone],
-        .nonprofitCharity: [.headline, .subheadline, .date, .bodyText, .ctaText, .website],
+        .nonprofitCharity: [.headline, .subheadline, .bodyText, .date, .time, .venueName, .address, .ctaText, .phone, .email, .website],
         .musicConcert: [.headline, .subheadline, .date, .time, .venueName, .address, .price, .ctaText, .website]
     ]
 

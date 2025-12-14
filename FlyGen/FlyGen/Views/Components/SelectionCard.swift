@@ -289,6 +289,71 @@ struct MoodSelectionCard: View {
     }
 }
 
+/// Language picker for selecting flyer output language
+struct LanguagePicker: View {
+    @Binding var selection: FlyerLanguage
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: FGSpacing.xs) {
+            HStack(spacing: FGSpacing.xxs) {
+                Image(systemName: "globe")
+                    .font(.system(size: 14))
+                    .foregroundColor(FGColors.textSecondary)
+
+                Text("Output Language")
+                    .font(FGTypography.label)
+                    .foregroundColor(FGColors.textSecondary)
+            }
+
+            Menu {
+                ForEach(FlyerLanguage.allCases, id: \.self) { language in
+                    Button {
+                        withAnimation(FGAnimations.quickEaseOut) {
+                            selection = language
+                        }
+                    } label: {
+                        HStack {
+                            Text(language.displayName)
+                            if selection == language {
+                                Image(systemName: "checkmark")
+                            }
+                        }
+                    }
+                }
+            } label: {
+                HStack {
+                    Text(selection.displayName)
+                        .font(FGTypography.body)
+                        .foregroundColor(FGColors.textPrimary)
+
+                    Spacer()
+
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(FGColors.textSecondary)
+                }
+                .padding(.horizontal, FGSpacing.sm)
+                .padding(.vertical, FGSpacing.sm)
+                .background(
+                    RoundedRectangle(cornerRadius: FGSpacing.chipRadius)
+                        .fill(FGColors.surfaceSelected)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: FGSpacing.chipRadius)
+                        .stroke(FGColors.accentPrimary, lineWidth: 1)
+                )
+            }
+        }
+        .padding(FGSpacing.sm)
+        .background(FGColors.surfaceDefault)
+        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+        .overlay(
+            RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
+                .stroke(FGColors.borderSubtle, lineWidth: 1)
+        )
+    }
+}
+
 #Preview("Selection Cards - Dark Theme") {
     ScrollView {
         VStack(spacing: FGSpacing.lg) {

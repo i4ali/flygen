@@ -3,6 +3,7 @@ import Foundation
 struct FlyerProject: Codable, Identifiable, Equatable {
     let id: UUID
     var category: FlyerCategory
+    var language: FlyerLanguage
     var textContent: TextContent
     var colors: ColorSettings
     var visuals: VisualSettings
@@ -14,9 +15,10 @@ struct FlyerProject: Codable, Identifiable, Equatable {
     let createdAt: Date
     var updatedAt: Date
 
-    init(category: FlyerCategory) {
+    init(category: FlyerCategory, language: FlyerLanguage = .english) {
         self.id = UUID()
         self.category = category
+        self.language = language
         self.textContent = TextContent()
         self.colors = ColorSettings()
         self.visuals = VisualSettings()
@@ -30,6 +32,7 @@ struct FlyerProject: Codable, Identifiable, Equatable {
     init(copyFrom source: FlyerProject) {
         self.id = UUID()
         self.category = source.category
+        self.language = source.language
         self.textContent = source.textContent
         self.colors = source.colors
         self.visuals = source.visuals

@@ -11,8 +11,6 @@ struct TemplateLibrary {
             textContent: TextContent(
                 headline: "[Your Event Name]",
                 subheadline: "Join us for an unforgettable experience",
-                date: "[Date]",
-                time: "[Time]",
                 venueName: "[Venue Name]",
                 address: "[Address]",
                 ctaText: "RSVP Now"
@@ -30,8 +28,6 @@ struct TemplateLibrary {
             textContent: TextContent(
                 headline: "[Conference Title]",
                 subheadline: "Industry Leaders • Expert Speakers • Networking",
-                date: "[Date]",
-                time: "[Time]",
                 venueName: "[Venue]",
                 address: "[City, State]",
                 ctaText: "Register Today",
@@ -50,7 +46,6 @@ struct TemplateLibrary {
             textContent: TextContent(
                 headline: "[Event Series Name]",
                 subheadline: "Multiple Sessions • Various Activities",
-                bodyText: "[Date 1]: [Activities]\n[Date 2]: [Activities]\n[Date 3]: [Activities]",
                 venueName: "[Venue Name]",
                 address: "[Address]",
                 ctaText: "Register Now",
@@ -71,8 +66,7 @@ struct TemplateLibrary {
                 headline: "[Newsletter Title]",
                 subheadline: "By [Author Name], [Title/Credentials]",
                 bodyText: "[Section 1 Title]\n[Content with bullet points...]\n\n[Section 2 Title]\n[More content...]\n\n[Section 3 Title]\n[Additional content...]",
-                venueName: "[Organization Name]",
-                website: "[website.com]"
+                ctaText: "Learn More"
             ),
             colors: ColorSettings(preset: .pastel, backgroundType: .light),
             visuals: VisualSettings(style: .watercolorArtistic, mood: .friendly),
@@ -88,7 +82,6 @@ struct TemplateLibrary {
             textContent: TextContent(
                 headline: "[XX]% OFF",
                 subheadline: "Limited Time Only!",
-                bodyText: "Don't miss our biggest sale of the season",
                 date: "Ends [Date]",
                 ctaText: "Shop Now",
                 finePrint: "While supplies last. Some exclusions apply."
@@ -125,7 +118,6 @@ struct TemplateLibrary {
             textContent: TextContent(
                 headline: "Today's Special: [Dish Name]",
                 subheadline: "[Brief Description]",
-                bodyText: "Fresh ingredients • Made with love",
                 venueName: "[Restaurant Name]",
                 price: "$[XX]",
                 ctaText: "Order Now",
@@ -166,7 +158,7 @@ struct TemplateLibrary {
             textContent: TextContent(
                 headline: "Join [Gym Name]",
                 subheadline: "Transform Your Body, Transform Your Life",
-                bodyText: "State-of-the-art equipment • Expert trainers • Group classes",
+                venueName: "[Gym Name]",
                 address: "[Address]",
                 discountText: "[XX]% Off First Month",
                 ctaText: "Start Today",
@@ -207,11 +199,8 @@ struct TemplateLibrary {
             category: .realEstate,
             textContent: TextContent(
                 headline: "[Service Name] Now Available",
-                subheadline: "Calculate how much you could get",
-                bodyText: "Choose your amount:\n• $50,000\n• $75,000\n• $100,000\n• $200,000",
-                ctaText: "Get Started Today",
-                website: "[yourcompany.com]",
-                finePrint: "[Company Name] • NMLS #[Number]"
+                bodyText: "Calculate how much you could get:\n• $50,000\n• $75,000\n• $100,000\n• $200,000",
+                website: "[yourcompany.com]"
             ),
             colors: ColorSettings(preset: .warm, backgroundType: .light),
             visuals: VisualSettings(style: .modernMinimal, mood: .friendly),
@@ -225,11 +214,9 @@ struct TemplateLibrary {
             category: .realEstate,
             textContent: TextContent(
                 headline: "[Property Type] For Sale",
-                subheadline: "[Number] Bed • [Number] Bath • [Sq Ft] sqft",
-                bodyText: "[Key features and highlights of the property]",
+                bodyText: "[Number] Bed • [Number] Bath • [Sq Ft] sqft\n[Key features and highlights]",
                 address: "[Property Address]",
                 price: "$[Price]",
-                ctaText: "Schedule a Viewing",
                 phone: "[Agent Phone]",
                 email: "[agent@email.com]"
             ),
@@ -248,8 +235,6 @@ struct TemplateLibrary {
                 headline: "We're Hiring!",
                 subheadline: "[Job Title]",
                 bodyText: "What we're looking for:\n• [Requirement 1]\n• [Requirement 2]\n• [Requirement 3]\n\nWhat we offer:\n• [Benefit 1]\n• [Benefit 2]\n• [Benefit 3]",
-                venueName: "[Company Name]",
-                address: "[Location / Remote]",
                 ctaText: "Apply Now",
                 email: "[careers@company.com]",
                 website: "[company.com/careers]"
@@ -268,10 +253,6 @@ struct TemplateLibrary {
                 headline: "Career Fair",
                 subheadline: "Your Future Starts Here",
                 bodyText: "Meet top employers\n• [Industry 1]\n• [Industry 2]\n• [Industry 3]\n\nBring your resume!",
-                date: "[Date]",
-                time: "[Time]",
-                venueName: "[Venue Name]",
-                address: "[Address]",
                 ctaText: "Register Free",
                 website: "[registration-link.com]"
             ),
@@ -289,14 +270,9 @@ struct TemplateLibrary {
             textContent: TextContent(
                 headline: "[Workshop Title]",
                 subheadline: "Learn • Practice • Master",
-                bodyText: "What you'll learn:\n• [Topic 1]\n• [Topic 2]\n• [Topic 3]\n\nPerfect for beginners and intermediate levels.",
-                date: "[Date]",
-                time: "[Time]",
                 venueName: "[Location / Online]",
                 price: "$[Price]",
-                ctaText: "Reserve Your Spot",
-                phone: "[Phone]",
-                website: "[registration-link.com]"
+                ctaText: "Reserve Your Spot"
             ),
             colors: ColorSettings(preset: .warm, backgroundType: .light),
             visuals: VisualSettings(style: .modernMinimal, mood: .inspirational),
@@ -311,12 +287,9 @@ struct TemplateLibrary {
             textContent: TextContent(
                 headline: "[Subject] Tutoring",
                 subheadline: "Personalized Learning for Success",
-                bodyText: "Subjects offered:\n• [Subject 1]\n• [Subject 2]\n• [Subject 3]\n\nAll grade levels welcome",
                 venueName: "[Tutor/Company Name]",
                 price: "Starting at $[XX]/hour",
-                ctaText: "Book a Session",
-                phone: "[Phone]",
-                email: "[email@example.com]"
+                ctaText: "Book a Session"
             ),
             colors: ColorSettings(preset: .cool, backgroundType: .light),
             visuals: VisualSettings(style: .handDrawnOrganic, mood: .friendly),
@@ -332,14 +305,11 @@ struct TemplateLibrary {
             textContent: TextContent(
                 headline: "Grand Opening!",
                 subheadline: "[Business Name]",
-                bodyText: "Join us for our grand opening celebration!\n\n• Special discounts\n• Free giveaways\n• Refreshments",
                 date: "[Date]",
-                time: "[Time]",
                 venueName: "[Business Name]",
                 address: "[Address]",
                 discountText: "[XX]% Off Opening Day",
-                ctaText: "See You There!",
-                phone: "[Phone]"
+                ctaText: "See You There!"
             ),
             colors: ColorSettings(preset: .warm, backgroundType: .light),
             visuals: VisualSettings(style: .boldVibrant, mood: .festive),

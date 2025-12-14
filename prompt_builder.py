@@ -8,7 +8,7 @@ from typing import Dict, List, Optional
 from models import (
     FlyerProject, FlyerCategory, VisualStyle, Mood, AspectRatio,
     ColorSchemePreset, BackgroundType, TextProminence, ImageryType,
-    CATEGORY_SUGGESTED_ELEMENTS
+    FlyerLanguage, CATEGORY_SUGGESTED_ELEMENTS
 )
 
 
@@ -260,14 +260,29 @@ class FlyerPromptBuilder:
             "promotional flyer design"
         )
         sections.append(f"Create a professional high-quality {category_context}.")
-        
+
+        # 1.5 Language requirement (if not English)
+        if self.project.language != FlyerLanguage.ENGLISH:
+            sections.append(
+                f"CRITICAL LANGUAGE REQUIREMENT: {self.project.language.prompt_instruction} "
+                "You MUST ensure ALL text content appears in the target language. "
+                "Translate any English or non-target-language text. Do NOT render English text as-is."
+            )
+
         # 2. Aspect ratio / format
         aspect_instruction = ASPECT_RATIO_INSTRUCTIONS.get(
             self.project.output.aspect_ratio,
             "standard flyer proportions"
         )
         sections.append(f"Format: {aspect_instruction}.")
-        
+
+        # 2.5 Flat design requirement
+        sections.append(
+            "CRITICAL: Render as a FLAT, full-bleed design that fills the entire canvas edge-to-edge. "
+            "Do NOT render as a 3D mockup, physical card, paper on a surface, or product photograph. "
+            "No shadows, no perspective, no depth effects - completely flat 2D design only."
+        )
+
         # 3. Visual style
         style_desc = STYLE_DESCRIPTORS.get(
             self.project.visuals.style,
@@ -422,6 +437,14 @@ class FlyerPromptBuilder:
         text = self.project.text_content
         parts = []
 
+        # Add translation reminder for non-English languages
+        if self.project.language != FlyerLanguage.ENGLISH:
+            parts.append(
+                f"IMPORTANT: All text below MUST appear in {self.project.language.display_name}. "
+                "If any text is in English or another language, translate it. "
+                "If text is already in the target language, use it as-is."
+            )
+
         parts.append("TEXT CONTENT - CRITICAL: Spell ALL text EXACTLY as shown, letter by letter:")
 
         # Headline - most important, with character-by-character spelling
@@ -476,10 +499,18 @@ class FlyerPromptBuilder:
                     address = address[:-len(suffix)]
                     break
 
+        # Location - handle RTL languages specially to avoid bidirectional text confusion
         if text.venue_name and address:
-            location = f"{text.venue_name} - {address}"
-            spelled = self._spell_out(location)
-            parts.append(f'Location must read EXACTLY: "{location}" (SPELLING: {spelled}).')
+            if self.project.language in [FlyerLanguage.ARABIC, FlyerLanguage.URDU]:
+                # Separate lines for RTL to avoid mixing directions
+                spelled_venue = self._spell_out(text.venue_name)
+                parts.append(f'Venue name must read EXACTLY: "{text.venue_name}" (SPELLING: {spelled_venue}).')
+                spelled_addr = self._spell_out(address)
+                parts.append(f'Address on separate line must read EXACTLY: "{address}" (SPELLING: {spelled_addr}).')
+            else:
+                location = f"{text.venue_name} - {address}"
+                spelled = self._spell_out(location)
+                parts.append(f'Location must read EXACTLY: "{location}" (SPELLING: {spelled}).')
         elif text.venue_name:
             spelled = self._spell_out(text.venue_name)
             parts.append(f'Venue must read EXACTLY: "{text.venue_name}" (SPELLING: {spelled}).')

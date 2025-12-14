@@ -38,9 +38,25 @@ struct PromptBuilder {
         let categoryContext = PromptDescriptors.categoryContext[project.category] ?? "promotional flyer design"
         sections.append("Create a professional high-quality \(categoryContext).")
 
+        // 1.5 Language requirement
+        if project.language != .english {
+            sections.append("""
+                CRITICAL LANGUAGE REQUIREMENT: \(project.language.promptInstruction) \
+                You MUST ensure ALL text content appears in the target language. \
+                Translate any English or non-target-language text. Do NOT render English text as-is.
+                """)
+        }
+
         // 2. Aspect ratio / format
         let aspectInstruction = PromptDescriptors.aspectRatioInstructions[project.output.aspectRatio] ?? "standard flyer proportions"
         sections.append("Format: \(aspectInstruction).")
+
+        // 2.5 Flat design requirement
+        sections.append("""
+            CRITICAL: Render as a FLAT, full-bleed design that fills the entire canvas edge-to-edge. \
+            Do NOT render as a 3D mockup, physical card, paper on a surface, or product photograph. \
+            No shadows, no perspective, no depth effects - completely flat 2D design only.
+            """)
 
         // 3. Visual style
         let styleDesc = PromptDescriptors.styleDescriptors[project.visuals.style] ?? "clean professional design"
@@ -180,6 +196,15 @@ struct PromptBuilder {
         let text = project.textContent
         var parts: [String] = []
 
+        // Add translation reminder for non-English languages
+        if project.language != .english {
+            parts.append("""
+                IMPORTANT: All text below MUST appear in \(project.language.displayName). \
+                If any text is in English or another language, translate it. \
+                If text is already in the target language, use it as-is.
+                """)
+        }
+
         parts.append("TEXT CONTENT - CRITICAL: Spell ALL text EXACTLY as shown, letter by letter:")
 
         // Headline - most important, with character-by-character spelling
@@ -243,10 +268,19 @@ struct PromptBuilder {
             }
         }
 
+        // Location - handle RTL languages specially to avoid bidirectional text confusion
         if let venueName = text.venueName, !venueName.isEmpty, !address.isEmpty {
-            let location = "\(venueName) - \(address)"
-            let spelled = spellOut(location)
-            parts.append("Location must read EXACTLY: \"\(location)\" (SPELLING: \(spelled)).")
+            if project.language == .arabic || project.language == .urdu {
+                // Separate lines for RTL to avoid mixing directions
+                let spelledVenue = spellOut(venueName)
+                parts.append("Venue name must read EXACTLY: \"\(venueName)\" (SPELLING: \(spelledVenue)).")
+                let spelledAddr = spellOut(address)
+                parts.append("Address on separate line must read EXACTLY: \"\(address)\" (SPELLING: \(spelledAddr)).")
+            } else {
+                let location = "\(venueName) - \(address)"
+                let spelled = spellOut(location)
+                parts.append("Location must read EXACTLY: \"\(location)\" (SPELLING: \(spelled)).")
+            }
         } else if let venueName = text.venueName, !venueName.isEmpty {
             let spelled = spellOut(venueName)
             parts.append("Venue must read EXACTLY: \"\(venueName)\" (SPELLING: \(spelled)).")
