@@ -3,9 +3,11 @@ import SwiftData
 
 struct ContentView: View {
     @EnvironmentObject var cloudKitService: CloudKitService
+    @EnvironmentObject var notificationService: NotificationService
     @StateObject private var viewModel = FlyerCreationViewModel()
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
     @State private var showingSettings = false
+    @Environment(\.scenePhase) private var scenePhase
 
     @Environment(\.modelContext) private var modelContext
     @Query private var userProfiles: [UserProfile]
@@ -46,6 +48,18 @@ struct ContentView: View {
                     await ensureUserProfileExists()
                     await syncCreditsFromCloud()
                 }
+            }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            switch newPhase {
+            case .active:
+                notificationService.appDidBecomeActive()
+            case .background:
+                notificationService.appDidEnterBackground()
+            case .inactive:
+                break
+            @unknown default:
+                break
             }
         }
     }
@@ -131,4 +145,5 @@ struct MainTabView: View {
 #Preview {
     ContentView()
         .environmentObject(CloudKitService())
+        .environmentObject(NotificationService())
 }

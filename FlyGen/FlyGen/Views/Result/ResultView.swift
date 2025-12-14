@@ -4,6 +4,7 @@ import SwiftData
 struct ResultView: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
     @EnvironmentObject var cloudKitService: CloudKitService
+    @EnvironmentObject var notificationService: NotificationService
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @Query private var userProfiles: [UserProfile]
@@ -191,6 +192,9 @@ struct ResultView: View {
             Task {
                 await cloudKitService.saveCredits(profile.credits)
             }
+
+            // Check if we should notify about low/no credits
+            notificationService.checkCreditsAndNotify(credits: profile.credits)
         }
     }
 
@@ -278,4 +282,6 @@ struct ActionButton: View {
     let vm = FlyerCreationViewModel()
     vm.generationState = .success(UIImage(systemName: "doc.richtext")!)
     return ResultView(viewModel: vm)
+        .environmentObject(CloudKitService())
+        .environmentObject(NotificationService())
 }

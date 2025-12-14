@@ -334,4 +334,5 @@ struct StatRow: View {
     ProfileTab()
         .environmentObject(CloudKitService())
         .environmentObject(StoreKitService())
+        .environmentObject(NotificationService())
 }

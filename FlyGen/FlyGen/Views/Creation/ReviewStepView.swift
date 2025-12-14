@@ -4,6 +4,7 @@ import SwiftData
 struct ReviewStepView: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
     @EnvironmentObject var cloudKitService: CloudKitService
+    @EnvironmentObject var notificationService: NotificationService
     @Environment(\.modelContext) private var modelContext
     @Query private var userProfiles: [UserProfile]
 
@@ -238,6 +239,9 @@ struct ReviewStepView: View {
             Task {
                 await cloudKitService.saveCredits(profile.credits)
             }
+
+            // Check if we should notify about low/no credits
+            notificationService.checkCreditsAndNotify(credits: profile.credits)
         }
     }
 
@@ -377,4 +381,6 @@ struct ReviewSection<Content: View>: View {
     vm.project?.textContent.headline = "MEGA SUMMER SALE"
     vm.project?.textContent.subheadline = "Up to 70% off everything"
     return ReviewStepView(viewModel: vm)
+        .environmentObject(CloudKitService())
+        .environmentObject(NotificationService())
 }

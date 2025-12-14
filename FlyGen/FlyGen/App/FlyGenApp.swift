@@ -5,6 +5,7 @@ import SwiftData
 struct FlyGenApp: App {
     @StateObject private var cloudKitService = CloudKitService()
     @StateObject private var storeKitService = StoreKitService()
+    @StateObject private var notificationService = NotificationService()
 
     private static let iCloudContainerIdentifier = "iCloud.com.flygen.app"
 
@@ -57,6 +58,7 @@ struct FlyGenApp: App {
             ContentView()
                 .environmentObject(cloudKitService)
                 .environmentObject(storeKitService)
+                .environmentObject(notificationService)
         }
         .modelContainer(sharedModelContainer)
     }
