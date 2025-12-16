@@ -5,6 +5,21 @@ struct ExtrasStepView: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
     @State private var includeElementsText: String = ""
     @State private var avoidElementsText: String = ""
+    @State private var imageryMode: ImageryMode = .none
+
+    enum ImageryMode: String, CaseIterable {
+        case none = "none"
+        case uploadPhoto = "upload"
+        case describeImagery = "describe"
+
+        var label: String {
+            switch self {
+            case .none: return "None"
+            case .uploadPhoto: return "Upload Photo"
+            case .describeImagery: return "Describe"
+            }
+        }
+    }
 
     private var suggestedElements: [String] {
         guard let category = viewModel.project?.category else { return [] }
@@ -41,6 +56,16 @@ struct ExtrasStepView: View {
 
                 // Special instructions section
                 specialInstructionsSection
+                    .padding(.horizontal, FGSpacing.screenHorizontal)
+
+                // Divider
+                Rectangle()
+                    .fill(FGColors.borderSubtle)
+                    .frame(height: 1)
+                    .padding(.horizontal, FGSpacing.screenHorizontal)
+
+                // Custom imagery section
+                imagerySection
                     .padding(.horizontal, FGSpacing.screenHorizontal)
 
                 // Divider
@@ -199,6 +224,180 @@ struct ExtrasStepView: View {
             Text("Example: \"Use a clean layout with text at the top\"")
                 .font(FGTypography.caption)
                 .foregroundColor(FGColors.textTertiary)
+        }
+    }
+
+    // MARK: - Custom Imagery Section
+
+    private var imagerySection: some View {
+        VStack(alignment: .leading, spacing: FGSpacing.md) {
+            HStack {
+                Text("Custom Imagery")
+                    .font(FGTypography.h3)
+                    .foregroundColor(FGColors.textPrimary)
+
+                FGInfoBadge(text: "Optional")
+            }
+
+            Text("Add your own photo or describe imagery for AI to generate")
+                .font(FGTypography.bodySmall)
+                .foregroundColor(FGColors.textTertiary)
+
+            // Mode selector
+            Picker("Imagery Mode", selection: $imageryMode) {
+                ForEach(ImageryMode.allCases, id: \.self) { mode in
+                    Text(mode.label).tag(mode)
+                }
+            }
+            .pickerStyle(.segmented)
+            .onChange(of: imageryMode) { _, newMode in
+                handleImageryModeChange(newMode)
+            }
+
+            // Content based on mode
+            switch imageryMode {
+            case .none:
+                EmptyView()
+            case .uploadPhoto:
+                userPhotoUploadView
+            case .describeImagery:
+                imageryDescriptionView
+            }
+        }
+        .onAppear {
+            // Initialize mode based on existing data
+            if viewModel.project?.userPhotoData != nil {
+                imageryMode = .uploadPhoto
+            } else if viewModel.project?.imageryDescription != nil {
+                imageryMode = .describeImagery
+            }
+        }
+    }
+
+    private var userPhotoUploadView: some View {
+        VStack(alignment: .leading, spacing: FGSpacing.sm) {
+            if let photoData = viewModel.project?.userPhotoData,
+               let uiImage = UIImage(data: photoData) {
+                // Show uploaded photo
+                HStack(spacing: FGSpacing.md) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 80)
+                        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: FGSpacing.inputRadius)
+                                .stroke(FGColors.borderSubtle, lineWidth: 1)
+                        )
+
+                    VStack(alignment: .leading, spacing: FGSpacing.xxs) {
+                        Text("Photo uploaded")
+                            .font(FGTypography.label)
+                            .foregroundColor(FGColors.textPrimary)
+
+                        Text("AI will stylize and incorporate this photo")
+                            .font(FGTypography.caption)
+                            .foregroundColor(FGColors.textTertiary)
+                    }
+
+                    Spacer()
+
+                    Button {
+                        withAnimation(FGAnimations.spring) {
+                            viewModel.clearUserPhoto()
+                        }
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 24))
+                            .foregroundColor(FGColors.statusError)
+                    }
+                }
+                .padding(FGSpacing.cardPadding)
+                .background(FGColors.surfaceDefault)
+                .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+                .overlay(
+                    RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
+                        .stroke(FGColors.borderSubtle, lineWidth: 1)
+                )
+            } else {
+                PhotosPicker(selection: $viewModel.selectedUserPhotoItem, matching: .images) {
+                    HStack(spacing: FGSpacing.sm) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: FGSpacing.inputRadius)
+                                .fill(FGColors.backgroundTertiary)
+                                .frame(width: 48, height: 48)
+
+                            Image(systemName: "person.crop.rectangle")
+                                .font(.system(size: 20))
+                                .foregroundColor(FGColors.accentPrimary)
+                        }
+
+                        VStack(alignment: .leading, spacing: FGSpacing.xxs) {
+                            Text("Upload a Photo")
+                                .font(FGTypography.labelLarge)
+                                .foregroundColor(FGColors.textPrimary)
+
+                            Text("Products, people, pets, or places work great")
+                                .font(FGTypography.caption)
+                                .foregroundColor(FGColors.textTertiary)
+                        }
+
+                        Spacer()
+
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(FGColors.textTertiary)
+                    }
+                    .padding(FGSpacing.cardPadding)
+                    .background(FGColors.surfaceDefault)
+                    .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
+                            .stroke(FGColors.borderSubtle, lineWidth: 1)
+                    )
+                }
+                .onChange(of: viewModel.selectedUserPhotoItem) { _, _ in
+                    Task {
+                        await viewModel.loadUserPhoto()
+                    }
+                }
+            }
+        }
+    }
+
+    private var imageryDescriptionView: some View {
+        VStack(alignment: .leading, spacing: FGSpacing.sm) {
+            TextEditor(text: Binding(
+                get: { viewModel.project?.imageryDescription ?? "" },
+                set: { viewModel.setImageryDescription($0) }
+            ))
+            .font(FGTypography.body)
+            .foregroundColor(FGColors.textPrimary)
+            .scrollContentBackground(.hidden)
+            .frame(minHeight: 80)
+            .padding(FGSpacing.sm)
+            .background(FGColors.surfaceDefault)
+            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
+            .overlay(
+                RoundedRectangle(cornerRadius: FGSpacing.inputRadius)
+                    .stroke(FGColors.borderSubtle, lineWidth: 1)
+            )
+
+            Text("Example: \"A golden retriever playing fetch in a sunny park\"")
+                .font(FGTypography.caption)
+                .foregroundColor(FGColors.textTertiary)
+        }
+    }
+
+    private func handleImageryModeChange(_ newMode: ImageryMode) {
+        switch newMode {
+        case .none:
+            viewModel.clearUserPhoto()
+            viewModel.setImageryDescription(nil)
+        case .uploadPhoto:
+            viewModel.setImageryDescription(nil)
+        case .describeImagery:
+            viewModel.clearUserPhoto()
         }
     }
 

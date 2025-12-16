@@ -249,6 +249,8 @@ class FlyerProject:
     target_audience: Optional[str] = None
     special_instructions: Optional[str] = None
     logo_path: Optional[str] = None  # Path to brand logo image
+    user_photo_path: Optional[str] = None  # Path to user's uploaded photo
+    imagery_description: Optional[str] = None  # Text description for AI-generated imagery
     qr_settings: Optional[QRCodeSettings] = None  # QR code configuration
 
 

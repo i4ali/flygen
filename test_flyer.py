@@ -860,6 +860,223 @@ Visit: www.nwsaturdayschool.org""",
             )
         )
     },
+
+    # =========================================================================
+    # USER PHOTO & IMAGERY DESCRIPTION TESTS
+    # =========================================================================
+
+    27: {
+        "name": "Concert Flyer with User Photo",
+        "description": "Tests user photo integration - Band/artist photo incorporated into flyer design",
+        "project": FlyerProject(
+            category=FlyerCategory.MUSIC_CONCERT,
+            text_content=TextContent(
+                headline="THE BEATLES TRIBUTE NIGHT",
+                subheadline="A Magical Mystery Tour Through the Hits",
+                date="Saturday, February 15, 2025 | 8:00 PM",
+                venue_name="Abbey Road Live",
+                address="1969 Penny Lane, Liverpool, TX 77001",
+                price="$45 General | $75 VIP",
+                cta_text="Get Your Tickets Now!",
+                website="www.abbeyroadlive.com"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.WARM,
+                background_type=BackgroundType.DARK
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.RETRO_VINTAGE,
+                mood=Mood.EXCITING,
+                text_prominence=TextProminence.BALANCED
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            ),
+            user_photo_path="test_images/beatles_photo.jpg",  # User's band photo
+            qr_settings=QRCodeSettings(
+                enabled=True,
+                url="https://www.abbeyroadlive.com/beatles-tribute"
+            )
+        )
+    },
+
+    28: {
+        "name": "Pet Grooming with User Photo",
+        "description": "Tests user photo integration - Pet photo for grooming service flyer",
+        "project": FlyerProject(
+            category=FlyerCategory.SALE_PROMO,
+            text_content=TextContent(
+                headline="PAMPERED PAWS GROOMING",
+                subheadline="Your Pet Deserves the Best!",
+                date="Open 7 Days a Week",
+                discount_text="20% OFF First Visit",
+                address="456 Pet Paradise Blvd, Austin, TX 78701",
+                phone="(512) 555-PAWS",
+                cta_text="Book Your Appointment Today!",
+                website="www.pamperedpawsatx.com"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.PASTEL,
+                background_type=BackgroundType.LIGHT
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.PLAYFUL_FUN,
+                mood=Mood.FRIENDLY,
+                text_prominence=TextProminence.BALANCED
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            ),
+            user_photo_path="test_images/cute_dog.jpg",  # User's pet photo
+            qr_settings=QRCodeSettings(
+                enabled=True,
+                url="https://www.pamperedpawsatx.com/book"
+            )
+        )
+    },
+
+    29: {
+        "name": "AI-Generated Imagery - Beach Vacation",
+        "description": "Tests imagery_description - AI generates beach scene for travel flyer",
+        "project": FlyerProject(
+            category=FlyerCategory.SALE_PROMO,
+            text_content=TextContent(
+                headline="SUMMER ESCAPE SALE",
+                subheadline="Your Dream Beach Vacation Awaits",
+                discount_text="SAVE UP TO 40%",
+                date="Book by March 31, 2025",
+                cta_text="Book Now & Save Big!",
+                website="www.tropicalgetaways.com",
+                fine_print="Restrictions apply. Based on availability."
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.COOL,
+                background_type=BackgroundType.GRADIENT
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.MODERN_MINIMAL,
+                mood=Mood.CALM,
+                text_prominence=TextProminence.BALANCED
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            ),
+            imagery_description="A pristine tropical beach with crystal clear turquoise water, white sand, palm trees swaying in the breeze, and a colorful sunset sky",
+            qr_settings=QRCodeSettings(
+                enabled=True,
+                url="https://www.tropicalgetaways.com/summer-sale"
+            )
+        )
+    },
+
+    30: {
+        "name": "AI-Generated Imagery - Gourmet Food",
+        "description": "Tests imagery_description - AI generates appetizing food imagery for restaurant",
+        "project": FlyerProject(
+            category=FlyerCategory.RESTAURANT_FOOD,
+            text_content=TextContent(
+                headline="CHEF'S TABLE EXPERIENCE",
+                subheadline="A Culinary Journey Like No Other",
+                venue_name="La Maison Élégante",
+                address="789 Gourmet Avenue, San Francisco, CA 94102",
+                price="$150 per person",
+                phone="(415) 555-CHEF",
+                cta_text="Reserve Your Seat",
+                website="www.lamaisonelegante.com"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.BLACK_GOLD,
+                background_type=BackgroundType.DARK
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.ELEGANT_LUXURY,
+                mood=Mood.ELEGANT,
+                text_prominence=TextProminence.BALANCED
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            ),
+            imagery_description="An exquisite gourmet dish beautifully plated with artistic garnishes, warm ambient lighting, fine dining atmosphere with elegant table setting",
+            qr_settings=QRCodeSettings(
+                enabled=True,
+                url="https://www.lamaisonelegante.com/reserve"
+            )
+        )
+    },
+
+    31: {
+        "name": "AI-Generated Imagery - Fitness Motivation",
+        "description": "Tests imagery_description - AI generates motivational fitness imagery",
+        "project": FlyerProject(
+            category=FlyerCategory.FITNESS_WELLNESS,
+            text_content=TextContent(
+                headline="TRANSFORM YOUR LIFE",
+                subheadline="Join Our 12-Week Body Transformation Program",
+                date="New Classes Starting Monthly",
+                time="Morning, Afternoon & Evening Sessions",
+                venue_name="Iron Will Fitness",
+                address="1000 Strength Street, Miami, FL 33101",
+                price="$299 for 12 weeks",
+                discount_text="ENROLL TODAY: GET 2 WEEKS FREE",
+                cta_text="Start Your Journey!",
+                phone="(305) 555-LIFT"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.NEON,
+                background_type=BackgroundType.DARK
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.BOLD_VIBRANT,
+                mood=Mood.INSPIRATIONAL,
+                text_prominence=TextProminence.DOMINANT
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            ),
+            imagery_description="A determined athlete in a modern gym, dramatic lighting, sweat glistening, showing strength and dedication, motivational fitness atmosphere"
+        )
+    },
+
+    32: {
+        "name": "User Photo + Logo Combined",
+        "description": "Tests both user photo and logo together - Real estate with agent photo",
+        "project": FlyerProject(
+            category=FlyerCategory.REAL_ESTATE,
+            text_content=TextContent(
+                headline="LUXURY LIVING AWAITS",
+                body_text="Stunning 4BR/3BA home with pool, gourmet kitchen, and panoramic views",
+                address="12345 Mansion Drive, Beverly Hills, CA 90210",
+                price="$4,500,000",
+                phone="(310) 555-HOME",
+                email="sarah@luxuryhomesla.com",
+                website="www.luxuryhomesla.com/mansion-drive"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.BLACK_GOLD,
+                background_type=BackgroundType.LIGHT
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.ELEGANT_LUXURY,
+                mood=Mood.ELEGANT,
+                text_prominence=TextProminence.BALANCED
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            ),
+            logo_path="logos/luxuryhomes_logo.png",  # Agency logo
+            user_photo_path="test_images/property_photo.jpg",  # Property/agent photo
+            qr_settings=QRCodeSettings(
+                enabled=True,
+                url="https://www.luxuryhomesla.com/mansion-drive"
+            )
+        )
+    },
 }
 
 
@@ -881,7 +1098,9 @@ def run_test(
     logo_override: str = None,
     qr_override: str = None,
     disable_logo: bool = False,
-    disable_qr: bool = False
+    disable_qr: bool = False,
+    user_photo_override: str = None,
+    disable_user_photo: bool = False
 ):
     """Run a single test case."""
     if test_num not in TEST_CASES:
@@ -896,6 +1115,11 @@ def run_test(
     if not disable_logo:
         logo_path = logo_override or project.logo_path
 
+    # Handle user photo override
+    user_photo_path = None
+    if not disable_user_photo:
+        user_photo_path = user_photo_override or project.user_photo_path
+
     # Handle QR override
     qr_url = None
     if not disable_qr:
@@ -909,6 +1133,10 @@ def run_test(
     print(f"   {test['description']}")
     if logo_path:
         print(f"   🖼️  Logo: {logo_path}")
+    if user_photo_path:
+        print(f"   📷 User Photo: {user_photo_path}")
+    if project.imagery_description:
+        print(f"   🎨 Imagery Description: {project.imagery_description[:50]}...")
     if qr_url:
         print(f"   📱 QR Code: {qr_url}")
     print(f"{'='*60}")
@@ -931,14 +1159,28 @@ def run_test(
 
     generator = create_generator(mock=False, use_openrouter=use_openrouter)
 
-    # Prepare input images (for logo)
-    input_images = None
+    # Prepare input images (for logo and user photo)
+    input_images = []
+
+    # Add logo if provided
     if logo_path:
         if Path(logo_path).exists():
-            input_images = [logo_path]
+            input_images.append(logo_path)
             print(f"   📎 Logo will be sent to AI for integration")
         else:
             print(f"   ⚠️  Logo file not found: {logo_path}")
+
+    # Add user photo if provided
+    if user_photo_path:
+        if Path(user_photo_path).exists():
+            input_images.append(user_photo_path)
+            print(f"   📎 User photo will be sent to AI for integration")
+        else:
+            print(f"   ⚠️  User photo file not found: {user_photo_path}")
+
+    # Set to None if empty list
+    if not input_images:
+        input_images = None
 
     results = generator.generate(
         prompt=package["main_prompt"],
@@ -983,8 +1225,11 @@ Examples:
     python test_flyer.py all                    # Run all test cases
     python test_flyer.py --list                 # List all test cases
     python test_flyer.py 1 --logo logo.png      # Run with custom logo
+    python test_flyer.py 1 --photo photo.jpg    # Run with custom user photo
     python test_flyer.py 1 --qr https://...     # Run with custom QR URL
     python test_flyer.py 1 --no-qr              # Run without QR code
+    python test_flyer.py 27                     # Run user photo test case
+    python test_flyer.py 29                     # Run imagery description test case
         """
     )
     parser.add_argument("test", nargs="?", help="Test case number or 'all'")
@@ -993,10 +1238,14 @@ Examples:
                         help="Use OpenAI directly instead of OpenRouter")
     parser.add_argument("--logo", type=str, metavar="PATH",
                         help="Path to logo image (overrides test case default)")
+    parser.add_argument("--photo", type=str, metavar="PATH",
+                        help="Path to user photo image (overrides test case default)")
     parser.add_argument("--qr", type=str, metavar="URL",
                         help="QR code URL (overrides test case default)")
     parser.add_argument("--no-logo", action="store_true",
                         help="Disable logo even if test case has one")
+    parser.add_argument("--no-photo", action="store_true",
+                        help="Disable user photo even if test case has one")
     parser.add_argument("--no-qr", action="store_true",
                         help="Disable QR code even if test case has one")
 
@@ -1022,7 +1271,9 @@ Examples:
                 logo_override=args.logo,
                 qr_override=args.qr,
                 disable_logo=args.no_logo,
-                disable_qr=args.no_qr
+                disable_qr=args.no_qr,
+                user_photo_override=args.photo,
+                disable_user_photo=args.no_photo
             )
             results[num] = success
 
@@ -1042,11 +1293,13 @@ Examples:
                 logo_override=args.logo,
                 qr_override=args.qr,
                 disable_logo=args.no_logo,
-                disable_qr=args.no_qr
+                disable_qr=args.no_qr,
+                user_photo_override=args.photo,
+                disable_user_photo=args.no_photo
             )
         except ValueError:
             print(f"❌ Invalid test number: {args.test}")
-            print("   Use a number (1-18) or 'all'")
+            print("   Use a number (1-32) or 'all'")
 
 
 if __name__ == "__main__":

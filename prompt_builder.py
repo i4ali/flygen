@@ -352,7 +352,31 @@ class FlyerPromptBuilder:
                 "the main content."
             )
 
-        # 14. Quality reminders (conditional based on NO_TEXT mode)
+        # 14. User photo OR imagery description (mutually exclusive)
+        if self.project.user_photo_path:
+            style_name = self.project.visuals.style.value.replace("_", " ").title()
+            mood_name = self.project.visuals.mood.value.title()
+            sections.append(
+                "CRITICAL USER PHOTO INSTRUCTIONS: A user photo has been provided and MUST be incorporated into the flyer design. "
+                "Decide the optimal placement and size for the photo based on the overall composition - it could be a hero image, "
+                "a smaller inset, or integrated into the background. "
+                f"IMPORTANT: Stylize the photo to match the flyer's visual aesthetic - apply appropriate color grading, "
+                f"filters, or artistic effects that harmonize with the chosen style ({style_name}) "
+                f"and mood ({mood_name}). "
+                "The photo should integrate seamlessly while the subject remains clearly recognizable. "
+                "Do NOT crop out important subjects from the photo."
+            )
+        elif self.project.imagery_description:
+            style_name = self.project.visuals.style.value.replace("_", " ").title()
+            mood_name = self.project.visuals.mood.value.title()
+            sections.append(
+                f'IMAGERY GENERATION: Generate custom visual imagery based on this description: "{self.project.imagery_description}". '
+                f"The generated imagery should match the flyer's style ({style_name}), "
+                f"colors, and mood ({mood_name}). "
+                "Integrate this imagery as a key visual element within the composition."
+            )
+
+        # 15. Quality reminders (conditional based on NO_TEXT mode)
         if self.project.visuals.imagery_type != ImageryType.NO_TEXT:
             sections.append(
                 "CRITICAL TEXT REQUIREMENTS: "

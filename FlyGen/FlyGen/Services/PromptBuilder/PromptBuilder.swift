@@ -124,7 +124,28 @@ struct PromptBuilder {
                 """)
         }
 
-        // 14. Quality reminders (conditional based on NO_TEXT mode)
+        // 14. User photo OR imagery description (mutually exclusive)
+        if project.userPhotoData != nil {
+            sections.append("""
+                CRITICAL USER PHOTO INSTRUCTIONS: A user photo has been provided and MUST be incorporated into the flyer design. \
+                Decide the optimal placement and size for the photo based on the overall composition - it could be a hero image, \
+                a smaller inset, or integrated into the background. \
+                IMPORTANT: Stylize the photo to match the flyer's visual aesthetic - apply appropriate color grading, \
+                filters, or artistic effects that harmonize with the chosen style (\(project.visuals.style.displayName)) \
+                and mood (\(project.visuals.mood.displayName)). \
+                The photo should integrate seamlessly while the subject remains clearly recognizable. \
+                Do NOT crop out important subjects from the photo.
+                """)
+        } else if let imageryDesc = project.imageryDescription, !imageryDesc.isEmpty {
+            sections.append("""
+                IMAGERY GENERATION: Generate custom visual imagery based on this description: "\(imageryDesc)". \
+                The generated imagery should match the flyer's style (\(project.visuals.style.displayName)), \
+                colors, and mood (\(project.visuals.mood.displayName)). \
+                Integrate this imagery as a key visual element within the composition.
+                """)
+        }
+
+        // 15. Quality reminders (conditional based on NO_TEXT mode)
         if project.visuals.imageryType != .noText {
             sections.append("""
                 CRITICAL TEXT REQUIREMENTS: \

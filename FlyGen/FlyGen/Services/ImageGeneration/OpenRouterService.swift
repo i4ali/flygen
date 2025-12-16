@@ -61,6 +61,7 @@ actor OpenRouterService {
             prompt: fullPrompt,
             aspectRatio: project.output.aspectRatio,
             logoImageData: project.logoImageData,
+            userPhotoData: project.userPhotoData,
             startTime: startTime
         )
     }
@@ -70,6 +71,7 @@ actor OpenRouterService {
         prompt: String,
         aspectRatio: AspectRatio,
         logoImageData: Data? = nil,
+        userPhotoData: Data? = nil,
         startTime: Date = Date()
     ) async throws -> ImageGenerationResult {
 
@@ -82,6 +84,15 @@ actor OpenRouterService {
             content.append([
                 "type": "image_url",
                 "image_url": ["url": "data:image/png;base64,\(base64Logo)"]
+            ])
+        }
+
+        // Add user photo if provided
+        if let photoData = userPhotoData {
+            let base64Photo = photoData.base64EncodedString()
+            content.append([
+                "type": "image_url",
+                "image_url": ["url": "data:image/png;base64,\(base64Photo)"]
             ])
         }
 

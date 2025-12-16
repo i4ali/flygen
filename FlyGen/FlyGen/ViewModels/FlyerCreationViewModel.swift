@@ -88,6 +88,9 @@ class FlyerCreationViewModel: ObservableObject {
     // Logo picker
     @Published var selectedLogoItem: PhotosPickerItem?
 
+    // User photo picker
+    @Published var selectedUserPhotoItem: PhotosPickerItem?
+
     // MARK: - Credit Management
 
     /// Callback triggered after each successful API call to deduct a credit
@@ -265,7 +268,8 @@ class FlyerCreationViewModel: ObservableObject {
             let result = try await openRouterService.generateImage(
                 prompt: refinedPrompt,
                 aspectRatio: project?.output.aspectRatio ?? .portrait,
-                logoImageData: project?.logoImageData
+                logoImageData: project?.logoImageData,
+                userPhotoData: project?.userPhotoData
             )
 
             lastPrompt = refinedPrompt
@@ -322,7 +326,8 @@ class FlyerCreationViewModel: ObservableObject {
             let result = try await openRouterService.generateImage(
                 prompt: noTextPrompt,
                 aspectRatio: project?.output.aspectRatio ?? .portrait,
-                logoImageData: project?.logoImageData
+                logoImageData: project?.logoImageData,
+                userPhotoData: project?.userPhotoData
             )
 
             lastPrompt = noTextPrompt
@@ -377,7 +382,8 @@ class FlyerCreationViewModel: ObservableObject {
             let result = try await openRouterService.generateImage(
                 prompt: lastPrompt,
                 aspectRatio: newRatio,
-                logoImageData: project?.logoImageData
+                logoImageData: project?.logoImageData,
+                userPhotoData: project?.userPhotoData
             )
 
             project?.output.aspectRatio = newRatio
@@ -449,6 +455,36 @@ class FlyerCreationViewModel: ObservableObject {
     func clearLogo() {
         selectedLogoItem = nil
         project?.logoImageData = nil
+    }
+
+    /// Load user photo from PhotosPickerItem
+    func loadUserPhoto() async {
+        guard let item = selectedUserPhotoItem else { return }
+
+        do {
+            if let data = try await item.loadTransferable(type: Data.self) {
+                project?.userPhotoData = data
+                // Clear imagery description since modes are mutually exclusive
+                project?.imageryDescription = nil
+            }
+        } catch {
+            print("Failed to load user photo: \(error)")
+        }
+    }
+
+    /// Clear the selected user photo
+    func clearUserPhoto() {
+        selectedUserPhotoItem = nil
+        project?.userPhotoData = nil
+    }
+
+    /// Set imagery description and clear photo (mutually exclusive)
+    func setImageryDescription(_ description: String?) {
+        project?.imageryDescription = description?.isEmpty == true ? nil : description
+        if project?.imageryDescription != nil {
+            // Clear photo since modes are mutually exclusive
+            clearUserPhoto()
+        }
     }
 
     // MARK: - Text Content Helpers

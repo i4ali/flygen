@@ -11,6 +11,8 @@ struct FlyerProject: Codable, Identifiable, Equatable {
     var targetAudience: String?
     var specialInstructions: String?
     var logoImageData: Data?
+    var userPhotoData: Data?           // User's uploaded photo for AI to incorporate
+    var imageryDescription: String?     // Text description for AI-generated imagery
     var qrSettings: QRCodeSettings
     let createdAt: Date
     var updatedAt: Date
@@ -40,6 +42,8 @@ struct FlyerProject: Codable, Identifiable, Equatable {
         self.targetAudience = source.targetAudience
         self.specialInstructions = source.specialInstructions
         self.logoImageData = source.logoImageData
+        self.userPhotoData = source.userPhotoData
+        self.imageryDescription = source.imageryDescription
         self.qrSettings = source.qrSettings
         self.createdAt = Date()
         self.updatedAt = Date()

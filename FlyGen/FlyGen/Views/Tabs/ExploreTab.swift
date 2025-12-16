@@ -23,6 +23,7 @@ struct ExploreTab: View {
         SampleFlyer(imageName: "sample_spanish_restaurant", title: "Spanish Restaurant", category: "Restaurant"),
         SampleFlyer(imageName: "sample_arabic_eid_event", title: "Eid Event", category: "Event"),
         SampleFlyer(imageName: "sample_chinese_fitness", title: "Fitness Class", category: "Class / Workshop"),
+        SampleFlyer(imageName: "sample_concert_user_photo", title: "Beatles Tribute Concert", category: "Music / Concert"),
     ]
 
     private let columns = [
