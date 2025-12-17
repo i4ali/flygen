@@ -27,8 +27,7 @@ struct ExploreTab: View {
     ]
 
     private let columns = [
-        GridItem(.flexible(), spacing: FGSpacing.md),
-        GridItem(.flexible(), spacing: FGSpacing.md)
+        GridItem(.adaptive(minimum: 170), spacing: FGSpacing.md)
     ]
 
     var body: some View {
@@ -42,7 +41,7 @@ struct ExploreTab: View {
             }
             .background(FGColors.backgroundPrimary)
             .navigationTitle("Explore")
-            .sheet(item: $selectedSample) { sample in
+            .fullScreenCover(item: $selectedSample) { sample in
                 SampleDetailSheet(sample: sample)
             }
         }
@@ -119,9 +118,7 @@ struct SampleThumbnailView: View {
             if let uiImage = UIImage(named: sample.imageName) {
                 Image(uiImage: uiImage)
                     .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(height: 150)
-                    .clipped()
+                    .aspectRatio(8.5/11, contentMode: .fit)
                     .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
             } else {
                 // Placeholder if image not found
@@ -133,7 +130,7 @@ struct SampleThumbnailView: View {
                             endPoint: .bottomTrailing
                         )
                     )
-                    .frame(height: 150)
+                    .aspectRatio(8.5/11, contentMode: .fit)
                     .overlay {
                         Image(systemName: "photo")
                             .font(.largeTitle)

@@ -155,7 +155,7 @@ struct HomeTab: View {
             .sheet(isPresented: $showingSettings) {
                 SettingsView()
             }
-            .sheet(isPresented: $showingTemplates) {
+            .fullScreenCover(isPresented: $showingTemplates) {
                 TemplatePickerView(viewModel: viewModel)
             }
             .sheet(isPresented: $showingCreditPurchase) {

@@ -9,8 +9,7 @@ struct GalleryTab: View {
     @State private var selectedFlyer: SavedFlyer?
 
     private let columns = [
-        GridItem(.flexible(), spacing: FGSpacing.md),
-        GridItem(.flexible(), spacing: FGSpacing.md)
+        GridItem(.adaptive(minimum: 170), spacing: FGSpacing.md)
     ]
 
     var body: some View {
@@ -24,7 +23,7 @@ struct GalleryTab: View {
             }
             .background(FGColors.backgroundPrimary)
             .navigationTitle("My Flyers")
-            .sheet(item: $selectedFlyer) { flyer in
+            .fullScreenCover(item: $selectedFlyer) { flyer in
                 FlyerDetailSheet(flyer: flyer) { savedFlyer in
                     // Use as template callback
                     viewModel.loadFromSavedFlyer(savedFlyer)
@@ -100,14 +99,12 @@ struct FlyerThumbnailView: View {
                let uiImage = UIImage(data: imageData) {
                 Image(uiImage: uiImage)
                     .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(height: 150)
-                    .clipped()
+                    .aspectRatio(8.5/11, contentMode: .fit)
                     .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
             } else {
                 RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
                     .fill(FGColors.surfaceDefault)
-                    .frame(height: 150)
+                    .aspectRatio(8.5/11, contentMode: .fit)
                     .overlay {
                         Image(systemName: "photo")
                             .font(.largeTitle)

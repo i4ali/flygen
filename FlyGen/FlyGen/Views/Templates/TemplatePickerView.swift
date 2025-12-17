@@ -72,7 +72,7 @@ struct TemplatePickerView: View {
                     .foregroundColor(FGColors.accentPrimary)
                 }
             }
-            .sheet(item: $selectedTemplate) { template in
+            .fullScreenCover(item: $selectedTemplate) { template in
                 TemplatePreviewView(
                     template: template,
                     viewModel: viewModel,
