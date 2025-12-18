@@ -18,17 +18,15 @@
 		277B13203FA5FBD8FC6CA8CB /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 730206EB978BE7E39383D4E7 /* Color+Hex.swift */; };
 		3B94A4B396C8D3435B1B7036 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B77BF34CD3B703956CC91DE /* SettingsView.swift */; };
 		41536973C193B227050DE9A3 /* HomeTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28384D20DBD9AA54F572AFFC /* HomeTab.swift */; };
-		AAEXPLORE00000001 /* ExploreTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBEXPLORE00000001 /* ExploreTab.swift */; };
-		AACREDIT000000001 /* CreditPurchaseSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBCREDIT000000001 /* CreditPurchaseSheet.swift */; };
 		449D883F219ADF7D2890DD16 /* PromptBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9579E2430EA7DEC2FA8D87BF /* PromptBuilder.swift */; };
 		51A412CAA71CCC99E9905560 /* BackgroundType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CE5F8A345997A42000089FD /* BackgroundType.swift */; };
 		583C195202B2E418A93257F1 /* GalleryTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 406E392633E0FE2FA6DCA496 /* GalleryTab.swift */; };
+		5C7C3B7B30AEBC3B92E6197E /* ReviewService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E794700C37A8E743419C16 /* ReviewService.swift */; };
 		5FB2D7F993C41590103B4627 /* FlyerCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02FE6F65315FE96A35C34223 /* FlyerCategory.swift */; };
 		64C32D608A4EFC6C72A370D6 /* VisualStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68824529B837896DBABCE0F2 /* VisualStyle.swift */; };
 		6576A29683D25BA73B38F93B /* RefinementSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB654DCA88FF679FBEFB358 /* RefinementSheet.swift */; };
 		66727D08C7345522F2AE16F8 /* DynamicTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12BBCEF15B2AF34A5A490D50 /* DynamicTextField.swift */; };
 		6C12C05D86292A4CD215C4C6 /* FlyerProject.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDBC65359BBD8F17309A355E /* FlyerProject.swift */; };
-		AALANG00000000001 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = LANG00000000000001 /* Language.swift */; };
 		7AA28B261F949897D5FC2C5E /* FlyerTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCFDACA03D378A28BF9670D9 /* FlyerTemplate.swift */; };
 		7CD3EBE906F543C25CE7093B /* FormatStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06A2021DD0B02DD6E91E8438 /* FormatStepView.swift */; };
 		7E5251F0DAF882D2A7170827 /* VisualStyleStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF6F1696F9CC685DEFECA3D /* VisualStyleStepView.swift */; };
@@ -71,6 +69,9 @@
 		AA00000000000006 /* FGTooltip.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000006 /* FGTooltip.swift */; };
 		AA00000000000008 /* FGButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000008 /* FGButtons.swift */; };
 		AA81BC3EDC68F5F40B236E37 /* TextProminence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F62F08E46FF0DE6F50F5350 /* TextProminence.swift */; };
+		AACREDIT000000001 /* CreditPurchaseSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBCREDIT000000001 /* CreditPurchaseSheet.swift */; };
+		AAEXPLORE00000001 /* ExploreTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBEXPLORE00000001 /* ExploreTab.swift */; };
+		AALANG00000000001 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = LANG00000000000001 /* Language.swift */; };
 		AF0E0F3ACA691B8747193C62 /* TextContentStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB04130801C20BE11F94D733 /* TextContentStepView.swift */; };
 		AF18214E835F054B9D8F49AE /* ColorSchemePreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B3C4ECDD1E3D317F67F2CE0 /* ColorSchemePreset.swift */; };
 		AF8A46FDD739A68963EAE7EE /* CategoryStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C0B42D66AE1AED299093D64 /* CategoryStepView.swift */; };
@@ -164,6 +165,7 @@
 		A5F0A68F65B4BF9A1CFA475A /* NegativePrompts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NegativePrompts.swift; sourceTree = "<group>"; };
 		A94669CCDA2F09E03E777709 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		ABD932742A9E1DC6131CEFEE /* QRCodeStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeStepView.swift; sourceTree = "<group>"; };
+		B5E794700C37A8E743419C16 /* ReviewService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReviewService.swift; sourceTree = "<group>"; };
 		BAF6F1696F9CC685DEFECA3D /* VisualStyleStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualStyleStepView.swift; sourceTree = "<group>"; };
 		BB00000000000001 /* FGColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGColors.swift; sourceTree = "<group>"; };
 		BB00000000000002 /* FGTypography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGTypography.swift; sourceTree = "<group>"; };
@@ -172,17 +174,16 @@
 		BB00000000000005 /* FGAnimations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGAnimations.swift; sourceTree = "<group>"; };
 		BB00000000000006 /* FGTooltip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGTooltip.swift; sourceTree = "<group>"; };
 		BB00000000000008 /* FGButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGButtons.swift; sourceTree = "<group>"; };
+		BBCREDIT000000001 /* CreditPurchaseSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditPurchaseSheet.swift; sourceTree = "<group>"; };
+		BBEXPLORE00000001 /* ExploreTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreTab.swift; sourceTree = "<group>"; };
 		BD83E70692A589F8678D5A0D /* ResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultView.swift; sourceTree = "<group>"; };
 		BF2FFDC8FE9FB5A25AA9DC55 /* RefinementBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefinementBuilder.swift; sourceTree = "<group>"; };
 		C751A204A7CDA258A17B6A21 /* ReviewStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewStepView.swift; sourceTree = "<group>"; };
 		CEB654DCA88FF679FBEFB358 /* RefinementSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefinementSheet.swift; sourceTree = "<group>"; };
 		D77094514BDAD21090480D3A /* CloudKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitService.swift; sourceTree = "<group>"; };
 		E1031905BEC715F64F5957DC /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		BBEXPLORE00000001 /* ExploreTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreTab.swift; sourceTree = "<group>"; };
-		BBCREDIT000000001 /* CreditPurchaseSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditPurchaseSheet.swift; sourceTree = "<group>"; };
 		EB04130801C20BE11F94D733 /* TextContentStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextContentStepView.swift; sourceTree = "<group>"; };
 		EDBC65359BBD8F17309A355E /* FlyerProject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyerProject.swift; sourceTree = "<group>"; };
-		LANG00000000000001 /* Language.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
 		F6E4BF8C2207C43A1E6C895F /* SelectionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionCard.swift; sourceTree = "<group>"; };
 		F7A5464C24F5B8B13D097698 /* MoodStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodStepView.swift; sourceTree = "<group>"; };
 		F8CD1653EE523C3DC3B07690 /* SavedFlyer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedFlyer.swift; sourceTree = "<group>"; };
@@ -190,6 +191,7 @@
 		FB709BFEED3D9A7E60798343 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		FC1056727B410D483D6F9ADD /* OpenRouterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterService.swift; sourceTree = "<group>"; };
 		FCFDACA03D378A28BF9670D9 /* FlyerTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyerTemplate.swift; sourceTree = "<group>"; };
+		LANG00000000000001 /* Language.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -359,14 +361,6 @@
 			path = Screens;
 			sourceTree = "<group>";
 		};
-		CCSHEETS00000001 /* Sheets */ = {
-			isa = PBXGroup;
-			children = (
-				BBCREDIT000000001 /* CreditPurchaseSheet.swift */,
-			);
-			path = Sheets;
-			sourceTree = "<group>";
-		};
 		91598030DADD7061BC0F47D8 /* Tabs */ = {
 			isa = PBXGroup;
 			children = (
@@ -428,6 +422,14 @@
 			path = Theme;
 			sourceTree = "<group>";
 		};
+		CCSHEETS00000001 /* Sheets */ = {
+			isa = PBXGroup;
+			children = (
+				BBCREDIT000000001 /* CreditPurchaseSheet.swift */,
+			);
+			path = Sheets;
+			sourceTree = "<group>";
+		};
 		CDCCF619B69E81FA099D4AF7 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
@@ -481,6 +483,7 @@
 				A127BBD1A88D83A876C6249C /* StoreKitService.swift */,
 				ACC1727E2B16FC554D251FA6 /* ImageGeneration */,
 				3E2453B6DBB44B211E937F92 /* PromptBuilder */,
+				B5E794700C37A8E743419C16 /* ReviewService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -562,6 +565,7 @@
 			packageReferences = (
 				8B31641B2EE5FCF300996E8A /* XCRemoteSwiftPackageReference "lottie-ios" */,
 			);
+			productRefGroup = F2F620B4FCB372C92181B0CF /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -673,6 +677,7 @@
 				AA00000000000005 /* FGAnimations.swift in Sources */,
 				AA00000000000006 /* FGTooltip.swift in Sources */,
 				AA00000000000008 /* FGButtons.swift in Sources */,
+				5C7C3B7B30AEBC3B92E6197E /* ReviewService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
