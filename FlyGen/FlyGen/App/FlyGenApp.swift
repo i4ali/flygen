@@ -6,6 +6,7 @@ struct FlyGenApp: App {
     @StateObject private var cloudKitService = CloudKitService()
     @StateObject private var storeKitService = StoreKitService()
     @StateObject private var reviewService = ReviewService()
+    @StateObject private var notificationService = NotificationService()
 
     private static let iCloudContainerIdentifier = "iCloud.com.flygen.app"
 
@@ -59,6 +60,7 @@ struct FlyGenApp: App {
                 .environmentObject(cloudKitService)
                 .environmentObject(storeKitService)
                 .environmentObject(reviewService)
+                .environmentObject(notificationService)
         }
         .modelContainer(sharedModelContainer)
     }

@@ -5,6 +5,7 @@ struct ResultView: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
     @EnvironmentObject var cloudKitService: CloudKitService
     @EnvironmentObject var reviewService: ReviewService
+    @EnvironmentObject var notificationService: NotificationService
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @Query private var userProfiles: [UserProfile]
@@ -195,6 +196,9 @@ struct ResultView: View {
 
             // Record successful generation for review prompt
             reviewService.recordSuccessfulGeneration()
+
+            // Check if credits hit zero for notification scheduling
+            notificationService.onCreditsChanged(newCredits: profile.credits)
         }
     }
 
@@ -284,4 +288,5 @@ struct ActionButton: View {
     return ResultView(viewModel: vm)
         .environmentObject(CloudKitService())
         .environmentObject(ReviewService())
+        .environmentObject(NotificationService())
 }

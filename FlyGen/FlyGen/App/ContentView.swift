@@ -3,12 +3,19 @@ import SwiftData
 
 struct ContentView: View {
     @EnvironmentObject var cloudKitService: CloudKitService
+    @EnvironmentObject var notificationService: NotificationService
     @StateObject private var viewModel = FlyerCreationViewModel()
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
     @State private var showingSettings = false
+    @State private var showingCreditPurchase = false
+    @Environment(\.scenePhase) private var scenePhase
 
     @Environment(\.modelContext) private var modelContext
     @Query private var userProfiles: [UserProfile]
+
+    private var credits: Int {
+        userProfiles.first?.credits ?? 0
+    }
 
     var body: some View {
         Group {
@@ -47,6 +54,25 @@ struct ContentView: View {
                     await syncCreditsFromCloud()
                 }
             }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                notificationService.onAppBecameActive(currentCredits: credits)
+            }
+        }
+        .alert("Out of Credits", isPresented: $notificationService.shouldShowInAppAlert) {
+            Button("Get Credits") {
+                notificationService.dismissInAppAlert()
+                showingCreditPurchase = true
+            }
+            Button("Later", role: .cancel) {
+                notificationService.dismissInAppAlert()
+            }
+        } message: {
+            Text("You've run out of credits. Purchase more to continue creating amazing flyers!")
+        }
+        .sheet(isPresented: $showingCreditPurchase) {
+            CreditPurchaseSheet()
         }
     }
 
@@ -131,4 +157,5 @@ struct MainTabView: View {
 #Preview {
     ContentView()
         .environmentObject(CloudKitService())
+        .environmentObject(NotificationService())
 }

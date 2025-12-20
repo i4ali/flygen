@@ -5,6 +5,7 @@ import StoreKit
 struct CreditPurchaseSheet: View {
     @EnvironmentObject var storeKitService: StoreKitService
     @EnvironmentObject var cloudKitService: CloudKitService
+    @EnvironmentObject var notificationService: NotificationService
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @Query private var userProfiles: [UserProfile]
@@ -196,6 +197,9 @@ struct CreditPurchaseSheet: View {
                 // Sync credits to CloudKit
                 await cloudKitService.saveCredits(profile.credits)
 
+                // Cancel scheduled notification since credits restored
+                notificationService.onCreditsChanged(newCredits: profile.credits)
+
                 purchasedCredits = creditsAdded
                 showingPurchaseSuccess = true
             }
@@ -274,4 +278,5 @@ struct CreditPackCard: View {
     CreditPurchaseSheet()
         .environmentObject(StoreKitService())
         .environmentObject(CloudKitService())
+        .environmentObject(NotificationService())
 }

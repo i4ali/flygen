@@ -78,6 +78,7 @@
 		B1AF5D2BC6C1DEA70A386BEF /* ReviewStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C751A204A7CDA258A17B6A21 /* ReviewStepView.swift */; };
 		C1CD44B611E655EE6AE96973 /* QRCodeSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 827EC63DDC6A4957895A8B11 /* QRCodeSettings.swift */; };
 		C1E4818D4049DED2EA4A4C4D /* FlyerCreationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 898F624DFE2689054E2A708A /* FlyerCreationViewModel.swift */; };
+		C26FE3379FE83AE1651A5BE4 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B8C8492F364170AB2291CB /* NotificationService.swift */; };
 		C28748394FC9BABE59A6C1DF /* GenerationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D0B5EC3F09F5173CDBA3CE /* GenerationView.swift */; };
 		C3BBCCD7150492B2AC6789A0 /* CreationFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A766390A874ED2612B3679 /* CreationFlowView.swift */; };
 		CFBB57982774AF66F39B14FB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1031905BEC715F64F5957DC /* ContentView.swift */; };
@@ -182,6 +183,7 @@
 		CEB654DCA88FF679FBEFB358 /* RefinementSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefinementSheet.swift; sourceTree = "<group>"; };
 		D77094514BDAD21090480D3A /* CloudKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitService.swift; sourceTree = "<group>"; };
 		E1031905BEC715F64F5957DC /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		E8B8C8492F364170AB2291CB /* NotificationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		EB04130801C20BE11F94D733 /* TextContentStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextContentStepView.swift; sourceTree = "<group>"; };
 		EDBC65359BBD8F17309A355E /* FlyerProject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyerProject.swift; sourceTree = "<group>"; };
 		F6E4BF8C2207C43A1E6C895F /* SelectionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionCard.swift; sourceTree = "<group>"; };
@@ -484,6 +486,7 @@
 				ACC1727E2B16FC554D251FA6 /* ImageGeneration */,
 				3E2453B6DBB44B211E937F92 /* PromptBuilder */,
 				B5E794700C37A8E743419C16 /* ReviewService.swift */,
+				E8B8C8492F364170AB2291CB /* NotificationService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -678,6 +681,7 @@
 				AA00000000000006 /* FGTooltip.swift in Sources */,
 				AA00000000000008 /* FGButtons.swift in Sources */,
 				5C7C3B7B30AEBC3B92E6197E /* ReviewService.swift in Sources */,
+				C26FE3379FE83AE1651A5BE4 /* NotificationService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
