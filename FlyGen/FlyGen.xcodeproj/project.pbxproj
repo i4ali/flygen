@@ -98,6 +98,8 @@
 		F315B5B3E510D452B864EFA8 /* MoodStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A5464C24F5B8B13D097698 /* MoodStepView.swift */; };
 		F698469DE0F1EF731F03ACB7 /* QRCodeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BF8F3456115A7D92EB1F149 /* QRCodeService.swift */; };
 		F927960154E78DFB295870BA /* QRCodeStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD932742A9E1DC6131CEFEE /* QRCodeStepView.swift */; };
+		AASAMPLEFLYER0001 /* SampleFlyer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBSAMPLEFLYER0001 /* SampleFlyer.swift */; };
+		AASAMPLELIB00001 /* SampleLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBSAMPLELIB00001 /* SampleLibrary.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -194,6 +196,8 @@
 		FC1056727B410D483D6F9ADD /* OpenRouterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterService.swift; sourceTree = "<group>"; };
 		FCFDACA03D378A28BF9670D9 /* FlyerTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyerTemplate.swift; sourceTree = "<group>"; };
 		LANG00000000000001 /* Language.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
+		BBSAMPLEFLYER0001 /* SampleFlyer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleFlyer.swift; sourceTree = "<group>"; };
+		BBSAMPLELIB00001 /* SampleLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleLibrary.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -398,6 +402,7 @@
 		BE6D9C68403AF260D1BA5CEB /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				BBSAMPLELIB00001 /* SampleLibrary.swift */,
 				0B4EB3FF702C55572A1A3DA0 /* TemplateLibrary.swift */,
 			);
 			path = Data;
@@ -458,6 +463,7 @@
 				LANG00000000000001 /* Language.swift */,
 				7753024C905464D110F059D5 /* OutputSettings.swift */,
 				827EC63DDC6A4957895A8B11 /* QRCodeSettings.swift */,
+				BBSAMPLEFLYER0001 /* SampleFlyer.swift */,
 				F8CD1653EE523C3DC3B07690 /* SavedFlyer.swift */,
 				A4E86A123D7FDBB3C7C8AAEF /* TextContent.swift */,
 				FB709BFEED3D9A7E60798343 /* UserProfile.swift */,
@@ -682,6 +688,8 @@
 				AA00000000000008 /* FGButtons.swift in Sources */,
 				5C7C3B7B30AEBC3B92E6197E /* ReviewService.swift in Sources */,
 				C26FE3379FE83AE1651A5BE4 /* NotificationService.swift in Sources */,
+				AASAMPLEFLYER0001 /* SampleFlyer.swift in Sources */,
+				AASAMPLELIB00001 /* SampleLibrary.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

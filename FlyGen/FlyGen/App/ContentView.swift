@@ -139,7 +139,7 @@ struct MainTabView: View {
                 }
                 .tag(1)
 
-            ExploreTab()
+            ExploreTab(viewModel: viewModel)
                 .tabItem {
                     Label("Explore", systemImage: "sparkles")
                 }

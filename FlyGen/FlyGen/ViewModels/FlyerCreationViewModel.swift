@@ -169,6 +169,21 @@ class FlyerCreationViewModel: ObservableObject {
         showingCreationFlow = true
     }
 
+    /// Load a sample flyer as a starting point and start the creation flow
+    func loadFromSample(_ sample: SampleFlyer) {
+        project = sample.toProject()
+
+        // Clear fields that won't be visible in the form for this category
+        // This prevents hidden data from appearing in the generated flyer
+        clearNonVisibleFields()
+
+        currentStep = .textContent
+        generationState = .idle
+        generatedImageData = nil
+        generatedFlyer = nil
+        showingCreationFlow = true
+    }
+
     /// Move to the next step
     func goToNextStep() {
         if let next = currentStep.next {

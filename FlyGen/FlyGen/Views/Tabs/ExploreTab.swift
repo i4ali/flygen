@@ -1,39 +1,31 @@
 import SwiftUI
 
-/// Sample flyer data for the Explore gallery
-struct SampleFlyer: Identifiable {
-    let id = UUID()
-    let imageName: String
-    let title: String
-    let category: String
-}
-
 struct ExploreTab: View {
+    @ObservedObject var viewModel: FlyerCreationViewModel
     @State private var selectedSample: SampleFlyer?
-
-    /// Sample flyers bundled with the app
-    /// These images should be added to Assets.xcassets/SampleFlyers/
-    private let sampleFlyers: [SampleFlyer] = [
-        SampleFlyer(imageName: "sample_grand_opening", title: "Grand Opening Restaurant", category: "Grand Opening"),
-        SampleFlyer(imageName: "sample_tech_conference", title: "Tech Conference", category: "Event"),
-        SampleFlyer(imageName: "sample_educational_newsletter", title: "Educational Newsletter", category: "Announcement"),
-        SampleFlyer(imageName: "sample_mega_sale", title: "Mega Sale", category: "Sale / Promotion"),
-        SampleFlyer(imageName: "sample_brake_service", title: "Brake Service Special", category: "Sale / Promotion"),
-        SampleFlyer(imageName: "sample_no_registration", title: "No Registration Fees", category: "Promotion"),
-        SampleFlyer(imageName: "sample_spanish_restaurant", title: "Spanish Restaurant", category: "Restaurant"),
-        SampleFlyer(imageName: "sample_arabic_eid_event", title: "Eid Event", category: "Event"),
-        SampleFlyer(imageName: "sample_chinese_fitness", title: "Fitness Class", category: "Class / Workshop"),
-        SampleFlyer(imageName: "sample_concert_user_photo", title: "Beatles Tribute Concert", category: "Music / Concert"),
-    ]
+    @State private var selectedCategory: FlyerCategory? = nil  // nil = "All"
 
     private let columns = [
         GridItem(.adaptive(minimum: 170), spacing: FGSpacing.md)
     ]
 
+    /// Get unique categories that have samples, sorted alphabetically
+    private var availableCategories: [FlyerCategory] {
+        Array(Set(SampleLibrary.samples.map { $0.category })).sorted { $0.displayName < $1.displayName }
+    }
+
+    /// Filter samples based on selected category
+    private var filteredSamples: [SampleFlyer] {
+        if let category = selectedCategory {
+            return SampleLibrary.samples.filter { $0.category == category }
+        }
+        return SampleLibrary.samples
+    }
+
     var body: some View {
         NavigationStack {
             Group {
-                if sampleFlyers.isEmpty {
+                if SampleLibrary.samples.isEmpty {
                     emptyState
                 } else {
                     sampleGrid
@@ -42,7 +34,10 @@ struct ExploreTab: View {
             .background(FGColors.backgroundPrimary)
             .navigationTitle("Explore")
             .fullScreenCover(item: $selectedSample) { sample in
-                SampleDetailSheet(sample: sample)
+                SampleDetailSheet(sample: sample) {
+                    selectedSample = nil
+                    viewModel.loadFromSample(sample)
+                }
             }
         }
     }
@@ -84,15 +79,18 @@ struct ExploreTab: View {
                         .font(FGTypography.h3)
                         .foregroundColor(FGColors.textPrimary)
 
-                    Text("Browse sample flyers created with FlyGen")
+                    Text("Browse sample flyers created with FlyGen. Tap to use as a starting point.")
                         .font(FGTypography.body)
                         .foregroundColor(FGColors.textSecondary)
                 }
                 .padding(.horizontal, FGSpacing.screenHorizontal)
 
+                // Category filter row
+                categoryFilterRow
+
                 // Grid
                 LazyVGrid(columns: columns, spacing: FGSpacing.md) {
-                    ForEach(sampleFlyers) { sample in
+                    ForEach(filteredSamples) { sample in
                         SampleThumbnailView(sample: sample)
                             .onTapGesture {
                                 selectedSample = sample
@@ -104,6 +102,33 @@ struct ExploreTab: View {
             .padding(.top, FGSpacing.md)
         }
         .background(FGColors.backgroundPrimary)
+    }
+
+    private var categoryFilterRow: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: FGSpacing.sm) {
+                // "All" button
+                FilterPillButton(
+                    title: "All",
+                    icon: "square.grid.2x2",
+                    isSelected: selectedCategory == nil
+                ) {
+                    selectedCategory = nil
+                }
+
+                // Category buttons
+                ForEach(availableCategories) { category in
+                    FilterPillButton(
+                        title: category.displayName,
+                        icon: category.icon,
+                        isSelected: selectedCategory == category
+                    ) {
+                        selectedCategory = category
+                    }
+                }
+            }
+            .padding(.horizontal, FGSpacing.screenHorizontal)
+        }
     }
 }
 
@@ -140,12 +165,12 @@ struct SampleThumbnailView: View {
 
             // Info
             VStack(alignment: .leading, spacing: FGSpacing.xxs) {
-                Text(sample.title)
+                Text(sample.name)
                     .font(FGTypography.labelLarge)
                     .foregroundColor(FGColors.textPrimary)
                     .lineLimit(1)
 
-                Text(sample.category)
+                Text(sample.category.displayName)
                     .font(FGTypography.caption)
                     .foregroundColor(FGColors.textSecondary)
             }
@@ -160,11 +185,12 @@ struct SampleThumbnailView: View {
     }
 }
 
-// MARK: - Sample Detail Sheet (View Only)
+// MARK: - Sample Detail Sheet
 
 struct SampleDetailSheet: View {
     @Environment(\.dismiss) private var dismiss
     let sample: SampleFlyer
+    let onUseAsStartingPoint: () -> Void
 
     var body: some View {
         NavigationStack {
@@ -187,9 +213,21 @@ struct SampleDetailSheet: View {
                                 .font(FGTypography.body)
                                 .foregroundColor(FGColors.textSecondary)
                             Spacer()
-                            Text(sample.category)
+                            Text(sample.category.displayName)
                                 .font(FGTypography.labelLarge)
                                 .foregroundColor(FGColors.textPrimary)
+                        }
+
+                        if sample.language != .english {
+                            HStack {
+                                Text("Language")
+                                    .font(FGTypography.body)
+                                    .foregroundColor(FGColors.textSecondary)
+                                Spacer()
+                                Text(sample.language.displayName)
+                                    .font(FGTypography.labelLarge)
+                                    .foregroundColor(FGColors.textPrimary)
+                            }
                         }
                     }
                     .padding(FGSpacing.cardPadding)
@@ -201,8 +239,26 @@ struct SampleDetailSheet: View {
                     )
                     .padding(.horizontal, FGSpacing.screenHorizontal)
 
+                    // "Use as Starting Point" button
+                    Button {
+                        onUseAsStartingPoint()
+                        dismiss()
+                    } label: {
+                        HStack(spacing: FGSpacing.sm) {
+                            Image(systemName: "wand.and.stars")
+                            Text("Use as Starting Point")
+                        }
+                        .font(FGTypography.button)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, FGSpacing.md)
+                        .background(FGColors.accentPrimary)
+                        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+                    }
+                    .padding(.horizontal, FGSpacing.screenHorizontal)
+
                     // Info text
-                    Text("This sample was created using FlyGen's AI-powered flyer generator.")
+                    Text("This sample was created using FlyGen's AI-powered flyer generator. Use it as a starting point to create your own!")
                         .font(FGTypography.caption)
                         .foregroundColor(FGColors.textTertiary)
                         .multilineTextAlignment(.center)
@@ -211,7 +267,7 @@ struct SampleDetailSheet: View {
                 .padding(.vertical, FGSpacing.lg)
             }
             .background(FGColors.backgroundPrimary)
-            .navigationTitle(sample.title)
+            .navigationTitle(sample.name)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -228,6 +284,36 @@ struct SampleDetailSheet: View {
     }
 }
 
+// MARK: - Filter Pill Button
+
+struct FilterPillButton: View {
+    let title: String
+    let icon: String
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: FGSpacing.xs) {
+                Image(systemName: icon)
+                    .font(.system(size: 12, weight: .medium))
+                Text(title)
+                    .font(FGTypography.labelSmall)
+            }
+            .padding(.horizontal, FGSpacing.md)
+            .padding(.vertical, FGSpacing.sm)
+            .background(isSelected ? FGColors.accentPrimary : FGColors.backgroundElevated)
+            .foregroundColor(isSelected ? .white : FGColors.textSecondary)
+            .clipShape(Capsule())
+            .overlay(
+                Capsule()
+                    .stroke(isSelected ? Color.clear : FGColors.borderSubtle, lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 #Preview {
-    ExploreTab()
+    ExploreTab(viewModel: FlyerCreationViewModel())
 }

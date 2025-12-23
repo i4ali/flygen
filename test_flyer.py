@@ -1077,6 +1077,208 @@ Visit: www.nwsaturdayschool.org""",
             )
         )
     },
+
+    # =========================================================================
+    # NEWSLETTER SHOWCASE FLYERS - For Marketing FlyGen Newsletter Feature
+    # =========================================================================
+
+    33: {
+        "name": "Small Business Newsletter",
+        "description": "Showcase: Local bakery monthly newsletter with seasonal updates and customer appreciation",
+        "project": FlyerProject(
+            category=FlyerCategory.ANNOUNCEMENT,
+            text_content=TextContent(
+                headline="The Monthly Buzz",
+                subheadline="Sweet Delights Bakery Newsletter - January 2025",
+                body_text="""What's New This Month
+
+NEW ON THE MENU
+Introducing our Winter Warmers collection! Try our new Maple Pecan Danish, Spiced Apple Croissant, and Hot Honey Butter Biscuits.
+
+CUSTOMER SPOTLIGHT
+Thank you to the Martinez family for being our Customer of the Month! They've been visiting us every Saturday morning for 3 years.
+
+UPCOMING EVENTS
+• Jan 18: Kids Cookie Decorating Class (Ages 5-12)
+• Jan 25: Valentine's Day Pre-Order Opens
+• Feb 1: Couples' Baking Night
+
+JANUARY SPECIAL
+Show this newsletter for 15% off any specialty cake order!
+
+Visit: www.sweetdelightsbakery.com""",
+                cta_text="Follow us @SweetDelightsBakery"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.PASTEL,
+                background_type=BackgroundType.LIGHT
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.PLAYFUL_FUN,
+                mood=Mood.FRIENDLY,
+                text_prominence=TextProminence.DOMINANT
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            )
+        )
+    },
+
+    34: {
+        "name": "Community Newsletter",
+        "description": "Showcase: HOA/neighborhood community newsletter with updates and events",
+        "project": FlyerProject(
+            category=FlyerCategory.ANNOUNCEMENT,
+            text_content=TextContent(
+                headline="Riverside Community News",
+                subheadline="Your Neighborhood Update - Spring 2025",
+                body_text="""From the HOA Board
+
+Spring is here and our community is thriving! Here's what you need to know:
+
+COMMUNITY UPDATES
+• Pool opens May 1st - new hours: 8 AM - 9 PM
+• Landscaping improvements completed on Oak Drive
+• New playground equipment installed at Central Park
+
+IMPORTANT REMINDERS
+• Annual dues are due by March 15th
+• Garage sale weekend: April 5-6
+• Lawn maintenance standards in effect
+
+UPCOMING EVENTS
+March 22 - Spring Block Party (4-8 PM)
+April 12 - Easter Egg Hunt at Central Park
+April 26 - Community Clean-Up Day
+
+CONTACT US
+Email: board@riversidehoa.org
+Portal: www.riversidecommunity.org""",
+                cta_text="Join our Facebook Group!"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.COOL,
+                background_type=BackgroundType.LIGHT
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.MODERN_MINIMAL,
+                mood=Mood.PROFESSIONAL,
+                text_prominence=TextProminence.DOMINANT
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            )
+        )
+    },
+
+    35: {
+        "name": "Tech Startup Newsletter",
+        "description": "Showcase: SaaS product update newsletter with feature announcements",
+        "project": FlyerProject(
+            category=FlyerCategory.ANNOUNCEMENT,
+            text_content=TextContent(
+                headline="Product Update",
+                subheadline="CloudSync Monthly - January 2025",
+                body_text="""What's New in CloudSync
+
+NEW FEATURES
+• Real-time collaboration - Edit documents with your team simultaneously
+• AI-powered search - Find files instantly with natural language
+• Mobile app v3.0 - Completely redesigned for speed
+
+PERFORMANCE IMPROVEMENTS
+We've reduced sync times by 60% and improved offline mode reliability.
+
+BY THE NUMBERS
+• 2M+ files synced daily
+• 99.99% uptime in 2024
+• 50+ new integrations added
+
+COMING SOON
+• Advanced analytics dashboard
+• Custom workflow automation
+• Enterprise SSO improvements
+
+PRO TIP
+Try the new keyboard shortcut Cmd+K to access quick actions from anywhere!
+
+Learn more: blog.cloudsync.io""",
+                cta_text="Upgrade to Pro - 20% Off"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.COOL,
+                background_type=BackgroundType.DARK
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.GRADIENT_MODERN,
+                mood=Mood.EXCITING,
+                text_prominence=TextProminence.DOMINANT
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            )
+        )
+    },
+
+    36: {
+        "name": "Internet Safety Newsletter",
+        "description": "Showcase: School newsletter about online safety, cyberbullying prevention, and digital citizenship",
+        "project": FlyerProject(
+            category=FlyerCategory.ANNOUNCEMENT,
+            text_content=TextContent(
+                headline="Digital Safety Corner",
+                subheadline="Northwest Saturday School Newsletter",
+                body_text="""Keeping Our Children Safe Online
+By Officer Jameel Hassan, School Resource Officer
+
+The internet is a powerful tool for learning, but it comes with real risks. Here's what every parent should know:
+
+WARNING SIGNS YOUR CHILD MAY BE AT RISK
+• Hiding screens when you walk by
+• Becoming withdrawn or secretive
+• New "friends" you've never heard of
+• Unexpected gifts or money
+• Using devices late at night
+
+CYBERBULLYING: WHAT TO WATCH FOR
+• Sudden reluctance to use devices
+• Emotional after being online
+• Deleting social media accounts
+• Declining grades or school avoidance
+
+5 RULES EVERY FAMILY NEEDS
+1. Devices stay in common areas - no phones in bedrooms
+2. Know your child's passwords and accounts
+3. Set daily time limits (use Screen Time or Family Link)
+4. Talk openly about what they see online
+5. Report suspicious contact immediately
+
+ISLAMIC PERSPECTIVE
+The Prophet (PBUH) said: "Each of you is a shepherd and each is responsible for his flock."
+
+Our children are our trust (amanah). Protecting their eyes, hearts, and minds from harmful content is part of our duty as parents.
+
+Resources: www.nwsaturdayschool.org/safety""",
+                cta_text="Download Our Family Safety Guide"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.COOL,
+                background_type=BackgroundType.LIGHT
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.MODERN_MINIMAL,
+                mood=Mood.PROFESSIONAL,
+                text_prominence=TextProminence.DOMINANT
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            )
+        )
+    },
 }
 
 
