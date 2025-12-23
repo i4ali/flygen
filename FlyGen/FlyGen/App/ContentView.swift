@@ -60,7 +60,11 @@ struct ContentView: View {
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
-                notificationService.onAppBecameActive(currentCredits: credits)
+                // Only check credits if user profile exists (credits are loaded)
+                // Avoids false "out of credits" alerts during initial data load
+                if let profile = userProfiles.first {
+                    notificationService.onAppBecameActive(currentCredits: profile.credits)
+                }
             }
         }
         .alert("Out of Credits", isPresented: $notificationService.shouldShowInAppAlert) {
