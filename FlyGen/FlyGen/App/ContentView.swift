@@ -6,8 +6,11 @@ struct ContentView: View {
     @EnvironmentObject var notificationService: NotificationService
     @StateObject private var viewModel = FlyerCreationViewModel()
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
+    @AppStorage("hasSeenNewUserOffer") private var hasSeenNewUserOffer: Bool = false
     @State private var showingSettings = false
     @State private var showingCreditPurchase = false
+    @State private var showingNewUserOffer = false
+    @State private var creditPurchaseIsPromoMode = false
     @Environment(\.scenePhase) private var scenePhase
 
     @Environment(\.modelContext) private var modelContext
@@ -71,8 +74,39 @@ struct ContentView: View {
         } message: {
             Text("You've run out of credits. Purchase more to continue creating amazing flyers!")
         }
-        .sheet(isPresented: $showingCreditPurchase) {
-            CreditPurchaseSheet()
+        .sheet(isPresented: $showingCreditPurchase, onDismiss: {
+            // Reset promo mode when sheet is dismissed
+            creditPurchaseIsPromoMode = false
+        }) {
+            CreditPurchaseSheet(isPromoMode: creditPurchaseIsPromoMode)
+        }
+        .sheet(isPresented: $showingNewUserOffer) {
+            NewUserOfferSheet(
+                onClaimOffer: {
+                    hasSeenNewUserOffer = true
+                    showingNewUserOffer = false
+                    // Small delay before showing credit purchase in promo mode
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        creditPurchaseIsPromoMode = true
+                        showingCreditPurchase = true
+                    }
+                },
+                onDecline: {
+                    hasSeenNewUserOffer = true
+                    showingNewUserOffer = false
+                }
+            )
+        }
+        .onAppear {
+            // Show new user offer after onboarding if not seen yet
+            if hasCompletedOnboarding && !hasSeenNewUserOffer {
+                // Small delay for smoother UX
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    if !hasSeenNewUserOffer {
+                        showingNewUserOffer = true
+                    }
+                }
+            }
         }
     }
 

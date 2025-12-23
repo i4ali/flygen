@@ -10,6 +10,9 @@ struct CreditPurchaseSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Query private var userProfiles: [UserProfile]
 
+    /// When true, shows promotional 50% off products instead of regular products
+    var isPromoMode: Bool = false
+
     @State private var showingPurchaseSuccess = false
     @State private var purchasedCredits: Int = 0
 
@@ -67,7 +70,7 @@ struct CreditPurchaseSheet: View {
                     .frame(width: 100, height: 100)
                     .blur(radius: 15)
 
-                Image(systemName: "sparkles")
+                Image(systemName: isPromoMode ? "gift.fill" : "sparkles")
                     .font(.system(size: 50))
                     .foregroundStyle(
                         LinearGradient(
@@ -78,14 +81,35 @@ struct CreditPurchaseSheet: View {
                     )
             }
 
-            Text("Credit Packs")
-                .font(FGTypography.displaySmall)
-                .foregroundColor(FGColors.textPrimary)
+            if isPromoMode {
+                Text("50% OFF")
+                    .font(.system(size: 32, weight: .black))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [FGColors.accentPrimary, FGColors.accentSecondary],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
 
-            Text("Purchase credits to create\nmore AI-powered flyers")
-                .font(FGTypography.body)
-                .foregroundColor(FGColors.textSecondary)
-                .multilineTextAlignment(.center)
+                Text("Welcome Offer")
+                    .font(FGTypography.displaySmall)
+                    .foregroundColor(FGColors.textPrimary)
+
+                Text("One-time discount for new users\nClaim before this offer expires!")
+                    .font(FGTypography.body)
+                    .foregroundColor(FGColors.textSecondary)
+                    .multilineTextAlignment(.center)
+            } else {
+                Text("Credit Packs")
+                    .font(FGTypography.displaySmall)
+                    .foregroundColor(FGColors.textPrimary)
+
+                Text("Purchase credits to create\nmore AI-powered flyers")
+                    .font(FGTypography.body)
+                    .foregroundColor(FGColors.textSecondary)
+                    .multilineTextAlignment(.center)
+            }
         }
         .padding(.top, FGSpacing.lg)
     }
@@ -127,6 +151,14 @@ struct CreditPurchaseSheet: View {
                         .foregroundColor(FGColors.textSecondary)
                 }
                 .padding(FGSpacing.xl)
+            } else if isPromoMode {
+                // Promo mode - show discounted products
+                if storeKitService.promoProducts.isEmpty {
+                    // Fallback to regular products if promo products not available
+                    regularProductsList
+                } else {
+                    promoProductsList
+                }
             } else if storeKitService.products.isEmpty {
                 VStack(spacing: FGSpacing.md) {
                     Image(systemName: "exclamationmark.triangle")
@@ -161,17 +193,7 @@ struct CreditPurchaseSheet: View {
                 }
                 .padding(FGSpacing.lg)
             } else {
-                ForEach(CreditPack.allCases, id: \.rawValue) { pack in
-                    if let product = storeKitService.product(for: pack) {
-                        CreditPackCard(
-                            pack: pack,
-                            product: product,
-                            isLoading: storeKitService.purchaseInProgress
-                        ) {
-                            await purchaseCredits(product: product, pack: pack)
-                        }
-                    }
-                }
+                regularProductsList
             }
 
             if let error = storeKitService.errorMessage {
@@ -184,9 +206,39 @@ struct CreditPurchaseSheet: View {
         .padding(.horizontal, FGSpacing.screenHorizontal)
     }
 
+    private var regularProductsList: some View {
+        ForEach(CreditPack.allCases, id: \.rawValue) { pack in
+            if let product = storeKitService.product(for: pack) {
+                CreditPackCard(
+                    pack: pack,
+                    product: product,
+                    isLoading: storeKitService.purchaseInProgress
+                ) {
+                    await purchaseCredits(product: product, creditAmount: pack.creditAmount)
+                }
+            }
+        }
+    }
+
+    private var promoProductsList: some View {
+        ForEach(PromoCreditPack.allCases, id: \.rawValue) { promoPack in
+            if let promoProduct = storeKitService.promoProduct(for: promoPack) {
+                let regularProduct = storeKitService.product(for: promoPack.regularPack)
+                PromoCreditPackCard(
+                    promoPack: promoPack,
+                    promoProduct: promoProduct,
+                    originalPrice: regularProduct?.displayPrice,
+                    isLoading: storeKitService.purchaseInProgress
+                ) {
+                    await purchaseCredits(product: promoProduct, creditAmount: promoPack.creditAmount)
+                }
+            }
+        }
+    }
+
     // MARK: - Purchase Action
 
-    private func purchaseCredits(product: Product, pack: CreditPack) async {
+    private func purchaseCredits(product: Product, creditAmount: Int) async {
         if let creditsAdded = await storeKitService.purchase(product) {
             // Add credits to user profile
             if let profile = userProfiles.first {
@@ -270,6 +322,100 @@ struct CreditPackCard: View {
         .overlay(
             RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
                 .stroke(FGColors.borderSubtle, lineWidth: 1)
+        )
+    }
+}
+
+// MARK: - Promo Credit Pack Card
+
+struct PromoCreditPackCard: View {
+    let promoPack: PromoCreditPack
+    let promoProduct: Product
+    let originalPrice: String?
+    let isLoading: Bool
+    let onPurchase: () async -> Void
+
+    var body: some View {
+        HStack(spacing: FGSpacing.md) {
+            // Credits amount
+            VStack(alignment: .leading, spacing: FGSpacing.xxs) {
+                HStack(spacing: FGSpacing.sm) {
+                    Text(promoPack.displayName)
+                        .font(FGTypography.h4)
+                        .foregroundColor(FGColors.textPrimary)
+
+                    Text(promoPack.badge)
+                        .font(FGTypography.captionBold)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, FGSpacing.sm)
+                        .padding(.vertical, FGSpacing.xxxs)
+                        .background(
+                            LinearGradient(
+                                colors: [FGColors.accentPrimary, FGColors.accentSecondary],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.chipRadius))
+                }
+
+                Text(promoProduct.description)
+                    .font(FGTypography.caption)
+                    .foregroundColor(FGColors.textSecondary)
+            }
+
+            Spacer()
+
+            // Price section with strikethrough original price
+            VStack(alignment: .trailing, spacing: 2) {
+                if let originalPrice = originalPrice {
+                    Text(originalPrice)
+                        .font(FGTypography.caption)
+                        .foregroundColor(FGColors.textTertiary)
+                        .strikethrough()
+                }
+
+                Button {
+                    Task {
+                        await onPurchase()
+                    }
+                } label: {
+                    if isLoading {
+                        ProgressView()
+                            .tint(FGColors.textOnAccent)
+                            .frame(width: 80)
+                    } else {
+                        Text(promoProduct.displayPrice)
+                            .font(FGTypography.buttonLarge)
+                            .foregroundColor(.white)
+                            .frame(width: 80)
+                            .padding(.vertical, FGSpacing.sm)
+                            .background(
+                                LinearGradient(
+                                    colors: [FGColors.accentPrimary, FGColors.accentSecondary],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+                    }
+                }
+                .disabled(isLoading)
+            }
+        }
+        .padding(FGSpacing.cardPadding)
+        .background(FGColors.backgroundElevated)
+        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+        .overlay(
+            RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
+                .stroke(
+                    LinearGradient(
+                        colors: [FGColors.accentPrimary.opacity(0.5), FGColors.accentSecondary.opacity(0.5)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 2
+                )
         )
     }
 }

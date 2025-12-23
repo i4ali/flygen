@@ -37,9 +37,51 @@ enum CreditPack: String, CaseIterable {
     }
 }
 
+/// Promotional credit pack product identifiers (50% off welcome offer)
+enum PromoCreditPack: String, CaseIterable {
+    case credits100Promo = "com.flygen.credits.100.welcome"
+    case credits250Promo = "com.flygen.credits.250.welcome"
+    case credits500Promo = "com.flygen.credits.500.welcome"
+
+    var creditAmount: Int {
+        switch self {
+        case .credits100Promo: return 100
+        case .credits250Promo: return 250
+        case .credits500Promo: return 500
+        }
+    }
+
+    var displayName: String {
+        switch self {
+        case .credits100Promo: return "100 Credits"
+        case .credits250Promo: return "250 Credits"
+        case .credits500Promo: return "500 Credits"
+        }
+    }
+
+    /// Number of generations this pack provides (10 credits per generation)
+    var generationCount: Int {
+        creditAmount / 10
+    }
+
+    var badge: String {
+        "50% OFF"
+    }
+
+    /// The corresponding regular pack for showing original price
+    var regularPack: CreditPack {
+        switch self {
+        case .credits100Promo: return .credits100
+        case .credits250Promo: return .credits250
+        case .credits500Promo: return .credits500
+        }
+    }
+}
+
 @MainActor
 class StoreKitService: ObservableObject {
     @Published var products: [Product] = []
+    @Published var promoProducts: [Product] = []
     @Published var purchasedProductIDs: Set<String> = []
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
@@ -51,6 +93,7 @@ class StoreKitService: ObservableObject {
         transactionListener = listenForTransactions()
         Task {
             await loadProducts()
+            await loadPromoProducts()
         }
     }
 
@@ -75,6 +118,18 @@ class StoreKitService: ObservableObject {
         isLoading = false
     }
 
+    /// Load promotional products from App Store
+    func loadPromoProducts() async {
+        do {
+            let promoProductIDs = PromoCreditPack.allCases.map { $0.rawValue }
+            promoProducts = try await Product.products(for: promoProductIDs)
+            promoProducts.sort { $0.price < $1.price }
+        } catch {
+            print("StoreKit: Failed to load promo products: \(error)")
+            // Don't set error message - promo products are optional
+        }
+    }
+
     /// Purchase a product
     func purchase(_ product: Product) async -> Int? {
         purchaseInProgress = true
@@ -87,9 +142,13 @@ class StoreKitService: ObservableObject {
             case .success(let verification):
                 let transaction = try checkVerified(verification)
 
-                // Get credit amount for this product
-                let creditPack = CreditPack(rawValue: product.id)
-                let creditsToAdd = creditPack?.creditAmount ?? 0
+                // Get credit amount for this product (check both regular and promo packs)
+                var creditsToAdd = 0
+                if let creditPack = CreditPack(rawValue: product.id) {
+                    creditsToAdd = creditPack.creditAmount
+                } else if let promoPack = PromoCreditPack(rawValue: product.id) {
+                    creditsToAdd = promoPack.creditAmount
+                }
 
                 // Finish the transaction
                 await transaction.finish()
@@ -152,6 +211,11 @@ class StoreKitService: ObservableObject {
     /// Get product for a credit pack
     func product(for creditPack: CreditPack) -> Product? {
         products.first { $0.id == creditPack.rawValue }
+    }
+
+    /// Get promo product for a promo credit pack
+    func promoProduct(for promoPack: PromoCreditPack) -> Product? {
+        promoProducts.first { $0.id == promoPack.rawValue }
     }
 
     /// Format price for display

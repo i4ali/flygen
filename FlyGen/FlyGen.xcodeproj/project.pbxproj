@@ -70,6 +70,7 @@
 		AA00000000000008 /* FGButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000008 /* FGButtons.swift */; };
 		AA81BC3EDC68F5F40B236E37 /* TextProminence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F62F08E46FF0DE6F50F5350 /* TextProminence.swift */; };
 		AACREDIT000000001 /* CreditPurchaseSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBCREDIT000000001 /* CreditPurchaseSheet.swift */; };
+		AANEWOFFER00001 /* NewUserOfferSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBNEWOFFER00001 /* NewUserOfferSheet.swift */; };
 		AAEXPLORE00000001 /* ExploreTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBEXPLORE00000001 /* ExploreTab.swift */; };
 		AALANG00000000001 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = LANG00000000000001 /* Language.swift */; };
 		AF0E0F3ACA691B8747193C62 /* TextContentStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB04130801C20BE11F94D733 /* TextContentStepView.swift */; };
@@ -178,6 +179,7 @@
 		BB00000000000006 /* FGTooltip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGTooltip.swift; sourceTree = "<group>"; };
 		BB00000000000008 /* FGButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGButtons.swift; sourceTree = "<group>"; };
 		BBCREDIT000000001 /* CreditPurchaseSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditPurchaseSheet.swift; sourceTree = "<group>"; };
+		BBNEWOFFER00001 /* NewUserOfferSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewUserOfferSheet.swift; sourceTree = "<group>"; };
 		BBEXPLORE00000001 /* ExploreTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreTab.swift; sourceTree = "<group>"; };
 		BD83E70692A589F8678D5A0D /* ResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultView.swift; sourceTree = "<group>"; };
 		BF2FFDC8FE9FB5A25AA9DC55 /* RefinementBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefinementBuilder.swift; sourceTree = "<group>"; };
@@ -433,6 +435,7 @@
 			isa = PBXGroup;
 			children = (
 				BBCREDIT000000001 /* CreditPurchaseSheet.swift */,
+				BBNEWOFFER00001 /* NewUserOfferSheet.swift */,
 			);
 			path = Sheets;
 			sourceTree = "<group>";
@@ -653,6 +656,7 @@
 				018C2423C0C86CE01329D1C1 /* PhotoLibraryService.swift in Sources */,
 				AAEXPLORE00000001 /* ExploreTab.swift in Sources */,
 				AACREDIT000000001 /* CreditPurchaseSheet.swift in Sources */,
+				AANEWOFFER00001 /* NewUserOfferSheet.swift in Sources */,
 				02C7FBC355F6A0B6897904C8 /* ProfileTab.swift in Sources */,
 				449D883F219ADF7D2890DD16 /* PromptBuilder.swift in Sources */,
 				9FC6E6C9D0FF652459D20F78 /* PromptDescriptors.swift in Sources */,
