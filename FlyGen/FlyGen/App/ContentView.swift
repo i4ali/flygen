@@ -97,9 +97,9 @@ struct ContentView: View {
                 }
             )
         }
-        .onAppear {
-            // Show new user offer after onboarding if not seen yet
-            if hasCompletedOnboarding && !hasSeenNewUserOffer {
+        .onChange(of: hasCompletedOnboarding) { _, completed in
+            // Show new user offer after onboarding completes
+            if completed && !hasSeenNewUserOffer {
                 // Small delay for smoother UX
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                     if !hasSeenNewUserOffer {
