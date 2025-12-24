@@ -5,48 +5,93 @@
   ],
   "products" : [
     {
-      "displayPrice" : "1.99",
+      "displayPrice" : "4.99",
       "familyShareable" : false,
-      "internalID" : "credits_10",
+      "internalID" : "credits_100",
       "localizations" : [
         {
-          "description" : "Get 10 credits to create flyers",
-          "displayName" : "10 Credits",
+          "description" : "Create 10 AI-powered flyers",
+          "displayName" : "100 Credits",
           "locale" : "en_US"
         }
       ],
-      "productID" : "com.flygen.credits.10",
-      "referenceName" : "10 Credits",
+      "productID" : "com.flygen.credits.100",
+      "referenceName" : "100 Credits",
       "type" : "Consumable"
     },
     {
-      "displayPrice" : "3.99",
+      "displayPrice" : "9.99",
       "familyShareable" : false,
-      "internalID" : "credits_25",
+      "internalID" : "credits_250",
       "localizations" : [
         {
-          "description" : "Get 25 credits to create flyers - Save 20%!",
-          "displayName" : "25 Credits",
+          "description" : "Create 25 AI-powered flyers - Save 20%!",
+          "displayName" : "250 Credits",
           "locale" : "en_US"
         }
       ],
-      "productID" : "com.flygen.credits.25",
-      "referenceName" : "25 Credits",
+      "productID" : "com.flygen.credits.250",
+      "referenceName" : "250 Credits",
       "type" : "Consumable"
     },
     {
-      "displayPrice" : "5.99",
+      "displayPrice" : "14.99",
       "familyShareable" : false,
-      "internalID" : "credits_50",
+      "internalID" : "credits_500",
       "localizations" : [
         {
-          "description" : "Get 50 credits to create flyers - Best Value!",
-          "displayName" : "50 Credits",
+          "description" : "Create 50 AI-powered flyers - Best Value!",
+          "displayName" : "500 Credits",
           "locale" : "en_US"
         }
       ],
-      "productID" : "com.flygen.credits.50",
-      "referenceName" : "50 Credits",
+      "productID" : "com.flygen.credits.500",
+      "referenceName" : "500 Credits",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "2.49",
+      "familyShareable" : false,
+      "internalID" : "credits_100_welcome",
+      "localizations" : [
+        {
+          "description" : "Create 10 AI-powered flyers - 50% OFF!",
+          "displayName" : "100 Credits (50% OFF)",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.flygen.credits.100.welcome",
+      "referenceName" : "100 Credits Welcome",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "4.99",
+      "familyShareable" : false,
+      "internalID" : "credits_250_welcome",
+      "localizations" : [
+        {
+          "description" : "Create 25 AI-powered flyers - 50% OFF!",
+          "displayName" : "250 Credits (50% OFF)",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.flygen.credits.250.welcome",
+      "referenceName" : "250 Credits Welcome",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "7.49",
+      "familyShareable" : false,
+      "internalID" : "credits_500_welcome",
+      "localizations" : [
+        {
+          "description" : "Create 50 AI-powered flyers - 50% OFF!",
+          "displayName" : "500 Credits (50% OFF)",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.flygen.credits.500.welcome",
+      "referenceName" : "500 Credits Welcome",
       "type" : "Consumable"
     }
   ],
@@ -104,7 +149,187 @@
     ]
   },
   "subscriptionGroups" : [
+    {
+      "id" : "flygen_premium",
+      "localizations" : [
+        {
+          "description" : "FlyGen Premium Subscription",
+          "displayName" : "FlyGen Premium",
+          "locale" : "en_US"
+        }
+      ],
+      "name" : "FlyGen Premium",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
 
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "6.99",
+          "familyShareable" : false,
+          "groupNumber" : 3,
+          "internalID" : "starter_monthly",
+          "introductoryOffer" : {
+            "displayPrice" : "0.99",
+            "internalID" : "starter_intro",
+            "numberOfPeriods" : 1,
+            "paymentMode" : "payUpFront",
+            "subscriptionPeriod" : "P1W"
+          },
+          "localizations" : [
+            {
+              "description" : "20 AI-generated flyers per month",
+              "displayName" : "Starter Monthly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.flygen.subscription.starter.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Starter Monthly",
+          "subscriptionGroupID" : "flygen_premium",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "54.99",
+          "familyShareable" : false,
+          "groupNumber" : 3,
+          "internalID" : "starter_yearly",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "20 AI-generated flyers per month - Save 35%!",
+              "displayName" : "Starter Yearly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.flygen.subscription.starter.yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Starter Yearly",
+          "subscriptionGroupID" : "flygen_premium",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "14.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "creator_monthly",
+          "introductoryOffer" : {
+            "displayPrice" : "1.99",
+            "internalID" : "creator_intro",
+            "numberOfPeriods" : 1,
+            "paymentMode" : "payUpFront",
+            "subscriptionPeriod" : "P1W"
+          },
+          "localizations" : [
+            {
+              "description" : "75 AI-generated flyers per month",
+              "displayName" : "Creator Monthly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.flygen.subscription.creator.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Creator Monthly",
+          "subscriptionGroupID" : "flygen_premium",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "119.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "creator_yearly",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "75 AI-generated flyers per month - Save 33%!",
+              "displayName" : "Creator Yearly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.flygen.subscription.creator.yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Creator Yearly",
+          "subscriptionGroupID" : "flygen_premium",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "34.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "pro_monthly",
+          "introductoryOffer" : {
+            "displayPrice" : "4.99",
+            "internalID" : "pro_intro",
+            "numberOfPeriods" : 1,
+            "paymentMode" : "payUpFront",
+            "subscriptionPeriod" : "P1W"
+          },
+          "localizations" : [
+            {
+              "description" : "Unlimited AI-generated flyers",
+              "displayName" : "Pro Monthly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.flygen.subscription.pro.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Pro Monthly",
+          "subscriptionGroupID" : "flygen_premium",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "279.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "pro_yearly",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Unlimited AI-generated flyers - Save 33%!",
+              "displayName" : "Pro Yearly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.flygen.subscription.pro.yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Pro Yearly",
+          "subscriptionGroupID" : "flygen_premium",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
   ],
   "version" : {
     "major" : 3,

@@ -1,7 +1,52 @@
 import StoreKit
 import SwiftUI
 
-/// Credit pack product identifiers
+/// Subscription plan product identifiers
+enum SubscriptionProductId: String, CaseIterable {
+    // Starter Plan
+    case starterMonthly = "com.flygen.subscription.starter.monthly"
+    case starterYearly = "com.flygen.subscription.starter.yearly"
+    // Creator Plan
+    case creatorMonthly = "com.flygen.subscription.creator.monthly"
+    case creatorYearly = "com.flygen.subscription.creator.yearly"
+    // Pro Plan
+    case proMonthly = "com.flygen.subscription.pro.monthly"
+    case proYearly = "com.flygen.subscription.pro.yearly"
+
+    var isYearly: Bool {
+        switch self {
+        case .starterYearly, .creatorYearly, .proYearly:
+            return true
+        default:
+            return false
+        }
+    }
+
+    var planName: String {
+        switch self {
+        case .starterMonthly, .starterYearly:
+            return "Starter"
+        case .creatorMonthly, .creatorYearly:
+            return "Creator"
+        case .proMonthly, .proYearly:
+            return "Pro"
+        }
+    }
+
+    /// Monthly credits for this plan (10 credits = 1 flyer)
+    var monthlyCredits: Int {
+        switch self {
+        case .starterMonthly, .starterYearly:
+            return 200 // 20 flyers
+        case .creatorMonthly, .creatorYearly:
+            return 750 // 75 flyers
+        case .proMonthly, .proYearly:
+            return 9999 // Unlimited
+        }
+    }
+}
+
+/// Credit pack product identifiers (legacy - kept for backward compatibility)
 enum CreditPack: String, CaseIterable {
     case credits100 = "com.flygen.credits.100"
     case credits250 = "com.flygen.credits.250"
@@ -82,7 +127,10 @@ enum PromoCreditPack: String, CaseIterable {
 class StoreKitService: ObservableObject {
     @Published var products: [Product] = []
     @Published var promoProducts: [Product] = []
+    @Published var subscriptionProducts: [Product] = []
     @Published var purchasedProductIDs: Set<String> = []
+    @Published var activeSubscription: Product?
+    @Published var subscriptionStatus: Product.SubscriptionInfo.Status?
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     @Published var purchaseInProgress: Bool = false
@@ -94,6 +142,8 @@ class StoreKitService: ObservableObject {
         Task {
             await loadProducts()
             await loadPromoProducts()
+            await loadSubscriptionProducts()
+            await updateSubscriptionStatus()
         }
     }
 
@@ -221,6 +271,130 @@ class StoreKitService: ObservableObject {
     /// Format price for display
     func formattedPrice(for product: Product) -> String {
         product.displayPrice
+    }
+
+    // MARK: - Subscription Methods
+
+    /// Load subscription products from App Store
+    func loadSubscriptionProducts() async {
+        do {
+            let subscriptionIDs = SubscriptionProductId.allCases.map { $0.rawValue }
+            subscriptionProducts = try await Product.products(for: subscriptionIDs)
+            subscriptionProducts.sort { $0.price < $1.price }
+        } catch {
+            print("StoreKit: Failed to load subscription products: \(error)")
+        }
+    }
+
+    /// Get subscription product for a plan
+    func subscriptionProduct(for plan: SubscriptionPlan, yearly: Bool) -> Product? {
+        let productId = yearly ? plan.yearlyProductId : plan.monthlyProductId
+        return subscriptionProducts.first { $0.id == productId }
+    }
+
+    /// Purchase a subscription
+    func purchaseSubscription(_ product: Product, plan: SubscriptionPlan) async -> Product? {
+        purchaseInProgress = true
+        errorMessage = nil
+
+        do {
+            let result = try await product.purchase()
+
+            switch result {
+            case .success(let verification):
+                let transaction = try checkVerified(verification)
+                await transaction.finish()
+                await updateSubscriptionStatus()
+                purchaseInProgress = false
+                return product
+
+            case .userCancelled:
+                purchaseInProgress = false
+                return nil
+
+            case .pending:
+                errorMessage = "Purchase is pending approval"
+                purchaseInProgress = false
+                return nil
+
+            @unknown default:
+                purchaseInProgress = false
+                return nil
+            }
+        } catch {
+            errorMessage = "Purchase failed: \(error.localizedDescription)"
+            print("StoreKit: Subscription purchase failed: \(error)")
+            purchaseInProgress = false
+            return nil
+        }
+    }
+
+    /// Update the current subscription status
+    func updateSubscriptionStatus() async {
+        var highestSubscription: Product?
+        var highestStatus: Product.SubscriptionInfo.Status?
+
+        for product in subscriptionProducts {
+            guard let subscription = product.subscription else { continue }
+
+            // Get the subscription status
+            if let statuses = try? await subscription.status {
+                for status in statuses {
+                    switch status.state {
+                    case .subscribed, .inGracePeriod, .inBillingRetryPeriod:
+                        // User has an active subscription
+                        if highestSubscription == nil || product.price > highestSubscription!.price {
+                            highestSubscription = product
+                            highestStatus = status
+                        }
+                    default:
+                        break
+                    }
+                }
+            }
+        }
+
+        activeSubscription = highestSubscription
+        subscriptionStatus = highestStatus
+    }
+
+    /// Check if user has an active subscription
+    var hasActiveSubscription: Bool {
+        activeSubscription != nil
+    }
+
+    /// Get the current subscription plan
+    var currentSubscriptionPlan: SubscriptionPlan? {
+        guard let product = activeSubscription else { return nil }
+
+        if product.id.contains("starter") {
+            return .starter
+        } else if product.id.contains("creator") {
+            return .creator
+        } else if product.id.contains("pro") {
+            return .pro
+        }
+        return nil
+    }
+
+    /// Restore purchases
+    func restorePurchases() async {
+        do {
+            try await AppStore.sync()
+            await updateSubscriptionStatus()
+        } catch {
+            errorMessage = "Failed to restore purchases: \(error.localizedDescription)"
+            print("StoreKit: Failed to restore purchases: \(error)")
+        }
+    }
+
+    /// Get credits for current subscription plan
+    var subscriptionCredits: Int {
+        guard let product = activeSubscription,
+              let subscriptionId = SubscriptionProductId(rawValue: product.id) else {
+            return 0
+        }
+        return subscriptionId.monthlyCredits
     }
 }
 
