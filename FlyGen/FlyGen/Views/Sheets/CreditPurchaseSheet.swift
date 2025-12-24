@@ -155,7 +155,7 @@ struct CreditPurchaseSheet: View {
                     icon: "sparkles",
                     title: "FlyGen",
                     subtitle: "Done in 30 seconds",
-                    highlight: isPromoMode ? "From $0.05/flyer" : "From $0.10/flyer",
+                    highlight: isPromoMode ? "$0.10-$0.15/flyer" : "$0.20-$0.30/flyer",
                     isExpensive: false
                 )
             }
