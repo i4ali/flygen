@@ -97,7 +97,7 @@ struct WorkflowDemoScreen: View {
                 if viewModel.demoStep != .ready {
                     Text("Step \(viewModel.demoStep.stepNumber) of 6")
                         .font(FGTypography.caption)
-                        .foregroundColor(FGColors.textTertiary)
+                        .foregroundColor(FGColors.textSecondary)
                 }
 
                 Text(viewModel.demoStep.title)
@@ -138,7 +138,7 @@ struct WorkflowDemoScreen: View {
             if viewModel.demoStep != .ready {
                 Text("Tap anywhere to skip ahead")
                     .font(FGTypography.caption)
-                    .foregroundColor(FGColors.textTertiary.opacity(0.6))
+                    .foregroundColor(FGColors.textSecondary)
                     .padding(.bottom, FGSpacing.sm)
             }
         }
@@ -218,14 +218,14 @@ struct WorkflowDemoScreen: View {
                 } else {
                     Image(systemName: "plus.circle.dashed")
                         .font(.system(size: 36))
-                        .foregroundColor(FGColors.textTertiary)
+                        .foregroundColor(FGColors.textSecondary)
                 }
             }
             .animation(FGAnimations.spring, value: viewModel.hasLogo)
 
             Text(viewModel.hasLogo ? "Logo added!" : "Your brand logo here")
                 .font(FGTypography.caption)
-                .foregroundColor(viewModel.hasLogo ? FGColors.accentPrimary : FGColors.textTertiary)
+                .foregroundColor(viewModel.hasLogo ? FGColors.accentPrimary : FGColors.textSecondary)
         }
     }
 
@@ -244,14 +244,14 @@ struct WorkflowDemoScreen: View {
                 } else {
                     Image(systemName: "qrcode.viewfinder")
                         .font(.system(size: 36))
-                        .foregroundColor(FGColors.textTertiary)
+                        .foregroundColor(FGColors.textSecondary)
                 }
             }
             .animation(FGAnimations.spring, value: viewModel.hasQRCode)
 
             Text(viewModel.hasQRCode ? "QR Code ready!" : "Link to your website")
                 .font(FGTypography.caption)
-                .foregroundColor(viewModel.hasQRCode ? FGColors.accentPrimary : FGColors.textTertiary)
+                .foregroundColor(viewModel.hasQRCode ? FGColors.accentPrimary : FGColors.textSecondary)
         }
     }
 
@@ -349,17 +349,17 @@ private struct MockTextField: View {
         HStack(spacing: FGSpacing.sm) {
             Image(systemName: icon)
                 .font(.system(size: 16))
-                .foregroundColor(value.isEmpty ? FGColors.textTertiary : FGColors.accentPrimary)
+                .foregroundColor(value.isEmpty ? FGColors.textSecondary : FGColors.accentPrimary)
                 .frame(width: 24)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(label)
                     .font(FGTypography.caption)
-                    .foregroundColor(FGColors.textTertiary)
+                    .foregroundColor(FGColors.textSecondary)
 
                 Text(value.isEmpty ? "..." : value)
                     .font(FGTypography.body)
-                    .foregroundColor(value.isEmpty ? FGColors.textTertiary : FGColors.textPrimary)
+                    .foregroundColor(value.isEmpty ? FGColors.textSecondary : FGColors.textPrimary)
             }
 
             Spacer()

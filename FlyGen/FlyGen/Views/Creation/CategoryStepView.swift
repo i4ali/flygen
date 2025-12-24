@@ -1,12 +1,28 @@
 import SwiftUI
+import SwiftData
 
 struct CategoryStepView: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
+    @Query private var userProfiles: [UserProfile]
 
     private let columns = [
         GridItem(.flexible(), spacing: FGSpacing.md),
         GridItem(.flexible(), spacing: FGSpacing.md)
     ]
+
+    /// Categories sorted with user's preferred categories first
+    private var sortedCategories: [FlyerCategory] {
+        let preferredCategories = userProfiles.first?.preferredFlyerCategories ?? []
+
+        if preferredCategories.isEmpty {
+            return FlyerCategory.allCases
+        }
+
+        // Preferred categories first, then remaining in original order
+        let preferred = preferredCategories.filter { FlyerCategory.allCases.contains($0) }
+        let others = FlyerCategory.allCases.filter { !preferred.contains($0) }
+        return preferred + others
+    }
 
     var body: some View {
         ScrollView {
@@ -18,12 +34,13 @@ struct CategoryStepView: View {
                     tooltipText: "Categories help optimize the AI prompt for your specific use case"
                 )
 
-                // Categories grid
+                // Categories grid (sorted with preferred first)
                 LazyVGrid(columns: columns, spacing: FGSpacing.md) {
-                    ForEach(FlyerCategory.allCases) { category in
+                    ForEach(sortedCategories) { category in
                         CategoryCard(
                             category: category,
-                            isSelected: viewModel.project?.category == category
+                            isSelected: viewModel.project?.category == category,
+                            isPreferred: userProfiles.first?.preferredFlyerCategories.contains(category) ?? false
                         ) {
                             viewModel.startNewFlyer(category: category)
                         }
@@ -41,6 +58,7 @@ struct CategoryStepView: View {
 private struct CategoryCard: View {
     let category: FlyerCategory
     let isSelected: Bool
+    let isPreferred: Bool
     let action: () -> Void
 
     var body: some View {
@@ -54,6 +72,19 @@ private struct CategoryCard: View {
 
                     Text(category.emoji)
                         .font(.system(size: 28))
+
+                    // Star indicator for preferred categories
+                    if isPreferred && !isSelected {
+                        Circle()
+                            .fill(FGColors.accentSecondary)
+                            .frame(width: 12, height: 12)
+                            .overlay(
+                                Image(systemName: "star.fill")
+                                    .font(.system(size: 6))
+                                    .foregroundColor(.white)
+                            )
+                            .offset(x: 20, y: -20)
+                    }
                 }
 
                 VStack(spacing: FGSpacing.xxxs) {

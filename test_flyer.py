@@ -1279,6 +1279,191 @@ Resources: www.nwsaturdayschool.org/safety""",
             )
         )
     },
+
+    # =========================================================================
+    # GARAGE SALE FLYERS
+    # =========================================================================
+
+    37: {
+        "name": "Family Moving Sale",
+        "description": "Garage sale: Family relocating, selling household items, furniture, and kids' stuff",
+        "project": FlyerProject(
+            category=FlyerCategory.SALE_PROMO,
+            text_content=TextContent(
+                headline="HUGE MOVING SALE",
+                subheadline="Everything Must Go! 20+ Years of Treasures",
+                discount_text="Up to 75% Off Retail",
+                date="Saturday & Sunday, January 11-12 | 7 AM - 3 PM",
+                address="4521 Maple Grove Drive, Pleasanton",
+                cta_text="Cash & Venmo Accepted",
+                fine_print="Rain or shine • Early birds welcome at 6:30 AM for $5 entry"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.WARM,
+                background_type=BackgroundType.LIGHT
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.BOLD_VIBRANT,
+                mood=Mood.EXCITING,
+                text_prominence=TextProminence.DOMINANT
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            )
+        )
+    },
+
+    38: {
+        "name": "Estate Sale",
+        "description": "Garage sale: Estate liquidation with antiques, collectibles, and vintage items",
+        "project": FlyerProject(
+            category=FlyerCategory.SALE_PROMO,
+            text_content=TextContent(
+                headline="ESTATE SALE",
+                subheadline="Vintage Furniture • Antiques • Fine China • Collectibles",
+                discount_text="50% Off Sunday",
+                date="Fri-Sun, January 17-19 | 9 AM - 4 PM",
+                address="892 Heritage Oak Lane, Walnut Creek",
+                cta_text="Don't Miss This Once-in-a-Lifetime Find",
+                fine_print="No early birds please • Numbers given at 8:30 AM • Cash preferred"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.EARTH_TONES,
+                background_type=BackgroundType.LIGHT
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.ELEGANT_LUXURY,
+                mood=Mood.ELEGANT,
+                text_prominence=TextProminence.DOMINANT
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            )
+        )
+    },
+
+    39: {
+        "name": "Multi-Family Yard Sale",
+        "description": "Garage sale: Neighborhood multi-family sale with variety of items",
+        "project": FlyerProject(
+            category=FlyerCategory.SALE_PROMO,
+            text_content=TextContent(
+                headline="5-FAMILY YARD SALE",
+                subheadline="Baby Gear • Tools • Electronics • Clothes • Sports Equipment • Toys",
+                discount_text="Prices Starting at $1",
+                date="Saturday, January 25 | 8 AM - 2 PM",
+                address="Sunset Hills Cul-de-sac, 1200 Block of Hillview Dr",
+                cta_text="Something for Everyone!",
+                fine_print="Street parking available • Follow the signs from Main St"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.WARM,
+                background_type=BackgroundType.LIGHT
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.PLAYFUL_FUN,
+                mood=Mood.FRIENDLY,
+                text_prominence=TextProminence.DOMINANT
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            )
+        )
+    },
+
+    40: {
+        "name": "Downsizing Sale",
+        "description": "Garage sale: Retired couple downsizing with quality furniture and home goods",
+        "project": FlyerProject(
+            category=FlyerCategory.SALE_PROMO,
+            text_content=TextContent(
+                headline="DOWNSIZING SALE",
+                subheadline="Quality Furniture • Kitchen Appliances • Garden Tools • Home Decor",
+                discount_text="Priced to Sell",
+                date="Feb 1-2 | Sat 8 AM - 4 PM, Sun 10 AM - 2 PM",
+                address="7834 Orchard View Court, Dublin",
+                cta_text="All Reasonable Offers Considered",
+                fine_print="Large items available for pickup through Feb 5 • Cash or Zelle"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.COOL,
+                background_type=BackgroundType.LIGHT
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.MODERN_MINIMAL,
+                mood=Mood.PROFESSIONAL,
+                text_prominence=TextProminence.DOMINANT
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            )
+        )
+    },
+
+    41: {
+        "name": "Community Garage Sale",
+        "description": "Garage sale: HOA-organized community-wide garage sale event",
+        "project": FlyerProject(
+            category=FlyerCategory.SALE_PROMO,
+            text_content=TextContent(
+                headline="SPRING BROOK COMMUNITY GARAGE SALE",
+                subheadline="50+ Homes Participating • Maps Available at Clubhouse",
+                discount_text="Free Admission",
+                date="Saturday, March 8 | 7 AM - 1 PM",
+                address="Spring Brook Subdivision, Enter on Brookfield Rd",
+                cta_text="Shop the Whole Neighborhood!",
+                fine_print="Hosted by Spring Brook HOA • Refreshments at clubhouse • Restrooms available",
+                website="springbrookhoa.org/garagesale"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.COOL,
+                background_type=BackgroundType.LIGHT
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.BOLD_VIBRANT,
+                mood=Mood.EXCITING,
+                text_prominence=TextProminence.DOMINANT
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            )
+        )
+    },
+
+    42: {
+        "name": "Garage Cleanout Sale",
+        "description": "Garage sale: Tools, outdoor equipment, and man-cave items",
+        "project": FlyerProject(
+            category=FlyerCategory.SALE_PROMO,
+            text_content=TextContent(
+                headline="GARAGE CLEANOUT",
+                subheadline="Power Tools • Lawn Equipment • Camping Gear • Fishing Tackle • Workbenches",
+                discount_text="Make an Offer!",
+                date="Saturday, January 18 | 6 AM - Noon",
+                address="2847 Industrial Way, Livermore",
+                cta_text="Serious Tools for Serious DIYers",
+                fine_print="DeWalt • Milwaukee • Craftsman • Husqvarna • Cash only please"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.MONOCHROME,
+                background_type=BackgroundType.DARK
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.BOLD_VIBRANT,
+                mood=Mood.URGENT,
+                text_prominence=TextProminence.DOMINANT
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            )
+        )
+    },
 }
 
 

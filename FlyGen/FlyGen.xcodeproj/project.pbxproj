@@ -27,6 +27,7 @@
 		6576A29683D25BA73B38F93B /* RefinementSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB654DCA88FF679FBEFB358 /* RefinementSheet.swift */; };
 		66727D08C7345522F2AE16F8 /* DynamicTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12BBCEF15B2AF34A5A490D50 /* DynamicTextField.swift */; };
 		6C12C05D86292A4CD215C4C6 /* FlyerProject.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDBC65359BBD8F17309A355E /* FlyerProject.swift */; };
+		7657D1662281381A3D0FF455 /* SampleShowcaseScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59D15DB4DE5A14E48E823DB9 /* SampleShowcaseScreen.swift */; };
 		7AA28B261F949897D5FC2C5E /* FlyerTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCFDACA03D378A28BF9670D9 /* FlyerTemplate.swift */; };
 		7CD3EBE906F543C25CE7093B /* FormatStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06A2021DD0B02DD6E91E8438 /* FormatStepView.swift */; };
 		7E5251F0DAF882D2A7170827 /* VisualStyleStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF6F1696F9CC685DEFECA3D /* VisualStyleStepView.swift */; };
@@ -70,13 +71,16 @@
 		AA00000000000008 /* FGButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000008 /* FGButtons.swift */; };
 		AA81BC3EDC68F5F40B236E37 /* TextProminence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F62F08E46FF0DE6F50F5350 /* TextProminence.swift */; };
 		AACREDIT000000001 /* CreditPurchaseSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBCREDIT000000001 /* CreditPurchaseSheet.swift */; };
-		AANEWOFFER00001 /* NewUserOfferSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBNEWOFFER00001 /* NewUserOfferSheet.swift */; };
 		AAEXPLORE00000001 /* ExploreTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBEXPLORE00000001 /* ExploreTab.swift */; };
 		AALANG00000000001 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = LANG00000000000001 /* Language.swift */; };
+		AANEWOFFER00001 /* NewUserOfferSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBNEWOFFER00001 /* NewUserOfferSheet.swift */; };
+		AASAMPLEFLYER0001 /* SampleFlyer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBSAMPLEFLYER0001 /* SampleFlyer.swift */; };
+		AASAMPLELIB00001 /* SampleLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBSAMPLELIB00001 /* SampleLibrary.swift */; };
 		AF0E0F3ACA691B8747193C62 /* TextContentStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB04130801C20BE11F94D733 /* TextContentStepView.swift */; };
 		AF18214E835F054B9D8F49AE /* ColorSchemePreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B3C4ECDD1E3D317F67F2CE0 /* ColorSchemePreset.swift */; };
 		AF8A46FDD739A68963EAE7EE /* CategoryStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C0B42D66AE1AED299093D64 /* CategoryStepView.swift */; };
 		B1AF5D2BC6C1DEA70A386BEF /* ReviewStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C751A204A7CDA258A17B6A21 /* ReviewStepView.swift */; };
+		B516914BCDF12F3C699488C2 /* CategoryPreferencesScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1391F54EAEC68ADFEF21B253 /* CategoryPreferencesScreen.swift */; };
 		C1CD44B611E655EE6AE96973 /* QRCodeSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 827EC63DDC6A4957895A8B11 /* QRCodeSettings.swift */; };
 		C1E4818D4049DED2EA4A4C4D /* FlyerCreationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 898F624DFE2689054E2A708A /* FlyerCreationViewModel.swift */; };
 		C26FE3379FE83AE1651A5BE4 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B8C8492F364170AB2291CB /* NotificationService.swift */; };
@@ -99,8 +103,6 @@
 		F315B5B3E510D452B864EFA8 /* MoodStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A5464C24F5B8B13D097698 /* MoodStepView.swift */; };
 		F698469DE0F1EF731F03ACB7 /* QRCodeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BF8F3456115A7D92EB1F149 /* QRCodeService.swift */; };
 		F927960154E78DFB295870BA /* QRCodeStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD932742A9E1DC6131CEFEE /* QRCodeStepView.swift */; };
-		AASAMPLEFLYER0001 /* SampleFlyer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBSAMPLEFLYER0001 /* SampleFlyer.swift */; };
-		AASAMPLELIB00001 /* SampleLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBSAMPLELIB00001 /* SampleLibrary.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -112,6 +114,7 @@
 		0D3E46940C3FF0B96D5406A0 /* FlyGenProducts.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = FlyGenProducts.storekit; sourceTree = "<group>"; };
 		10FCE45EBD805D38DC2CB792 /* TemplatePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplatePreviewView.swift; sourceTree = "<group>"; };
 		12BBCEF15B2AF34A5A490D50 /* DynamicTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicTextField.swift; sourceTree = "<group>"; };
+		1391F54EAEC68ADFEF21B253 /* CategoryPreferencesScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CategoryPreferencesScreen.swift; sourceTree = "<group>"; };
 		181849BBD35235AF52FED857 /* FlyGen.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlyGen.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		184D25D42BAC7CE7B252BF86 /* iCloudRequiredView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iCloudRequiredView.swift; sourceTree = "<group>"; };
 		1FA816BFB754005DF233AD04 /* PromptDescriptors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptDescriptors.swift; sourceTree = "<group>"; };
@@ -124,6 +127,7 @@
 		48A766390A874ED2612B3679 /* CreationFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreationFlowView.swift; sourceTree = "<group>"; };
 		4C085DEEA61D0B6B26BA0AEF /* AspectRatio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AspectRatio.swift; sourceTree = "<group>"; };
 		4F62F08E46FF0DE6F50F5350 /* TextProminence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextProminence.swift; sourceTree = "<group>"; };
+		59D15DB4DE5A14E48E823DB9 /* SampleShowcaseScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SampleShowcaseScreen.swift; sourceTree = "<group>"; };
 		5B19FB9D5DD3973FDEA7EABC /* ImageryType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageryType.swift; sourceTree = "<group>"; };
 		5B77BF34CD3B703956CC91DE /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		64F969BABBE5624EFD6A441E /* FlyGenApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyGenApp.swift; sourceTree = "<group>"; };
@@ -179,8 +183,10 @@
 		BB00000000000006 /* FGTooltip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGTooltip.swift; sourceTree = "<group>"; };
 		BB00000000000008 /* FGButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FGButtons.swift; sourceTree = "<group>"; };
 		BBCREDIT000000001 /* CreditPurchaseSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditPurchaseSheet.swift; sourceTree = "<group>"; };
-		BBNEWOFFER00001 /* NewUserOfferSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewUserOfferSheet.swift; sourceTree = "<group>"; };
 		BBEXPLORE00000001 /* ExploreTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreTab.swift; sourceTree = "<group>"; };
+		BBNEWOFFER00001 /* NewUserOfferSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewUserOfferSheet.swift; sourceTree = "<group>"; };
+		BBSAMPLEFLYER0001 /* SampleFlyer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleFlyer.swift; sourceTree = "<group>"; };
+		BBSAMPLELIB00001 /* SampleLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleLibrary.swift; sourceTree = "<group>"; };
 		BD83E70692A589F8678D5A0D /* ResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultView.swift; sourceTree = "<group>"; };
 		BF2FFDC8FE9FB5A25AA9DC55 /* RefinementBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefinementBuilder.swift; sourceTree = "<group>"; };
 		C751A204A7CDA258A17B6A21 /* ReviewStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewStepView.swift; sourceTree = "<group>"; };
@@ -198,8 +204,6 @@
 		FC1056727B410D483D6F9ADD /* OpenRouterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterService.swift; sourceTree = "<group>"; };
 		FCFDACA03D378A28BF9670D9 /* FlyerTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyerTemplate.swift; sourceTree = "<group>"; };
 		LANG00000000000001 /* Language.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
-		BBSAMPLEFLYER0001 /* SampleFlyer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleFlyer.swift; sourceTree = "<group>"; };
-		BBSAMPLELIB00001 /* SampleLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleLibrary.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -365,6 +369,8 @@
 				8BF224B42EE5FE9700E8776A /* AIGenerationScreen.swift */,
 				8BF224B52EE5FE9700E8776A /* WelcomeScreen.swift */,
 				8BF224B62EE5FE9700E8776A /* WorkflowDemoScreen.swift */,
+				1391F54EAEC68ADFEF21B253 /* CategoryPreferencesScreen.swift */,
+				59D15DB4DE5A14E48E823DB9 /* SampleShowcaseScreen.swift */,
 			);
 			path = Screens;
 			sourceTree = "<group>";
@@ -694,6 +700,8 @@
 				C26FE3379FE83AE1651A5BE4 /* NotificationService.swift in Sources */,
 				AASAMPLEFLYER0001 /* SampleFlyer.swift in Sources */,
 				AASAMPLELIB00001 /* SampleLibrary.swift in Sources */,
+				B516914BCDF12F3C699488C2 /* CategoryPreferencesScreen.swift in Sources */,
+				7657D1662281381A3D0FF455 /* SampleShowcaseScreen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

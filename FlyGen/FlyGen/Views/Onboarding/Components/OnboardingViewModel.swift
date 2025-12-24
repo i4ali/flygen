@@ -1,5 +1,53 @@
 import SwiftUI
 
+// MARK: - User Preference Type
+
+/// Simplified user-facing preference options that map to internal FlyerCategory values
+enum UserPreferenceType: String, CaseIterable, Identifiable {
+    case newsletters
+    case salesMarketing
+    case eventsParties
+    case business
+    case foodDining
+    case classesFitness
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .newsletters: return "Newsletters"
+        case .salesMarketing: return "Sales & Marketing"
+        case .eventsParties: return "Events & Parties"
+        case .business: return "Business"
+        case .foodDining: return "Food & Dining"
+        case .classesFitness: return "Classes & Fitness"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .newsletters: return "newspaper"
+        case .salesMarketing: return "tag"
+        case .eventsParties: return "party.popper"
+        case .business: return "briefcase"
+        case .foodDining: return "fork.knife"
+        case .classesFitness: return "figure.run"
+        }
+    }
+
+    /// Maps to actual FlyerCategory values for internal use
+    var mappedCategories: [FlyerCategory] {
+        switch self {
+        case .newsletters: return [.announcement]
+        case .salesMarketing: return [.salePromo, .grandOpening]
+        case .eventsParties: return [.event, .partyCelebration, .musicConcert]
+        case .business: return [.salePromo, .grandOpening, .realEstate, .jobPosting]
+        case .foodDining: return [.restaurantFood]
+        case .classesFitness: return [.classWorkshop, .fitnessWellness]
+        }
+    }
+}
+
 /// View model for interactive onboarding flow
 @MainActor
 class OnboardingViewModel: ObservableObject {
@@ -9,12 +57,16 @@ class OnboardingViewModel: ObservableObject {
     enum OnboardingScreen: Int, CaseIterable {
         case welcome = 0
         case workflowDemo = 1
-        case aiGeneration = 2
+        case categoryPreferences = 2
+        case sampleShowcase = 3
+        case aiGeneration = 4
 
         var title: String {
             switch self {
             case .welcome: return "Welcome"
             case .workflowDemo: return "How It Works"
+            case .categoryPreferences: return "Your Preferences"
+            case .sampleShowcase: return "What's Possible"
             case .aiGeneration: return "AI Magic"
             }
         }
@@ -154,6 +206,10 @@ class OnboardingViewModel: ObservableObject {
             return true
         case .workflowDemo:
             return demoStep == .ready
+        case .categoryPreferences:
+            return true  // Can always continue (skip is allowed)
+        case .sampleShowcase:
+            return true
         case .aiGeneration:
             return true
         }
@@ -163,12 +219,54 @@ class OnboardingViewModel: ObservableObject {
         currentScreen == .aiGeneration
     }
 
+    // MARK: - Category Preferences
+
+    @Published var selectedPreferences: Set<UserPreferenceType> = []
+
+    func togglePreference(_ preference: UserPreferenceType) {
+        if selectedPreferences.contains(preference) {
+            selectedPreferences.remove(preference)
+        } else {
+            selectedPreferences.insert(preference)
+        }
+    }
+
+    /// Get all selected categories (flattened from user preferences)
+    var selectedCategories: [FlyerCategory] {
+        selectedPreferences.flatMap { $0.mappedCategories }
+    }
+
+    /// Check if sample showcase should be shown (only if preferences were selected)
+    var shouldShowSampleShowcase: Bool {
+        !selectedPreferences.isEmpty
+    }
+
+    /// Get samples filtered by selected categories (up to 2 per category, max 6 total)
+    var filteredSamples: [SampleFlyer] {
+        let categories = selectedCategories
+        guard !categories.isEmpty else { return [] }
+
+        var result: [SampleFlyer] = []
+        for category in categories {
+            let categorySamples = SampleLibrary.samples.filter { $0.category == category }
+            result.append(contentsOf: categorySamples.prefix(2))
+        }
+        return Array(result.prefix(6))
+    }
+
     // MARK: - Navigation Actions
 
     func goToNextScreen() {
         guard !isTransitioning else { return }
 
-        if let nextIndex = OnboardingScreen(rawValue: currentScreen.rawValue + 1) {
+        var nextScreen = OnboardingScreen(rawValue: currentScreen.rawValue + 1)
+
+        // Skip sample showcase if no categories selected
+        if nextScreen == .sampleShowcase && !shouldShowSampleShowcase {
+            nextScreen = .aiGeneration
+        }
+
+        if let nextIndex = nextScreen {
             isTransitioning = true
             withAnimation(FGAnimations.slowEase) {
                 currentScreen = nextIndex

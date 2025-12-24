@@ -40,7 +40,17 @@ struct ContentView: View {
             } else if hasCompletedOnboarding {
                 MainTabView(viewModel: viewModel, showingSettings: $showingSettings)
             } else {
-                OnboardingContainerView {
+                OnboardingContainerView { selectedCategories in
+                    // Save selected categories to user profile
+                    if let profile = userProfiles.first {
+                        profile.setPreferredCategories(selectedCategories)
+                        try? modelContext.save()
+
+                        // Sync to CloudKit
+                        Task {
+                            await cloudKitService.savePreferredCategories(selectedCategories.map { $0.rawValue })
+                        }
+                    }
                     hasCompletedOnboarding = true
                 }
             }

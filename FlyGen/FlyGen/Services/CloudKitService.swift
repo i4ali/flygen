@@ -15,6 +15,11 @@ class CloudKitService: ObservableObject {
     private let creditsRecordName = "user-credits-record"  // Fixed ID for all devices
     private var creditsRecordID: CKRecord.ID?
 
+    // Preferences
+    private let preferencesRecordType = "UserPreferences"
+    private let preferredCategoriesKey = "preferredCategories"
+    private let preferencesRecordName = "user-preferences-record"
+
     init() {
         Task {
             await checkAccountStatus()
@@ -148,6 +153,52 @@ class CloudKitService: ObservableObject {
             await saveCredits(localCredits)
             print("CloudKit: Created new credits record with \(localCredits) credits")
             return localCredits
+        }
+    }
+
+    // MARK: - Preferences Sync Methods
+
+    /// Saves preferred categories to CloudKit
+    /// - Parameter categories: Array of category raw values
+    func savePreferredCategories(_ categories: [String]) async {
+        guard isSignedIn else { return }
+
+        let database = container.privateCloudDatabase
+        let recordID = CKRecord.ID(recordName: preferencesRecordName)
+
+        do {
+            let record: CKRecord
+
+            do {
+                // Try to fetch existing record
+                record = try await database.record(for: recordID)
+            } catch {
+                // Record doesn't exist, create new
+                record = CKRecord(recordType: preferencesRecordType, recordID: recordID)
+            }
+
+            record[preferredCategoriesKey] = categories
+            try await database.save(record)
+            print("CloudKit: Preferred categories saved successfully")
+        } catch {
+            print("CloudKit savePreferredCategories error: \(error.localizedDescription)")
+        }
+    }
+
+    /// Fetches preferred categories from CloudKit
+    /// - Returns: Array of category raw values, or nil if no record exists
+    func fetchPreferredCategories() async -> [String]? {
+        guard isSignedIn else { return nil }
+
+        let database = container.privateCloudDatabase
+        let recordID = CKRecord.ID(recordName: preferencesRecordName)
+
+        do {
+            let record = try await database.record(for: recordID)
+            return record[preferredCategoriesKey] as? [String]
+        } catch {
+            print("CloudKit fetchPreferredCategories: No record found")
+            return nil
         }
     }
 }

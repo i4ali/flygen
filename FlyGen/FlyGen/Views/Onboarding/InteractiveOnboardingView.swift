@@ -3,7 +3,7 @@ import SwiftUI
 /// Main coordinator for the interactive onboarding experience
 struct InteractiveOnboardingView: View {
     @StateObject private var viewModel = OnboardingViewModel()
-    let onComplete: () -> Void
+    let onComplete: ([FlyerCategory]) -> Void
 
     var body: some View {
         ZStack {
@@ -45,7 +45,7 @@ struct InteractiveOnboardingView: View {
             // Skip button (hidden on last screen)
             if !viewModel.isLastScreen {
                 Button("Skip") {
-                    onComplete()
+                    onComplete(Array(viewModel.selectedCategories))
                 }
                 .font(FGTypography.body)
                 .foregroundColor(FGColors.textSecondary)
@@ -68,6 +68,20 @@ struct InteractiveOnboardingView: View {
 
         case .workflowDemo:
             WorkflowDemoScreen(viewModel: viewModel)
+                .transition(.asymmetric(
+                    insertion: .move(edge: .trailing).combined(with: .opacity),
+                    removal: .move(edge: .leading).combined(with: .opacity)
+                ))
+
+        case .categoryPreferences:
+            CategoryPreferencesScreen(viewModel: viewModel)
+                .transition(.asymmetric(
+                    insertion: .move(edge: .trailing).combined(with: .opacity),
+                    removal: .move(edge: .leading).combined(with: .opacity)
+                ))
+
+        case .sampleShowcase:
+            SampleShowcaseScreen(viewModel: viewModel)
                 .transition(.asymmetric(
                     insertion: .move(edge: .trailing).combined(with: .opacity),
                     removal: .move(edge: .leading).combined(with: .opacity)
@@ -123,7 +137,7 @@ struct InteractiveOnboardingView: View {
                         // Complete onboarding
                         let impact = UIImpactFeedbackGenerator(style: .medium)
                         impact.impactOccurred()
-                        onComplete()
+                        onComplete(Array(viewModel.selectedCategories))
                     } else {
                         viewModel.goToNextScreen()
                     }
@@ -138,7 +152,7 @@ struct InteractiveOnboardingView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, FGSpacing.md)
                     .background(viewModel.canContinue ? FGColors.accentPrimary : FGColors.surfaceDefault)
-                    .foregroundColor(viewModel.canContinue ? FGColors.textOnAccent : FGColors.textTertiary)
+                    .foregroundColor(viewModel.canContinue ? FGColors.textOnAccent : FGColors.textSecondary)
                     .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
                     .shadow(
                         color: viewModel.canContinue ? FGColors.accentPrimary.opacity(0.4) : .clear,
@@ -160,6 +174,10 @@ struct InteractiveOnboardingView: View {
             return "Get Started"
         case .workflowDemo:
             return viewModel.canContinue ? "Continue" : "Try it out!"
+        case .categoryPreferences:
+            return viewModel.selectedPreferences.isEmpty ? "Skip" : "Continue"
+        case .sampleShowcase:
+            return "Continue"
         case .aiGeneration:
             return "Let's Create!"
         }
@@ -167,7 +185,7 @@ struct InteractiveOnboardingView: View {
 }
 
 #Preview("Interactive Onboarding") {
-    InteractiveOnboardingView {
-        print("Onboarding complete!")
+    InteractiveOnboardingView { categories in
+        print("Onboarding complete with categories: \(categories)")
     }
 }
