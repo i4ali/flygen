@@ -27,6 +27,9 @@ struct CreditPurchaseSheet: View {
                     // Header
                     headerSection
 
+                    // Value comparison
+                    valueComparisonSection
+
                     // Current credits
                     creditsDisplay
 
@@ -112,6 +115,59 @@ struct CreditPurchaseSheet: View {
             }
         }
         .padding(.top, FGSpacing.lg)
+    }
+
+    // MARK: - Value Comparison Section
+
+    private var valueComparisonSection: some View {
+        VStack(spacing: FGSpacing.sm) {
+            Text("Why FlyGen?")
+                .font(FGTypography.h4)
+                .foregroundColor(FGColors.textPrimary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            VStack(spacing: FGSpacing.xs) {
+                ComparisonRow(
+                    icon: "person.fill",
+                    title: "Hire a Designer",
+                    subtitle: "$150-500+ per flyer",
+                    highlight: nil,
+                    isExpensive: true
+                )
+
+                ComparisonRow(
+                    icon: "paintbrush.fill",
+                    title: "Canva Pro",
+                    subtitle: "$12.99/mo + hours of work",
+                    highlight: nil,
+                    isExpensive: true
+                )
+
+                ComparisonRow(
+                    icon: "clock.fill",
+                    title: "DIY Design",
+                    subtitle: "3-5 hours of your time",
+                    highlight: nil,
+                    isExpensive: true
+                )
+
+                ComparisonRow(
+                    icon: "sparkles",
+                    title: "FlyGen",
+                    subtitle: "Done in 30 seconds",
+                    highlight: isPromoMode ? "From $0.05/flyer" : "From $0.10/flyer",
+                    isExpensive: false
+                )
+            }
+        }
+        .padding(FGSpacing.cardPadding)
+        .background(FGColors.surfaceDefault)
+        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+        .overlay(
+            RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
+                .stroke(FGColors.borderSubtle, lineWidth: 1)
+        )
+        .padding(.horizontal, FGSpacing.screenHorizontal)
     }
 
     // MARK: - Credits Display
@@ -417,6 +473,59 @@ struct PromoCreditPackCard: View {
                     lineWidth: 2
                 )
         )
+    }
+}
+
+// MARK: - Comparison Row
+
+struct ComparisonRow: View {
+    let icon: String
+    let title: String
+    let subtitle: String
+    let highlight: String?
+    let isExpensive: Bool
+
+    var body: some View {
+        HStack(spacing: FGSpacing.sm) {
+            Image(systemName: icon)
+                .font(.system(size: 16))
+                .foregroundColor(isExpensive ? FGColors.textTertiary : FGColors.accentSecondary)
+                .frame(width: 24)
+
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: FGSpacing.xs) {
+                    Text(title)
+                        .font(FGTypography.bodyBold)
+                        .foregroundColor(isExpensive ? FGColors.textSecondary : FGColors.textPrimary)
+
+                    if isExpensive {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 12))
+                            .foregroundColor(FGColors.error.opacity(0.7))
+                    }
+                }
+
+                Text(subtitle)
+                    .font(FGTypography.caption)
+                    .foregroundColor(isExpensive ? FGColors.textTertiary : FGColors.textSecondary)
+            }
+
+            Spacer()
+
+            if let highlight = highlight {
+                Text(highlight)
+                    .font(FGTypography.captionBold)
+                    .foregroundColor(FGColors.success)
+                    .padding(.horizontal, FGSpacing.sm)
+                    .padding(.vertical, FGSpacing.xxxs)
+                    .background(FGColors.success.opacity(0.15))
+                    .clipShape(RoundedRectangle(cornerRadius: FGSpacing.chipRadius))
+            }
+        }
+        .padding(.vertical, FGSpacing.xs)
+        .padding(.horizontal, FGSpacing.sm)
+        .background(isExpensive ? Color.clear : FGColors.accentSecondary.opacity(0.08))
+        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
     }
 }
 
