@@ -49,3 +49,26 @@ Test cases in `test_flyer.py` must only use fields defined in `CATEGORY_TEXT_FIE
 - ANNOUNCEMENT: `headline`, `subheadline`, `body_text`, `date`, `cta_text`
 
 **Quick validation:** For each test case, its `TextContent` fields must be a subset of `CATEGORY_TEXT_FIELDS[category]`.
+
+### Test Case Settings Must Match iOS Enums Exactly
+
+**CRITICAL:** When adding test cases to `test_flyer.py`, all enum values and settings must use the exact values defined in Python `models.py`, which mirror the iOS app enums.
+
+**Before using any setting, verify it exists:**
+
+| Setting | Python File | iOS File |
+|---------|-------------|----------|
+| `AspectRatio` | `models.py` | `OutputSettings.swift` |
+| `VisualStyle` | `models.py` | `VisualSettings.swift` |
+| `Mood` | `models.py` | `VisualSettings.swift` |
+| `ColorSchemePreset` | `models.py` | `ColorSettings.swift` |
+| `BackgroundType` | `models.py` | `ColorSettings.swift` |
+| `TextProminence` | `models.py` | `VisualSettings.swift` |
+| `FlyerCategory` | `models.py` | `FlyerCategory.swift` |
+
+**Common mistakes to avoid:**
+- `AspectRatio.PORTRAIT` ❌ → `AspectRatio.PORTRAIT_4_5` ✅
+- `VisualStyle.LUXURY` ❌ → `VisualStyle.ELEGANT_LUXURY` ✅
+- Check `models.py` enum definitions before using any value
+
+**Quick validation:** Run `python test_flyer.py --list` to verify syntax, or `python -c "import test_flyer"` to check for import errors.

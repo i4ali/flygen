@@ -1464,6 +1464,34 @@ Resources: www.nwsaturdayschool.org/safety""",
             )
         )
     },
+
+    43: {
+        "name": "Holiday Restaurant Special",
+        "description": "Dark elegant holiday-themed restaurant flyer with gold accents (Oh My Chai style)",
+        "project": FlyerProject(
+            category=FlyerCategory.RESTAURANT_FOOD,
+            text_content=TextContent(
+                headline="Christmas Day",
+                subheadline="WE'RE OPEN | 12 PM - 5 PM",
+                venue_name="Oh My Chai",
+                price="Bihari Kabob Rolls",
+                cta_text="LIMITED & EXCLUSIVE",
+                address="46090 Michigan Ave, Canton MI"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.BLACK_GOLD,
+                background_type=BackgroundType.DARK
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.ELEGANT_LUXURY,
+                mood=Mood.FESTIVE,
+                text_prominence=TextProminence.BALANCED,
+                include_elements=["snowflakes", "holiday garland", "gold ornamental accents", "Christmas decorations"]
+            ),
+            output=OutputSettings(aspect_ratio=AspectRatio.PORTRAIT_4_5),
+            special_instructions="Professional food photography style. Dark elegant holiday theme with gold and champagne accents. Christmas atmosphere with snowflakes and ornamental decorations. Feature chai drink and kabob rolls as hero visual elements. Luxurious upscale restaurant feel."
+        )
+    },
 }
 
 

@@ -352,6 +352,25 @@ struct SampleLibrary {
             colors: ColorSettings(preset: .cool, backgroundType: .light),
             visuals: VisualSettings(style: .modernMinimal, mood: .professional, textProminence: .dominant),
             output: OutputSettings(aspectRatio: .portrait)
+        ),
+
+        // MARK: - Test 43: Holiday Restaurant Special
+        SampleFlyer(
+            id: "sample_holiday_restaurant",
+            imageName: "sample_holiday_restaurant",
+            name: "Holiday Restaurant Special",
+            category: .restaurantFood,
+            textContent: TextContent(
+                headline: "Christmas Day",
+                subheadline: "WE'RE OPEN | 12 PM - 5 PM",
+                venueName: "Oh My Chai",
+                address: "46090 Michigan Ave, Canton MI",
+                price: "Bihari Kabob Rolls",
+                ctaText: "LIMITED & EXCLUSIVE"
+            ),
+            colors: ColorSettings(preset: .blackGold, backgroundType: .dark),
+            visuals: VisualSettings(style: .elegantLuxury, mood: .festive, textProminence: .balanced),
+            output: OutputSettings(aspectRatio: .portrait)
         )
     ]
 
