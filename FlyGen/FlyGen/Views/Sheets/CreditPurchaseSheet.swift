@@ -27,6 +27,9 @@ struct CreditPurchaseSheet: View {
                     // Header
                     headerSection
 
+                    // Value comparison
+                    comparisonBanner
+
                     // Current credits
                     creditsDisplay
 
@@ -112,6 +115,60 @@ struct CreditPurchaseSheet: View {
             }
         }
         .padding(.top, FGSpacing.lg)
+    }
+
+    // MARK: - Comparison Banner
+
+    private var comparisonBanner: some View {
+        VStack(spacing: FGSpacing.sm) {
+            // Top label
+            Text("Hiring a Designer?")
+                .font(FGTypography.labelLarge)
+                .foregroundColor(.white)
+
+            // Giant strikethrough price
+            Text("$200+")
+                .font(.system(size: 36, weight: .bold, design: .rounded))
+                .foregroundColor(.white.opacity(0.4))
+                .strikethrough(true, color: .white.opacity(0.6))
+
+            // FlyGen price - the star
+            VStack(spacing: 2) {
+                Text("30¢")
+                    .font(.system(size: 52, weight: .black, design: .rounded))
+                    .foregroundColor(.white)
+
+                Text("per flyer with FlyGen")
+                    .font(FGTypography.caption)
+                    .foregroundColor(.white.opacity(0.8))
+            }
+
+            // Time savings
+            HStack(spacing: FGSpacing.xs) {
+                Image(systemName: "bolt.fill")
+                    .font(.system(size: 12))
+                Text("Create in seconds, not hours")
+                    .font(FGTypography.captionBold)
+            }
+            .foregroundColor(.white.opacity(0.9))
+            .padding(.top, FGSpacing.xs)
+        }
+        .padding(.vertical, FGSpacing.lg)
+        .padding(.horizontal, FGSpacing.xl)
+        .frame(maxWidth: .infinity)
+        .background(
+            LinearGradient(
+                colors: [
+                    FGColors.accentPrimary.opacity(0.4),
+                    FGColors.accentSecondary.opacity(0.2)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
+        .background(FGColors.backgroundElevated)
+        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+        .padding(.horizontal, FGSpacing.screenHorizontal)
     }
 
     // MARK: - Credits Display
