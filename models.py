@@ -227,7 +227,7 @@ class OutputSettings:
     """Output format settings"""
     aspect_ratio: AspectRatio = AspectRatio.PORTRAIT_4_5
     quality: str = "hd"
-    model: str = "nano-banana"
+    model: str = "nano-banana-pro"
 
 
 @dataclass
