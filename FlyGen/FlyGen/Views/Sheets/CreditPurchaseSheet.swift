@@ -122,8 +122,8 @@ struct CreditPurchaseSheet: View {
     private var comparisonBanner: some View {
         VStack(spacing: FGSpacing.sm) {
             // Top label
-            Text("Hiring a Designer?")
-                .font(FGTypography.labelLarge)
+            Text("Skip the Designer")
+                .font(.system(size: 16, weight: .semibold, design: .rounded))
                 .foregroundColor(.white)
 
             // Giant strikethrough price
@@ -134,12 +134,12 @@ struct CreditPurchaseSheet: View {
 
             // FlyGen price - the star
             VStack(spacing: 2) {
-                Text("30¢")
-                    .font(.system(size: 52, weight: .black, design: .rounded))
+                Text("Just 30¢")
+                    .font(.system(size: 38, weight: .black, design: .rounded))
                     .foregroundColor(.white)
 
-                Text("per flyer with FlyGen")
-                    .font(FGTypography.caption)
+                Text("per professional flyer")
+                    .font(.system(size: 13, weight: .medium, design: .default))
                     .foregroundColor(.white.opacity(0.8))
             }
 
@@ -147,11 +147,35 @@ struct CreditPurchaseSheet: View {
             HStack(spacing: FGSpacing.xs) {
                 Image(systemName: "bolt.fill")
                     .font(.system(size: 12))
-                Text("Create in seconds, not hours")
+                Text("Create instantly")
                     .font(FGTypography.captionBold)
             }
             .foregroundColor(.white.opacity(0.9))
             .padding(.top, FGSpacing.xs)
+
+            // User testimonial
+            VStack(spacing: 6) {
+                Text("\"Game-changer... honestly a lifesaver!\"")
+                    .font(.system(size: 14, weight: .medium, design: .serif))
+                    .italic()
+                    .foregroundColor(.white.opacity(0.95))
+                    .multilineTextAlignment(.center)
+
+                HStack(spacing: FGSpacing.xs) {
+                    HStack(spacing: 2) {
+                        ForEach(0..<5, id: \.self) { _ in
+                            Image(systemName: "star.fill")
+                                .font(.system(size: 10))
+                        }
+                    }
+                    .foregroundColor(FGColors.warning)
+
+                    Text("— wisementor274, App Store")
+                        .font(.system(size: 12, weight: .medium, design: .default))
+                        .foregroundColor(.white.opacity(0.6))
+                }
+            }
+            .padding(.top, FGSpacing.sm)
         }
         .padding(.vertical, FGSpacing.lg)
         .padding(.horizontal, FGSpacing.xl)
