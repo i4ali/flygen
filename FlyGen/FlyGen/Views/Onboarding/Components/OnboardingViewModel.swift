@@ -58,14 +58,16 @@ class OnboardingViewModel: ObservableObject {
         case welcome = 0
         case workflowDemo = 1
         case categoryPreferences = 2
-        case sampleShowcase = 3
-        case aiGeneration = 4
+        case languagePreferences = 3
+        case sampleShowcase = 4
+        case aiGeneration = 5
 
         var title: String {
             switch self {
             case .welcome: return "Welcome"
             case .workflowDemo: return "How It Works"
             case .categoryPreferences: return "Your Preferences"
+            case .languagePreferences: return "Languages"
             case .sampleShowcase: return "What's Possible"
             case .aiGeneration: return "AI Magic"
             }
@@ -208,6 +210,8 @@ class OnboardingViewModel: ObservableObject {
             return demoStep == .ready
         case .categoryPreferences:
             return true  // Can always continue (skip is allowed)
+        case .languagePreferences:
+            return true  // Can always continue
         case .sampleShowcase:
             return true
         case .aiGeneration:
@@ -236,21 +240,66 @@ class OnboardingViewModel: ObservableObject {
         selectedPreferences.flatMap { $0.mappedCategories }
     }
 
+    // MARK: - Language Preferences
+
+    @Published var selectedLanguages: Set<FlyerLanguage> = [.english]
+
+    func toggleLanguage(_ language: FlyerLanguage) {
+        if selectedLanguages.contains(language) {
+            // Don't allow deselecting the last language
+            if selectedLanguages.count > 1 {
+                selectedLanguages.remove(language)
+            }
+        } else {
+            selectedLanguages.insert(language)
+        }
+    }
+
     /// Check if sample showcase should be shown (only if preferences were selected)
     var shouldShowSampleShowcase: Bool {
         !selectedPreferences.isEmpty
     }
 
-    /// Get samples filtered by selected categories (up to 2 per category, max 6 total)
+    /// Get samples filtered by selected categories AND languages with smart fallbacks
     var filteredSamples: [SampleFlyer] {
         let categories = selectedCategories
+        let languages = selectedLanguages
+
         guard !categories.isEmpty else { return [] }
 
         var result: [SampleFlyer] = []
-        for category in categories {
-            let categorySamples = SampleLibrary.samples.filter { $0.category == category }
-            result.append(contentsOf: categorySamples.prefix(2))
+
+        // Priority 1: Exact matches (selected language + selected category)
+        for language in languages {
+            let exactMatches = SampleLibrary.samples.filter { sample in
+                categories.contains(sample.category) && sample.language == language
+            }
+            result.append(contentsOf: exactMatches)
         }
+
+        // Priority 2: Fill gaps with English fallbacks for missing categories
+        let coveredCategories = Set(result.map { $0.category })
+        let missingCategories = categories.filter { !coveredCategories.contains($0) }
+
+        for category in missingCategories {
+            // Try English first
+            if let englishSample = SampleLibrary.samples.first(where: {
+                $0.category == category && $0.language == .english
+            }) {
+                result.append(englishSample)
+            }
+            // Priority 3: If no English, use any available sample for this category
+            else if let anySample = SampleLibrary.samples.first(where: {
+                $0.category == category
+            }) {
+                result.append(anySample)
+            }
+        }
+
+        // Remove duplicates and limit to 6
+        var seen = Set<String>()
+        result = result.filter { seen.insert($0.id).inserted }
+
         return Array(result.prefix(6))
     }
 
@@ -261,8 +310,12 @@ class OnboardingViewModel: ObservableObject {
 
         var nextScreen = OnboardingScreen(rawValue: currentScreen.rawValue + 1)
 
-        // Skip sample showcase if no categories selected
-        if nextScreen == .sampleShowcase && !shouldShowSampleShowcase {
+        // Skip language preferences AND sample showcase if no categories selected
+        if nextScreen == .languagePreferences && !shouldShowSampleShowcase {
+            nextScreen = .aiGeneration
+        }
+        // Skip sample showcase if no categories selected (in case we're coming from language prefs)
+        else if nextScreen == .sampleShowcase && !shouldShowSampleShowcase {
             nextScreen = .aiGeneration
         }
 

@@ -371,6 +371,25 @@ struct SampleLibrary {
             colors: ColorSettings(preset: .blackGold, backgroundType: .dark),
             visuals: VisualSettings(style: .elegantLuxury, mood: .festive, textProminence: .balanced),
             output: OutputSettings(aspectRatio: .portrait)
+        ),
+
+        // MARK: - Test 19: Urdu Niaz Invitation
+        SampleFlyer(
+            id: "sample_urdu_niaz",
+            imageName: "sample_urdu_niaz",
+            name: "Urdu Niaz Invitation",
+            category: .event,
+            language: .urdu,
+            textContent: TextContent(
+                headline: "نیاز امام جعفر صادق (علیہ السلام)",
+                subheadline: "براہ کرم ہمارے ساتھ شامل ہوں",
+                date: "یکم جنوری 2026 | شام 6 بجے سے رات 10 بجے تک",
+                address: "4521 Meadow Brook Drive, Houston TX 77084",
+                ctaText: "فاطمہ اور علی کی طرف سے دعوت"
+            ),
+            colors: ColorSettings(preset: .pastel, backgroundType: .gradient),
+            visuals: VisualSettings(style: .elegantLuxury, mood: .elegant, textProminence: .dominant),
+            output: OutputSettings(aspectRatio: .portrait)
         )
     ]
 

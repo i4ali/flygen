@@ -80,6 +80,13 @@ struct InteractiveOnboardingView: View {
                     removal: .move(edge: .leading).combined(with: .opacity)
                 ))
 
+        case .languagePreferences:
+            LanguagePreferencesScreen(viewModel: viewModel)
+                .transition(.asymmetric(
+                    insertion: .move(edge: .trailing).combined(with: .opacity),
+                    removal: .move(edge: .leading).combined(with: .opacity)
+                ))
+
         case .sampleShowcase:
             SampleShowcaseScreen(viewModel: viewModel)
                 .transition(.asymmetric(
@@ -176,6 +183,8 @@ struct InteractiveOnboardingView: View {
             return viewModel.canContinue ? "Continue" : "Try it out!"
         case .categoryPreferences:
             return viewModel.selectedPreferences.isEmpty ? "Skip" : "Continue"
+        case .languagePreferences:
+            return "Continue"
         case .sampleShowcase:
             return "Continue"
         case .aiGeneration:
