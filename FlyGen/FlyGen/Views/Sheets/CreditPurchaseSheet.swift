@@ -20,6 +20,28 @@ struct CreditPurchaseSheet: View {
         userProfiles.first?.credits ?? 3
     }
 
+    /// Calculate the highest discount percentage across all promo packs
+    private var maxDiscountPercentage: Int? {
+        var maxDiscount: Int?
+        for promoPack in PromoCreditPack.allCases {
+            guard let promoProduct = storeKitService.promoProduct(for: promoPack),
+                  let regularProduct = storeKitService.product(for: promoPack.regularPack) else {
+                continue
+            }
+            let regularPrice = regularProduct.price
+            let promoPrice = promoProduct.price
+            guard regularPrice > 0 else { continue }
+            let discount = ((regularPrice - promoPrice) / regularPrice) * 100
+            let discountInt = Int(NSDecimalNumber(decimal: discount).doubleValue.rounded())
+            if let current = maxDiscount {
+                maxDiscount = max(current, discountInt)
+            } else {
+                maxDiscount = discountInt
+            }
+        }
+        return maxDiscount
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -60,6 +82,15 @@ struct CreditPurchaseSheet: View {
             } message: {
                 Text("You've received \(purchasedCredits) credits. Happy creating!")
             }
+            .task {
+                // Ensure both regular and promo products are loaded for discount calculation
+                if storeKitService.products.isEmpty {
+                    await storeKitService.loadProducts()
+                }
+                if storeKitService.promoProducts.isEmpty {
+                    await storeKitService.loadPromoProducts()
+                }
+            }
         }
     }
 
@@ -85,15 +116,17 @@ struct CreditPurchaseSheet: View {
             }
 
             if isPromoMode {
-                Text("50% OFF")
-                    .font(.system(size: 32, weight: .black))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [FGColors.accentPrimary, FGColors.accentSecondary],
-                            startPoint: .leading,
-                            endPoint: .trailing
+                if let discount = maxDiscountPercentage {
+                    Text("\(discount)% OFF")
+                        .font(.system(size: 32, weight: .black))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [FGColors.accentPrimary, FGColors.accentSecondary],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
                         )
-                    )
+                }
 
                 Text("Welcome Offer")
                     .font(FGTypography.displaySmall)
@@ -198,15 +231,26 @@ struct CreditPurchaseSheet: View {
     // MARK: - Credits Display
 
     private var creditsDisplay: some View {
-        HStack(spacing: FGSpacing.sm) {
-            Image(systemName: "sparkles")
-                .foregroundColor(FGColors.accentSecondary)
-            Text("Current Credits:")
-                .font(FGTypography.body)
-                .foregroundColor(FGColors.textSecondary)
-            Text("\(credits)")
-                .font(FGTypography.h3)
-                .foregroundColor(FGColors.textPrimary)
+        VStack(spacing: FGSpacing.xs) {
+            HStack(spacing: FGSpacing.sm) {
+                Image(systemName: "sparkles")
+                    .foregroundColor(FGColors.accentSecondary)
+                Text("Current Credits:")
+                    .font(FGTypography.body)
+                    .foregroundColor(FGColors.textSecondary)
+                Text("\(credits)")
+                    .font(FGTypography.h3)
+                    .foregroundColor(FGColors.textPrimary)
+            }
+
+            // Credits never expire note
+            HStack(spacing: FGSpacing.xxs) {
+                Image(systemName: "infinity")
+                    .font(.system(size: 12))
+                Text("Credits never expire")
+                    .font(FGTypography.caption)
+            }
+            .foregroundColor(FGColors.textTertiary)
         }
         .padding(FGSpacing.md)
         .frame(maxWidth: .infinity)
@@ -308,7 +352,7 @@ struct CreditPurchaseSheet: View {
                 PromoCreditPackCard(
                     promoPack: promoPack,
                     promoProduct: promoProduct,
-                    originalPrice: regularProduct?.displayPrice,
+                    regularProduct: regularProduct,
                     isLoading: storeKitService.purchaseInProgress
                 ) {
                     await purchaseCredits(product: promoProduct, creditAmount: promoPack.creditAmount)
@@ -412,9 +456,32 @@ struct CreditPackCard: View {
 struct PromoCreditPackCard: View {
     let promoPack: PromoCreditPack
     let promoProduct: Product
-    let originalPrice: String?
+    let regularProduct: Product?
     let isLoading: Bool
     let onPurchase: () async -> Void
+
+    /// Calculate actual discount percentage from prices
+    private var discountPercentage: Int? {
+        guard let regularProduct = regularProduct else { return nil }
+        let regularPrice = regularProduct.price
+        let promoPrice = promoProduct.price
+        guard regularPrice > 0 else { return nil }
+        let discount = ((regularPrice - promoPrice) / regularPrice) * 100
+        return Int(NSDecimalNumber(decimal: discount).doubleValue.rounded())
+    }
+
+    /// Dynamic badge text based on actual discount
+    private var badgeText: String {
+        if let percent = discountPercentage {
+            return "\(percent)% OFF"
+        }
+        return promoPack.badge
+    }
+
+    /// Original price display from regular product
+    private var originalPriceDisplay: String? {
+        regularProduct?.displayPrice
+    }
 
     var body: some View {
         HStack(spacing: FGSpacing.md) {
@@ -425,7 +492,7 @@ struct PromoCreditPackCard: View {
                         .font(FGTypography.h4)
                         .foregroundColor(FGColors.textPrimary)
 
-                    Text(promoPack.badge)
+                    Text(badgeText)
                         .font(FGTypography.captionBold)
                         .foregroundColor(.white)
                         .padding(.horizontal, FGSpacing.sm)
@@ -449,7 +516,7 @@ struct PromoCreditPackCard: View {
 
             // Price section with strikethrough original price
             VStack(alignment: .trailing, spacing: 2) {
-                if let originalPrice = originalPrice {
+                if let originalPrice = originalPriceDisplay {
                     Text(originalPrice)
                         .font(FGTypography.caption)
                         .foregroundColor(FGColors.textTertiary)

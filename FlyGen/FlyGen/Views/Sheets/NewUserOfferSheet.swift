@@ -2,8 +2,38 @@ import SwiftUI
 
 struct NewUserOfferSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var storeKitService: StoreKitService
     let onClaimOffer: () -> Void
     let onDecline: () -> Void
+
+    /// Calculate the highest discount percentage across all promo packs
+    private var maxDiscountPercentage: Int? {
+        var maxDiscount: Int?
+        for promoPack in PromoCreditPack.allCases {
+            guard let promoProduct = storeKitService.promoProduct(for: promoPack),
+                  let regularProduct = storeKitService.product(for: promoPack.regularPack) else {
+                continue
+            }
+            let regularPrice = regularProduct.price
+            let promoPrice = promoProduct.price
+            guard regularPrice > 0 else { continue }
+            let discount = ((regularPrice - promoPrice) / regularPrice) * 100
+            let discountInt = Int(NSDecimalNumber(decimal: discount).doubleValue.rounded())
+            if let current = maxDiscount {
+                maxDiscount = max(current, discountInt)
+            } else {
+                maxDiscount = discountInt
+            }
+        }
+        return maxDiscount
+    }
+
+    private var discountText: String {
+        if let discount = maxDiscountPercentage {
+            return "\(discount)% OFF"
+        }
+        return "SPECIAL OFFER"
+    }
 
     var body: some View {
         ZStack {
@@ -43,7 +73,7 @@ struct NewUserOfferSheet: View {
 
                     // Discount badge
                     VStack(spacing: FGSpacing.xs) {
-                        Text("50% OFF")
+                        Text(discountText)
                             .font(.system(size: 52, weight: .black))
                             .minimumScaleFactor(0.5)
                             .lineLimit(1)
@@ -91,11 +121,20 @@ struct NewUserOfferSheet: View {
                             .font(FGTypography.body)
                             .foregroundColor(FGColors.textPrimary)
 
-                        Text("at HALF PRICE!")
+                        Text(maxDiscountPercentage != nil ? "at a SPECIAL PRICE!" : "at a DISCOUNT!")
                             .font(FGTypography.h3)
                             .foregroundColor(FGColors.accentPrimary)
                     }
                     .multilineTextAlignment(.center)
+
+                    // Credits never expire note
+                    HStack(spacing: FGSpacing.xxs) {
+                        Image(systemName: "infinity")
+                            .font(.system(size: 12))
+                        Text("Credits never expire • Use anytime")
+                            .font(FGTypography.caption)
+                    }
+                    .foregroundColor(FGColors.textSecondary)
 
                     // Urgency warning
                     HStack(spacing: FGSpacing.sm) {
@@ -121,7 +160,7 @@ struct NewUserOfferSheet: View {
                     } label: {
                         HStack(spacing: FGSpacing.sm) {
                             Image(systemName: "flame.fill")
-                            Text("Claim 50% Off Now")
+                            Text(maxDiscountPercentage != nil ? "Claim \(maxDiscountPercentage!)% Off Now" : "Claim Offer Now")
                                 .font(FGTypography.button)
                         }
                         .foregroundColor(.white)
@@ -165,6 +204,15 @@ struct NewUserOfferSheet: View {
             .padding(.horizontal, FGSpacing.lg)
         }
         .interactiveDismissDisabled()
+        .task {
+            // Ensure both regular and promo products are loaded for discount calculation
+            if storeKitService.products.isEmpty {
+                await storeKitService.loadProducts()
+            }
+            if storeKitService.promoProducts.isEmpty {
+                await storeKitService.loadPromoProducts()
+            }
+        }
     }
 }
 
@@ -173,4 +221,5 @@ struct NewUserOfferSheet: View {
         onClaimOffer: {},
         onDecline: {}
     )
+    .environmentObject(StoreKitService())
 }

@@ -87,6 +87,13 @@ struct InteractiveOnboardingView: View {
                     removal: .move(edge: .leading).combined(with: .opacity)
                 ))
 
+        case .sampleLoading:
+            SampleLoadingScreen(viewModel: viewModel)
+                .transition(.asymmetric(
+                    insertion: .move(edge: .trailing).combined(with: .opacity),
+                    removal: .move(edge: .leading).combined(with: .opacity)
+                ))
+
         case .sampleShowcase:
             SampleShowcaseScreen(viewModel: viewModel)
                 .transition(.asymmetric(
@@ -185,6 +192,8 @@ struct InteractiveOnboardingView: View {
             return viewModel.selectedPreferences.isEmpty ? "Skip" : "Continue"
         case .languagePreferences:
             return "Continue"
+        case .sampleLoading:
+            return ""  // No button shown during loading
         case .sampleShowcase:
             return "Continue"
         case .aiGeneration:

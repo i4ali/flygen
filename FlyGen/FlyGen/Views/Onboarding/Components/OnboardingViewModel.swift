@@ -59,8 +59,9 @@ class OnboardingViewModel: ObservableObject {
         case workflowDemo = 1
         case categoryPreferences = 2
         case languagePreferences = 3
-        case sampleShowcase = 4
-        case aiGeneration = 5
+        case sampleLoading = 4
+        case sampleShowcase = 5
+        case aiGeneration = 6
 
         var title: String {
             switch self {
@@ -68,6 +69,7 @@ class OnboardingViewModel: ObservableObject {
             case .workflowDemo: return "How It Works"
             case .categoryPreferences: return "Your Preferences"
             case .languagePreferences: return "Languages"
+            case .sampleLoading: return "Loading"
             case .sampleShowcase: return "What's Possible"
             case .aiGeneration: return "AI Magic"
             }
@@ -212,6 +214,8 @@ class OnboardingViewModel: ObservableObject {
             return true  // Can always continue (skip is allowed)
         case .languagePreferences:
             return true  // Can always continue
+        case .sampleLoading:
+            return true  // Auto-advances
         case .sampleShowcase:
             return true
         case .aiGeneration:
@@ -310,11 +314,15 @@ class OnboardingViewModel: ObservableObject {
 
         var nextScreen = OnboardingScreen(rawValue: currentScreen.rawValue + 1)
 
-        // Skip language preferences AND sample showcase if no categories selected
+        // Skip language preferences, loading, AND sample showcase if no categories selected
         if nextScreen == .languagePreferences && !shouldShowSampleShowcase {
             nextScreen = .aiGeneration
         }
-        // Skip sample showcase if no categories selected (in case we're coming from language prefs)
+        // Skip loading and sample showcase if no categories selected
+        else if nextScreen == .sampleLoading && !shouldShowSampleShowcase {
+            nextScreen = .aiGeneration
+        }
+        // Skip sample showcase if no categories selected (in case we're coming from loading)
         else if nextScreen == .sampleShowcase && !shouldShowSampleShowcase {
             nextScreen = .aiGeneration
         }
