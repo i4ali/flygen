@@ -4,13 +4,13 @@ import SwiftData
 struct ContentView: View {
     @EnvironmentObject var cloudKitService: CloudKitService
     @EnvironmentObject var notificationService: NotificationService
+    @EnvironmentObject var storeKitService: StoreKitService
     @StateObject private var viewModel = FlyerCreationViewModel()
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
     @AppStorage("hasSeenNewUserOffer") private var hasSeenNewUserOffer: Bool = false
     @State private var showingSettings = false
     @State private var showingCreditPurchase = false
     @State private var showingNewUserOffer = false
-    @State private var creditPurchaseIsPromoMode = false
     @Environment(\.scenePhase) private var scenePhase
 
     @Environment(\.modelContext) private var modelContext
@@ -90,9 +90,9 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showingCreditPurchase, onDismiss: {
             // Reset promo mode when sheet is dismissed
-            creditPurchaseIsPromoMode = false
+            storeKitService.isPromoModeActive = false
         }) {
-            CreditPurchaseSheet(isPromoMode: creditPurchaseIsPromoMode)
+            CreditPurchaseSheet()
         }
         .sheet(isPresented: $showingNewUserOffer) {
             NewUserOfferSheet(
@@ -101,7 +101,7 @@ struct ContentView: View {
                     showingNewUserOffer = false
                     // Small delay before showing credit purchase in promo mode
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        creditPurchaseIsPromoMode = true
+                        storeKitService.isPromoModeActive = true
                         showingCreditPurchase = true
                     }
                 },
@@ -206,4 +206,5 @@ struct MainTabView: View {
     ContentView()
         .environmentObject(CloudKitService())
         .environmentObject(NotificationService())
+        .environmentObject(StoreKitService())
 }

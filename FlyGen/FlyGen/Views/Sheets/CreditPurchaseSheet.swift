@@ -10,11 +10,9 @@ struct CreditPurchaseSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Query private var userProfiles: [UserProfile]
 
-    /// When true, shows promotional 50% off products instead of regular products
-    var isPromoMode: Bool = false
-
     @State private var showingPurchaseSuccess = false
     @State private var purchasedCredits: Int = 0
+    @State private var hasAttemptedPromoLoad = false
 
     private var credits: Int {
         userProfiles.first?.credits ?? 3
@@ -87,8 +85,13 @@ struct CreditPurchaseSheet: View {
                 if storeKitService.products.isEmpty {
                     await storeKitService.loadProducts()
                 }
-                if storeKitService.promoProducts.isEmpty {
+                // In promo mode, always try to load promo products if empty
+                if storeKitService.isPromoModeActive && storeKitService.promoProducts.isEmpty {
                     await storeKitService.loadPromoProducts()
+                    hasAttemptedPromoLoad = true
+                } else if !storeKitService.promoProducts.isEmpty {
+                    // Products already loaded
+                    hasAttemptedPromoLoad = true
                 }
             }
         }
@@ -104,7 +107,7 @@ struct CreditPurchaseSheet: View {
                     .frame(width: 100, height: 100)
                     .blur(radius: 15)
 
-                Image(systemName: isPromoMode ? "gift.fill" : "sparkles")
+                Image(systemName: storeKitService.isPromoModeActive ? "gift.fill" : "sparkles")
                     .font(.system(size: 50))
                     .foregroundStyle(
                         LinearGradient(
@@ -115,7 +118,7 @@ struct CreditPurchaseSheet: View {
                     )
             }
 
-            if isPromoMode {
+            if storeKitService.isPromoModeActive {
                 if let discount = maxDiscountPercentage {
                     Text("\(discount)% OFF")
                         .font(.system(size: 32, weight: .black))
@@ -267,7 +270,10 @@ struct CreditPurchaseSheet: View {
 
     private var creditPacksSection: some View {
         VStack(spacing: FGSpacing.md) {
-            if storeKitService.isLoading {
+            // Key fix: In promo mode, show loading until promo products are ACTUALLY available
+            // This handles the gap between loadProducts() finishing and loadPromoProducts() starting
+            if storeKitService.isLoading || (storeKitService.isPromoModeActive && storeKitService.promoProducts.isEmpty && !hasAttemptedPromoLoad) {
+                // Still loading - either regular products or waiting for promo load attempt
                 VStack(spacing: FGSpacing.sm) {
                     ProgressView()
                         .tint(FGColors.accentPrimary)
@@ -276,12 +282,12 @@ struct CreditPurchaseSheet: View {
                         .foregroundColor(FGColors.textSecondary)
                 }
                 .padding(FGSpacing.xl)
-            } else if isPromoMode {
-                // Promo mode - show discounted products
+            } else if storeKitService.isPromoModeActive {
                 if storeKitService.promoProducts.isEmpty {
-                    // Fallback to regular products if promo products not available
-                    regularProductsList
+                    // Load attempted but failed - show error with retry
+                    promoLoadFailureView
                 } else {
+                    // Promo products available
                     promoProductsList
                 }
             } else if storeKitService.products.isEmpty {
@@ -359,6 +365,45 @@ struct CreditPurchaseSheet: View {
                 }
             }
         }
+    }
+
+    private var promoLoadFailureView: some View {
+        VStack(spacing: FGSpacing.md) {
+            Image(systemName: "exclamationmark.triangle")
+                .font(.system(size: 40))
+                .foregroundColor(FGColors.warning)
+
+            Text("Unable to load promotional prices")
+                .font(FGTypography.h4)
+                .foregroundColor(FGColors.textPrimary)
+
+            Text("Please check your connection and try again")
+                .font(FGTypography.caption)
+                .foregroundColor(FGColors.textSecondary)
+                .multilineTextAlignment(.center)
+
+            Button {
+                // Reset flag to show loading state while retrying
+                hasAttemptedPromoLoad = false
+                Task {
+                    await storeKitService.loadPromoProducts()
+                    hasAttemptedPromoLoad = true
+                }
+            } label: {
+                Text("Retry")
+                    .font(FGTypography.button)
+                    .foregroundColor(FGColors.accentPrimary)
+                    .padding(.horizontal, FGSpacing.lg)
+                    .padding(.vertical, FGSpacing.sm)
+                    .background(FGColors.surfaceDefault)
+                    .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: FGSpacing.buttonRadius)
+                            .stroke(FGColors.accentPrimary, lineWidth: 1)
+                    )
+            }
+        }
+        .padding(FGSpacing.lg)
     }
 
     // MARK: - Purchase Action

@@ -35,14 +35,142 @@ struct NewUserOfferSheet: View {
         return "SPECIAL OFFER"
     }
 
+    /// Check if we're still loading promo products
+    private var isLoadingPromoData: Bool {
+        storeKitService.isLoading || storeKitService.isLoadingPromoProducts
+    }
+
+    /// Check if promo data loaded successfully
+    private var promoDataLoadedSuccessfully: Bool {
+        !storeKitService.promoProducts.isEmpty && !storeKitService.products.isEmpty
+    }
+
+    /// Check if promo data failed to load (not loading and still empty)
+    private var promoDataFailed: Bool {
+        !isLoadingPromoData && (storeKitService.promoProducts.isEmpty || storeKitService.products.isEmpty)
+    }
+
     var body: some View {
         ZStack {
             // Dimmed background
             Color.black.opacity(0.6)
                 .ignoresSafeArea()
 
-            // Outer card container with border
-            VStack(spacing: FGSpacing.lg) {
+            if isLoadingPromoData {
+                // Loading state
+                loadingView
+            } else if promoDataFailed {
+                // Error state with retry
+                errorView
+            } else {
+                // Offer content
+                offerContentView
+            }
+        }
+        .interactiveDismissDisabled()
+        .task {
+            // Ensure both regular and promo products are loaded for discount calculation
+            if storeKitService.products.isEmpty {
+                await storeKitService.loadProducts()
+            }
+            if storeKitService.promoProducts.isEmpty {
+                await storeKitService.loadPromoProducts()
+            }
+        }
+    }
+
+    // MARK: - Loading View
+
+    private var loadingView: some View {
+        VStack(spacing: FGSpacing.lg) {
+            ProgressView()
+                .scaleEffect(1.5)
+                .tint(FGColors.accentPrimary)
+
+            Text("Loading special offer...")
+                .font(FGTypography.body)
+                .foregroundColor(FGColors.textSecondary)
+        }
+        .padding(FGSpacing.xl)
+        .background(
+            RoundedRectangle(cornerRadius: 24)
+                .fill(FGColors.backgroundPrimary)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 24)
+                .stroke(Color.gray.opacity(0.5), lineWidth: 1.5)
+        )
+        .padding(.horizontal, FGSpacing.lg)
+    }
+
+    // MARK: - Error View
+
+    private var errorView: some View {
+        VStack(spacing: FGSpacing.lg) {
+            Image(systemName: "exclamationmark.triangle")
+                .font(.system(size: 50))
+                .foregroundColor(FGColors.warning)
+
+            VStack(spacing: FGSpacing.sm) {
+                Text("Unable to load offer")
+                    .font(FGTypography.h3)
+                    .foregroundColor(FGColors.textPrimary)
+
+                Text("Please check your connection and try again")
+                    .font(FGTypography.body)
+                    .foregroundColor(FGColors.textSecondary)
+                    .multilineTextAlignment(.center)
+            }
+
+            Button {
+                Task {
+                    await storeKitService.loadProducts()
+                    await storeKitService.loadPromoProducts()
+                }
+            } label: {
+                HStack(spacing: FGSpacing.sm) {
+                    Image(systemName: "arrow.clockwise")
+                    Text("Retry")
+                        .font(FGTypography.button)
+                }
+                .foregroundColor(FGColors.accentPrimary)
+                .padding(.horizontal, FGSpacing.lg)
+                .padding(.vertical, FGSpacing.sm)
+                .background(FGColors.surfaceDefault)
+                .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+                .overlay(
+                    RoundedRectangle(cornerRadius: FGSpacing.buttonRadius)
+                        .stroke(FGColors.accentPrimary, lineWidth: 1)
+                )
+            }
+
+            Button {
+                onDecline()
+            } label: {
+                Text("Close")
+                    .font(FGTypography.caption)
+                    .foregroundColor(FGColors.textTertiary)
+                    .underline()
+            }
+            .padding(.top, FGSpacing.sm)
+        }
+        .padding(FGSpacing.xl)
+        .background(
+            RoundedRectangle(cornerRadius: 24)
+                .fill(FGColors.backgroundPrimary)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 24)
+                .stroke(Color.gray.opacity(0.5), lineWidth: 1.5)
+        )
+        .padding(.horizontal, FGSpacing.lg)
+    }
+
+    // MARK: - Offer Content View
+
+    private var offerContentView: some View {
+        // Outer card container with border
+        VStack(spacing: FGSpacing.lg) {
                 Spacer()
                     .frame(height: FGSpacing.lg)
 
@@ -202,17 +330,6 @@ struct NewUserOfferSheet: View {
                     .stroke(Color.gray.opacity(0.5), lineWidth: 1.5)
             )
             .padding(.horizontal, FGSpacing.lg)
-        }
-        .interactiveDismissDisabled()
-        .task {
-            // Ensure both regular and promo products are loaded for discount calculation
-            if storeKitService.products.isEmpty {
-                await storeKitService.loadProducts()
-            }
-            if storeKitService.promoProducts.isEmpty {
-                await storeKitService.loadPromoProducts()
-            }
-        }
     }
 }
 

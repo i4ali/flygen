@@ -84,8 +84,13 @@ class StoreKitService: ObservableObject {
     @Published var promoProducts: [Product] = []
     @Published var purchasedProductIDs: Set<String> = []
     @Published var isLoading: Bool = false
+    @Published var isLoadingPromoProducts: Bool = false
     @Published var errorMessage: String?
     @Published var purchaseInProgress: Bool = false
+
+    /// Whether the credit purchase sheet should show promotional prices
+    /// This is set by ContentView when presenting the sheet from the promo flow
+    @Published var isPromoModeActive: Bool = false
 
     private var transactionListener: Task<Void, Error>?
 
@@ -120,6 +125,9 @@ class StoreKitService: ObservableObject {
 
     /// Load promotional products from App Store
     func loadPromoProducts() async {
+        isLoadingPromoProducts = true
+        defer { isLoadingPromoProducts = false }
+
         do {
             let promoProductIDs = PromoCreditPack.allCases.map { $0.rawValue }
             promoProducts = try await Product.products(for: promoProductIDs)
