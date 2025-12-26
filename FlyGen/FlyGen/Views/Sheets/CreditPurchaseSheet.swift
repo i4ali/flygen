@@ -267,7 +267,7 @@ struct CreditPurchaseSheet: View {
 
     private var creditPacksSection: some View {
         VStack(spacing: FGSpacing.md) {
-            if storeKitService.isLoading {
+            if storeKitService.isLoading || (isPromoMode && storeKitService.isLoadingPromoProducts) {
                 VStack(spacing: FGSpacing.sm) {
                     ProgressView()
                         .tint(FGColors.accentPrimary)
@@ -279,7 +279,7 @@ struct CreditPurchaseSheet: View {
             } else if isPromoMode {
                 // Promo mode - show discounted products
                 if storeKitService.promoProducts.isEmpty {
-                    // Fallback to regular products if promo products not available
+                    // Fallback to regular products if promo products failed to load
                     regularProductsList
                 } else {
                     promoProductsList

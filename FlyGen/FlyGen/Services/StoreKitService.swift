@@ -84,6 +84,7 @@ class StoreKitService: ObservableObject {
     @Published var promoProducts: [Product] = []
     @Published var purchasedProductIDs: Set<String> = []
     @Published var isLoading: Bool = false
+    @Published var isLoadingPromoProducts: Bool = false
     @Published var errorMessage: String?
     @Published var purchaseInProgress: Bool = false
 
@@ -120,6 +121,8 @@ class StoreKitService: ObservableObject {
 
     /// Load promotional products from App Store
     func loadPromoProducts() async {
+        isLoadingPromoProducts = true
+
         do {
             let promoProductIDs = PromoCreditPack.allCases.map { $0.rawValue }
             promoProducts = try await Product.products(for: promoProductIDs)
@@ -128,6 +131,8 @@ class StoreKitService: ObservableObject {
             print("StoreKit: Failed to load promo products: \(error)")
             // Don't set error message - promo products are optional
         }
+
+        isLoadingPromoProducts = false
     }
 
     /// Purchase a product
