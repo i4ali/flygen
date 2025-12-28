@@ -30,11 +30,11 @@ struct SampleLoadingScreen: View {
             .frame(height: 140)
 
             VStack(spacing: FGSpacing.sm) {
-                Text("Finding perfect samples...")
+                Text("Personalizing your experience...")
                     .font(FGTypography.h3)
                     .foregroundColor(FGColors.textPrimary)
 
-                Text("Based on your preferences")
+                Text("Curating samples just for you")
                     .font(FGTypography.body)
                     .foregroundColor(FGColors.textSecondary)
             }
@@ -56,8 +56,8 @@ struct SampleLoadingScreen: View {
                 showText = true
             }
 
-            // Auto-advance after 2.5 seconds
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+            // Auto-advance after 4 seconds for personalization feel
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
                 viewModel.goToNextScreen()
             }
         }

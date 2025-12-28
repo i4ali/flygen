@@ -1,7 +1,9 @@
 import SwiftUI
+import SwiftData
 
 struct ExploreTab: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
+    @Query private var userProfiles: [UserProfile]
     @State private var selectedSample: SampleFlyer?
     @State private var selectedCategory: FlyerCategory? = nil  // nil = "All"
 
@@ -20,6 +22,14 @@ struct ExploreTab: View {
             return SampleLibrary.samples.filter { $0.category == category }
         }
         return SampleLibrary.samples
+    }
+
+    /// Check if a sample's category matches user's preferred categories
+    private func isPreferredSample(_ sample: SampleFlyer) -> Bool {
+        guard let preferredCategories = userProfiles.first?.preferredFlyerCategories else {
+            return false
+        }
+        return preferredCategories.contains(sample.category)
     }
 
     var body: some View {
@@ -91,10 +101,13 @@ struct ExploreTab: View {
                 // Grid
                 LazyVGrid(columns: columns, spacing: FGSpacing.md) {
                     ForEach(filteredSamples) { sample in
-                        SampleThumbnailView(sample: sample)
-                            .onTapGesture {
-                                selectedSample = sample
-                            }
+                        SampleThumbnailView(
+                            sample: sample,
+                            isPreferred: isPreferredSample(sample)
+                        )
+                        .onTapGesture {
+                            selectedSample = sample
+                        }
                     }
                 }
                 .padding(.horizontal, FGSpacing.screenHorizontal)
@@ -136,31 +149,40 @@ struct ExploreTab: View {
 
 struct SampleThumbnailView: View {
     let sample: SampleFlyer
+    var isPreferred: Bool = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: FGSpacing.sm) {
-            // Image thumbnail
-            if let uiImage = UIImage(named: sample.imageName) {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .aspectRatio(8.5/11, contentMode: .fit)
-                    .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
-            } else {
-                // Placeholder if image not found
-                RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
-                    .fill(
-                        LinearGradient(
-                            colors: [FGColors.accentPrimary.opacity(0.3), FGColors.accentSecondary.opacity(0.3)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
+            // Image thumbnail with optional "For You" badge
+            ZStack(alignment: .topLeading) {
+                if let uiImage = UIImage(named: sample.imageName) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .aspectRatio(8.5/11, contentMode: .fit)
+                        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+                } else {
+                    // Placeholder if image not found
+                    RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
+                        .fill(
+                            LinearGradient(
+                                colors: [FGColors.accentPrimary.opacity(0.3), FGColors.accentSecondary.opacity(0.3)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
                         )
-                    )
-                    .aspectRatio(8.5/11, contentMode: .fit)
-                    .overlay {
-                        Image(systemName: "photo")
-                            .font(.largeTitle)
-                            .foregroundColor(FGColors.textTertiary)
-                    }
+                        .aspectRatio(8.5/11, contentMode: .fit)
+                        .overlay {
+                            Image(systemName: "photo")
+                                .font(.largeTitle)
+                                .foregroundColor(FGColors.textTertiary)
+                        }
+                }
+
+                // "For You" badge for preferred samples
+                if isPreferred {
+                    ForYouBadge()
+                        .padding(FGSpacing.xs)
+                }
             }
 
             // Info
@@ -182,6 +204,28 @@ struct SampleThumbnailView: View {
             RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
                 .stroke(FGColors.borderSubtle, lineWidth: 1)
         )
+    }
+}
+
+// MARK: - For You Badge
+
+private struct ForYouBadge: View {
+    var body: some View {
+        HStack(spacing: FGSpacing.xxs) {
+            Image(systemName: "star.fill")
+                .font(.system(size: 8))
+            Text("For You")
+                .font(FGTypography.captionSmall)
+                .fontWeight(.semibold)
+        }
+        .foregroundColor(.white)
+        .padding(.horizontal, FGSpacing.xs)
+        .padding(.vertical, FGSpacing.xxxs + 1)
+        .background(
+            Capsule()
+                .fill(FGColors.accentSecondary)
+        )
+        .shadow(color: .black.opacity(0.3), radius: 2, y: 1)
     }
 }
 
