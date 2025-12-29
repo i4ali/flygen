@@ -11,6 +11,8 @@ struct SampleFlyer: Identifiable {
     let colors: ColorSettings
     let visuals: VisualSettings
     let output: OutputSettings
+    let targetAudience: String?
+    let specialInstructions: String?
 
     init(
         id: String,
@@ -21,7 +23,9 @@ struct SampleFlyer: Identifiable {
         textContent: TextContent,
         colors: ColorSettings,
         visuals: VisualSettings,
-        output: OutputSettings
+        output: OutputSettings,
+        targetAudience: String? = nil,
+        specialInstructions: String? = nil
     ) {
         self.id = id
         self.imageName = imageName
@@ -32,6 +36,8 @@ struct SampleFlyer: Identifiable {
         self.colors = colors
         self.visuals = visuals
         self.output = output
+        self.targetAudience = targetAudience
+        self.specialInstructions = specialInstructions
     }
 
     /// Creates a FlyerProject from this sample
@@ -41,6 +47,8 @@ struct SampleFlyer: Identifiable {
         project.colors = colors
         project.visuals = visuals
         project.output = output
+        project.targetAudience = targetAudience
+        project.specialInstructions = specialInstructions
         return project
     }
 }

@@ -20,8 +20,15 @@ struct SampleLibrary {
                 ctaText: "Reserve Your Table"
             ),
             colors: ColorSettings(preset: .blackGold, backgroundType: .dark),
-            visuals: VisualSettings(style: .elegantLuxury, mood: .elegant, textProminence: .balanced),
-            output: OutputSettings(aspectRatio: .portrait)
+            visuals: VisualSettings(
+                style: .elegantLuxury,
+                mood: .elegant,
+                textProminence: .balanced,
+                includeElements: ["ribbon cutting", "champagne glasses", "elegant table setting"]
+            ),
+            output: OutputSettings(aspectRatio: .portrait),
+            targetAudience: "Fine dining enthusiasts, couples looking for date night spots",
+            specialInstructions: "Emphasize luxury and sophistication with warm, inviting lighting"
         ),
 
         // MARK: - Test 11: Tech Conference
@@ -39,8 +46,15 @@ struct SampleLibrary {
                 website: "www.techsummit2025.com"
             ),
             colors: ColorSettings(preset: .cool, backgroundType: .gradient),
-            visuals: VisualSettings(style: .modernMinimal, mood: .professional, textProminence: .dominant),
-            output: OutputSettings(aspectRatio: .portrait)
+            visuals: VisualSettings(
+                style: .modernMinimal,
+                mood: .professional,
+                textProminence: .dominant,
+                includeElements: ["circuit patterns", "digital grid lines", "abstract tech shapes"],
+                avoidElements: ["outdated technology imagery"]
+            ),
+            output: OutputSettings(aspectRatio: .portrait),
+            targetAudience: "Software developers, tech entrepreneurs, startup founders"
         ),
 
         // MARK: - Test 14: Educational Newsletter
@@ -78,8 +92,16 @@ struct SampleLibrary {
                 ctaText: "Learn More"
             ),
             colors: ColorSettings(preset: .pastel, backgroundType: .gradient),
-            visuals: VisualSettings(style: .watercolorArtistic, mood: .friendly, textProminence: .dominant),
-            output: OutputSettings(aspectRatio: .portrait)
+            visuals: VisualSettings(
+                style: .watercolorArtistic,
+                mood: .friendly,
+                textProminence: .dominant,
+                includeElements: ["soft watercolor backgrounds", "children's book style illustrations", "gentle nature elements"],
+                avoidElements: ["screens showing content", "scary or alarming imagery"]
+            ),
+            output: OutputSettings(aspectRatio: .portrait),
+            targetAudience: "Parents of young children, school community members",
+            specialInstructions: "Design should feel nurturing and educational, not alarming"
         ),
 
         // MARK: - Test 4: Mega Weekend Sale
@@ -99,8 +121,14 @@ struct SampleLibrary {
                 finePrint: "While supplies last. Some exclusions apply."
             ),
             colors: ColorSettings(preset: .neon, backgroundType: .dark),
-            visuals: VisualSettings(style: .neonGlow, mood: .urgent, textProminence: .dominant),
-            output: OutputSettings(aspectRatio: .portrait)
+            visuals: VisualSettings(
+                style: .neonGlow,
+                mood: .urgent,
+                textProminence: .dominant,
+                includeElements: ["sale tags", "burst shapes", "shopping bags", "percentage badges"]
+            ),
+            output: OutputSettings(aspectRatio: .portrait),
+            targetAudience: "Bargain hunters, fashion shoppers"
         ),
 
         // MARK: - Brake Service Special (defined from sample image)
@@ -119,8 +147,14 @@ struct SampleLibrary {
                 finePrint: "Most vehicles. Inspection included. Offer valid through January 2025."
             ),
             colors: ColorSettings(preset: .warm, backgroundType: .light),
-            visuals: VisualSettings(style: .retroVintage, mood: .friendly, textProminence: .balanced),
-            output: OutputSettings(aspectRatio: .portrait)
+            visuals: VisualSettings(
+                style: .retroVintage,
+                mood: .friendly,
+                textProminence: .balanced,
+                includeElements: ["automotive tools", "brake disc imagery", "checkered racing patterns"]
+            ),
+            output: OutputSettings(aspectRatio: .portrait),
+            targetAudience: "Car owners needing maintenance"
         ),
 
         // MARK: - No Registration Fees (defined from sample image)
@@ -137,8 +171,14 @@ struct SampleLibrary {
                 website: "brightmontschool.com"
             ),
             colors: ColorSettings(preset: .warm, backgroundType: .light),
-            visuals: VisualSettings(style: .playfulFun, mood: .friendly, textProminence: .balanced),
-            output: OutputSettings(aspectRatio: .portrait)
+            visuals: VisualSettings(
+                style: .playfulFun,
+                mood: .friendly,
+                textProminence: .balanced,
+                includeElements: ["school supplies", "learning icons", "playful shapes"]
+            ),
+            output: OutputSettings(aspectRatio: .portrait),
+            targetAudience: "Parents of school-age children"
         ),
 
         // MARK: - Test 20: Spanish Restaurant
@@ -157,8 +197,16 @@ struct SampleLibrary {
                 phone: "(713) 555-1234"
             ),
             colors: ColorSettings(preset: .warm, backgroundType: .light),
-            visuals: VisualSettings(style: .boldVibrant, mood: .friendly, textProminence: .balanced),
-            output: OutputSettings(aspectRatio: .portrait)
+            visuals: VisualSettings(
+                style: .boldVibrant,
+                mood: .friendly,
+                textProminence: .balanced,
+                includeElements: ["authentic Mexican food imagery", "traditional patterns", "fresh ingredients"],
+                avoidElements: ["stereotypical or offensive cultural imagery"]
+            ),
+            output: OutputSettings(aspectRatio: .portrait),
+            targetAudience: "Mexican food lovers, local Hispanic community",
+            specialInstructions: "Use warm, authentic Mexican color palette"
         ),
 
         // MARK: - Test 21: Arabic Eid Event
@@ -176,8 +224,16 @@ struct SampleLibrary {
                 ctaText: "الدعوة عامة للجميع"
             ),
             colors: ColorSettings(preset: .pastel, backgroundType: .gradient),
-            visuals: VisualSettings(style: .elegantLuxury, mood: .festive, textProminence: .dominant),
-            output: OutputSettings(aspectRatio: .portrait)
+            visuals: VisualSettings(
+                style: .elegantLuxury,
+                mood: .festive,
+                textProminence: .dominant,
+                includeElements: ["crescent moon", "stars", "Islamic geometric patterns", "lanterns"],
+                avoidElements: ["human figures", "religious figures"]
+            ),
+            output: OutputSettings(aspectRatio: .portrait),
+            targetAudience: "Muslim community members, families celebrating Eid",
+            specialInstructions: "Use elegant Islamic art patterns"
         ),
 
         // MARK: - Test 18: Chinese Fitness Class
@@ -198,8 +254,15 @@ struct SampleLibrary {
                 ctaText: "立即加入挑战!"
             ),
             colors: ColorSettings(preset: .neon, backgroundType: .dark),
-            visuals: VisualSettings(style: .boldVibrant, mood: .exciting, textProminence: .dominant),
-            output: OutputSettings(aspectRatio: .portrait)
+            visuals: VisualSettings(
+                style: .boldVibrant,
+                mood: .exciting,
+                textProminence: .dominant,
+                includeElements: ["fitness equipment silhouettes", "energy burst graphics", "dynamic motion lines"],
+                avoidElements: ["before/after body imagery"]
+            ),
+            output: OutputSettings(aspectRatio: .portrait),
+            targetAudience: "Chinese-speaking fitness enthusiasts"
         ),
 
         // MARK: - Test 27: Beatles Tribute Concert (with user photo)
@@ -219,8 +282,16 @@ struct SampleLibrary {
                 website: "www.abbeyroadlive.com"
             ),
             colors: ColorSettings(preset: .warm, backgroundType: .dark),
-            visuals: VisualSettings(style: .retroVintage, mood: .exciting, textProminence: .balanced),
-            output: OutputSettings(aspectRatio: .portrait)
+            visuals: VisualSettings(
+                style: .retroVintage,
+                mood: .exciting,
+                textProminence: .balanced,
+                includeElements: ["vintage microphones", "vinyl records", "60s-style patterns", "stage lights"],
+                avoidElements: ["modern technology", "contemporary elements"]
+            ),
+            output: OutputSettings(aspectRatio: .portrait),
+            targetAudience: "Beatles fans, classic rock enthusiasts, 50+ demographic",
+            specialInstructions: "Capture authentic retro 60s aesthetic with psychedelic-inspired elements"
         ),
 
         // MARK: - Test 34: Community Newsletter
@@ -259,8 +330,14 @@ struct SampleLibrary {
                 ctaText: "Join our Facebook Group!"
             ),
             colors: ColorSettings(preset: .cool, backgroundType: .light),
-            visuals: VisualSettings(style: .modernMinimal, mood: .professional, textProminence: .dominant),
-            output: OutputSettings(aspectRatio: .portrait)
+            visuals: VisualSettings(
+                style: .modernMinimal,
+                mood: .professional,
+                textProminence: .dominant,
+                includeElements: ["neighborhood icons", "community symbols", "seasonal spring elements"]
+            ),
+            output: OutputSettings(aspectRatio: .portrait),
+            targetAudience: "HOA members, neighborhood residents"
         ),
 
         // MARK: - Test 35: Tech Startup Newsletter
@@ -301,8 +378,14 @@ struct SampleLibrary {
                 ctaText: "Upgrade to Pro - 20% Off"
             ),
             colors: ColorSettings(preset: .cool, backgroundType: .dark),
-            visuals: VisualSettings(style: .gradientModern, mood: .exciting, textProminence: .dominant),
-            output: OutputSettings(aspectRatio: .portrait)
+            visuals: VisualSettings(
+                style: .gradientModern,
+                mood: .exciting,
+                textProminence: .dominant,
+                includeElements: ["cloud icons", "sync arrows", "app interface elements"]
+            ),
+            output: OutputSettings(aspectRatio: .portrait),
+            targetAudience: "SaaS customers, tech-savvy professionals"
         ),
 
         // MARK: - Test 36: Internet Safety Newsletter
@@ -350,8 +433,16 @@ struct SampleLibrary {
                 ctaText: "Download Our Family Safety Guide"
             ),
             colors: ColorSettings(preset: .cool, backgroundType: .light),
-            visuals: VisualSettings(style: .modernMinimal, mood: .professional, textProminence: .dominant),
-            output: OutputSettings(aspectRatio: .portrait)
+            visuals: VisualSettings(
+                style: .modernMinimal,
+                mood: .professional,
+                textProminence: .dominant,
+                includeElements: ["shield icons", "lock symbols", "digital safety icons"],
+                avoidElements: ["scary or threatening imagery", "predatory imagery"]
+            ),
+            output: OutputSettings(aspectRatio: .portrait),
+            targetAudience: "Parents concerned about online safety",
+            specialInstructions: "Convey protection and guidance, not fear"
         ),
 
         // MARK: - Test 43: Holiday Restaurant Special
@@ -369,8 +460,15 @@ struct SampleLibrary {
                 ctaText: "LIMITED & EXCLUSIVE"
             ),
             colors: ColorSettings(preset: .blackGold, backgroundType: .dark),
-            visuals: VisualSettings(style: .elegantLuxury, mood: .festive, textProminence: .balanced),
-            output: OutputSettings(aspectRatio: .portrait)
+            visuals: VisualSettings(
+                style: .elegantLuxury,
+                mood: .festive,
+                textProminence: .balanced,
+                includeElements: ["festive holiday decorations", "elegant food presentation"]
+            ),
+            output: OutputSettings(aspectRatio: .portrait),
+            targetAudience: "Local diners looking for holiday dining",
+            specialInstructions: "Food should be the star of the design"
         ),
 
         // MARK: - Test 19: Urdu Niaz Invitation
@@ -388,8 +486,16 @@ struct SampleLibrary {
                 ctaText: "فاطمہ اور علی کی طرف سے دعوت"
             ),
             colors: ColorSettings(preset: .pastel, backgroundType: .gradient),
-            visuals: VisualSettings(style: .elegantLuxury, mood: .elegant, textProminence: .dominant),
-            output: OutputSettings(aspectRatio: .portrait)
+            visuals: VisualSettings(
+                style: .elegantLuxury,
+                mood: .elegant,
+                textProminence: .dominant,
+                includeElements: ["Islamic geometric patterns", "elegant borders", "floral motifs"],
+                avoidElements: ["human figures", "photos of people"]
+            ),
+            output: OutputSettings(aspectRatio: .portrait),
+            targetAudience: "Shia Muslim community, Urdu-speaking families",
+            specialInstructions: "Elegant and respectful religious invitation design"
         )
     ]
 

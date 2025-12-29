@@ -109,18 +109,39 @@ struct CategoryConfiguration {
 
     /// Suggested visual elements to include by category
     static let suggestedElements: [FlyerCategory: [String]] = [
-        .event: ["decorative borders", "event-themed graphics"],
-        .salePromo: ["sale tags", "burst shapes", "percentage badges", "shopping bags"],
-        .announcement: ["attention-grabbing icons", "announcement banners"],
-        .restaurantFood: ["food imagery", "utensils", "plate arrangements"],
-        .realEstate: ["property silhouette", "key motifs", "house icons"],
-        .jobPosting: ["professional icons", "growth arrows", "team silhouettes"],
-        .classWorkshop: ["learning icons", "notebook motifs", "lightbulb"],
-        .grandOpening: ["ribbon cutting", "celebration confetti", "grand banner"],
-        .partyCelebration: ["balloons", "confetti", "party decorations"],
-        .fitnessWellness: ["fitness silhouettes", "wellness symbols", "nature elements"],
-        .nonprofitCharity: ["helping hands", "heart motifs", "community symbols"],
-        .musicConcert: ["musical notes", "instruments", "sound waves", "stage lights"]
+        .event: ["decorative borders", "event-themed graphics", "elegant frames", "spotlight effects", "abstract shapes", "geometric patterns", "venue silhouette", "calendar icon"],
+        .salePromo: ["sale tags", "burst shapes", "percentage badges", "shopping bags", "price tags", "ribbon banners", "star bursts", "discount badges", "sparkles", "gift boxes"],
+        .announcement: ["attention-grabbing icons", "announcement banners", "megaphone", "spotlight", "decorative borders", "info icons", "bullet points", "dividers"],
+        .restaurantFood: ["food imagery", "utensils", "plate arrangements", "fresh ingredients", "steam effects", "chef hat", "spices", "herbs", "wooden textures", "table setting"],
+        .realEstate: ["property silhouette", "key motifs", "house icons", "floor plan outlines", "location pins", "sold badge", "premium badge", "architectural elements"],
+        .jobPosting: ["professional icons", "growth arrows", "team silhouettes", "briefcase", "handshake", "career ladder", "checkmarks", "building silhouette"],
+        .classWorkshop: ["learning icons", "notebook motifs", "lightbulb", "graduation cap", "pencils", "books", "brain icon", "certificate", "workshop tools"],
+        .grandOpening: ["ribbon cutting", "celebration confetti", "grand banner", "champagne glasses", "balloons", "spotlight", "red carpet", "grand opening badge", "fireworks"],
+        .partyCelebration: ["balloons", "confetti", "party decorations", "streamers", "party hats", "gift boxes", "cake", "sparklers", "bunting", "disco ball"],
+        .fitnessWellness: ["fitness silhouettes", "wellness symbols", "nature elements", "dumbbells", "yoga poses", "heart rate", "water droplets", "leaves", "energy rays"],
+        .nonprofitCharity: ["helping hands", "heart motifs", "community symbols", "globe", "ribbon", "donation box", "unity circle", "caring hands", "hope symbols"],
+        .musicConcert: ["musical notes", "instruments", "sound waves", "stage lights", "vinyl records", "microphone", "equalizer bars", "guitar silhouette", "concert crowd silhouette"]
+    ]
+
+    /// Suggested visual elements to avoid by category
+    static let suggestedAvoidElements: [FlyerCategory: [String]] = [
+        .event: ["people", "faces", "hands", "cluttered backgrounds", "low quality images", "copyrighted logos"],
+        .salePromo: ["people", "faces", "hands", "competitor logos", "cluttered layouts", "small text", "too many colors"],
+        .announcement: ["people", "faces", "hands", "distracting backgrounds", "irrelevant imagery", "busy patterns"],
+        .restaurantFood: ["people", "faces", "hands", "raw meat", "unappetizing colors", "dirty dishes", "insects"],
+        .realEstate: ["people", "faces", "hands", "personal belongings", "clutter", "dated decor", "unflattering angles"],
+        .jobPosting: ["people", "faces", "hands", "casual imagery", "unprofessional elements", "cluttered layouts"],
+        .classWorkshop: ["people", "faces", "hands", "distracting elements", "childish imagery for adult classes", "outdated technology"],
+        .grandOpening: ["people", "faces", "hands", "closed signs", "construction imagery", "empty spaces"],
+        .partyCelebration: ["people", "faces", "hands", "sad imagery", "dark colors", "corporate elements"],
+        .fitnessWellness: ["people", "faces", "hands", "before/after imagery", "unhealthy food", "injury imagery", "extreme body images"],
+        .nonprofitCharity: ["people", "faces", "hands", "graphic imagery", "political symbols", "controversial content"],
+        .musicConcert: ["people", "faces", "hands", "modern tech for retro themes", "silent imagery", "office settings"]
+    ]
+
+    /// Common elements to avoid (used as fallback)
+    static let commonAvoidElements: [String] = [
+        "people", "faces", "hands", "text", "watermarks", "logos", "blurry images", "low quality", "copyrighted content"
     ]
 
     /// Get the text fields for a specific category
@@ -131,5 +152,10 @@ struct CategoryConfiguration {
     /// Get suggested elements for a category
     static func suggestionsFor(_ category: FlyerCategory) -> [String] {
         suggestedElements[category] ?? []
+    }
+
+    /// Get suggested elements to avoid for a category
+    static func avoidSuggestionsFor(_ category: FlyerCategory) -> [String] {
+        suggestedAvoidElements[category] ?? commonAvoidElements
     }
 }

@@ -26,6 +26,11 @@ struct ExtrasStepView: View {
         return CategoryConfiguration.suggestionsFor(category)
     }
 
+    private var suggestedAvoidElements: [String] {
+        guard let category = viewModel.project?.category else { return CategoryConfiguration.commonAvoidElements }
+        return CategoryConfiguration.avoidSuggestionsFor(category)
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: FGSpacing.xl) {
@@ -82,6 +87,15 @@ struct ExtrasStepView: View {
         }
         .background(FGColors.backgroundPrimary)
         .scrollDismissesKeyboard(.interactively)
+        .onAppear {
+            // Initialize local state from project data
+            if let elements = viewModel.project?.visuals.includeElements, !elements.isEmpty {
+                includeElementsText = elements.joined(separator: ", ")
+            }
+            if let elements = viewModel.project?.visuals.avoidElements, !elements.isEmpty {
+                avoidElementsText = elements.joined(separator: ", ")
+            }
+        }
     }
 
     // MARK: - Include Elements Section
@@ -153,16 +167,22 @@ struct ExtrasStepView: View {
                     .filter { !$0.isEmpty }
             }
 
-            // Common avoidance suggestions
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: FGSpacing.xs) {
-                    ForEach(["people", "faces", "hands", "text", "watermarks"], id: \.self) { element in
-                        SuggestionChip(
-                            text: element,
-                            isAdded: avoidElementsText.contains(element),
-                            style: .avoid
-                        ) {
-                            addAvoidSuggestion(element)
+            // Category-specific avoidance suggestions
+            VStack(alignment: .leading, spacing: FGSpacing.xs) {
+                Text("Suggestions")
+                    .font(FGTypography.caption)
+                    .foregroundColor(FGColors.textTertiary)
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: FGSpacing.xs) {
+                        ForEach(suggestedAvoidElements, id: \.self) { element in
+                            SuggestionChip(
+                                text: element,
+                                isAdded: avoidElementsText.contains(element),
+                                style: .avoid
+                            ) {
+                                addAvoidSuggestion(element)
+                            }
                         }
                     }
                 }
