@@ -13,6 +13,10 @@ Usage:
 import argparse
 import sys
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 from models import (
     FlyerProject, FlyerCategory, TextContent, ColorSettings,
@@ -1490,6 +1494,45 @@ Resources: www.nwsaturdayschool.org/safety""",
             ),
             output=OutputSettings(aspect_ratio=AspectRatio.PORTRAIT_4_5),
             special_instructions="Professional food photography style. Dark elegant holiday theme with gold and champagne accents. Christmas atmosphere with snowflakes and ornamental decorations. Feature chai drink and kabob rolls as hero visual elements. Luxurious upscale restaurant feel."
+        )
+    },
+
+    44: {
+        "name": "Christmas Greeting Card - Family",
+        "description": "Festive family Christmas card with warm holiday wishes and elegant winter styling",
+        "project": FlyerProject(
+            category=FlyerCategory.ANNOUNCEMENT,
+            text_content=TextContent(
+                headline="Merry Christmas",
+                subheadline="Wishing You Joy, Peace & Love This Holiday Season",
+                body_text="""From our family to yours, may this Christmas bring you warmth, laughter, and cherished moments with the ones you love.
+
+Thank you for being such an important part of our lives this year. We are truly grateful for your friendship and support.
+
+Here's to a wonderful holiday season and a blessed New Year filled with happiness and prosperity!
+
+With love and warm wishes,
+The Anderson Family
+Michael, Sarah, Emma & Jake""",
+                cta_text="Happy Holidays 2024"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.WARM,
+                primary_color="deep red",
+                accent_color="gold",
+                background_type=BackgroundType.GRADIENT
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.ELEGANT_LUXURY,
+                mood=Mood.FESTIVE,
+                text_prominence=TextProminence.DOMINANT,
+                include_elements=["snowflakes", "Christmas tree", "golden ornaments", "holly leaves", "twinkling lights", "winter berries"]
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            ),
+            special_instructions="Elegant Christmas greeting card design. Rich red and gold color palette with festive winter atmosphere. Soft snow falling effect. Warm, inviting holiday feel suitable for sending to family and friends. Classic Christmas card aesthetic with modern elegance."
         )
     },
 }

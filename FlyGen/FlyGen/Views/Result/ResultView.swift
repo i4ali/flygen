@@ -65,7 +65,7 @@ struct ResultView: View {
                             if showingSaveSuccess {
                                 HStack(spacing: FGSpacing.sm) {
                                     Image(systemName: "checkmark.circle.fill")
-                                    Text("Saved to Photos!")
+                                    Text("Saved!")
                                 }
                                 .font(FGTypography.label)
                                 .foregroundColor(FGColors.success)
@@ -213,6 +213,12 @@ struct ResultView: View {
         Task {
             do {
                 try await viewModel.saveToPhotos()
+
+                // Also save to My Flyers gallery
+                if !hasSavedToGallery {
+                    saveToGallery()
+                }
+
                 showingSaveSuccess = true
                 saveError = nil
 

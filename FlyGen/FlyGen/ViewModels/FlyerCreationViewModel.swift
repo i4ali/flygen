@@ -104,6 +104,13 @@ class FlyerCreationViewModel: ObservableObject {
 
     private let openRouterService = OpenRouterService()
     private let draftService = DraftStorageService()
+    private let suggestionService = SuggestionService()
+
+    // MARK: - AI Suggestions
+
+    @Published var aiSuggestions: [String] = []
+    @Published var aiElementSuggestions: [String] = []
+    @Published var isLoadingSuggestions: Bool = false
 
     // MARK: - Draft State
 
@@ -232,6 +239,8 @@ class FlyerCreationViewModel: ObservableObject {
         generatedFlyer = nil
         selectedIntent = nil
         showAllOutputTypes = false
+        aiSuggestions = []
+        aiElementSuggestions = []
     }
 
     // MARK: - Intent Selection (Two-Step Flow)
@@ -251,6 +260,40 @@ class FlyerCreationViewModel: ObservableObject {
     /// Toggle showing all output types regardless of intent
     func toggleShowAllTypes() {
         showAllOutputTypes.toggle()
+    }
+
+    // MARK: - AI Suggestions Management
+
+    /// Load AI-generated suggestions for both elements and special instructions
+    func loadAISuggestions() async {
+        guard let project = project else { return }
+
+        // Don't reload if we already have suggestions
+        guard aiSuggestions.isEmpty && aiElementSuggestions.isEmpty else { return }
+
+        isLoadingSuggestions = true
+
+        do {
+            let result = try await suggestionService.generateSuggestions(for: project)
+            aiElementSuggestions = result.elements
+            aiSuggestions = result.specialInstructions
+        } catch SuggestionService.SuggestionError.rateLimited {
+            // Rate limited - keep existing AI suggestions, don't overwrite
+            print("Suggestions rate limited, keeping existing suggestions")
+        } catch {
+            // Other errors - fall back to static category suggestions
+            print("AI suggestions failed, using fallback: \(error)")
+            aiElementSuggestions = CategoryConfiguration.suggestionsFor(project.category)
+            aiSuggestions = CategoryConfiguration.specialInstructionSuggestionsFor(project.category)
+        }
+
+        isLoadingSuggestions = false
+    }
+
+    /// Clear AI suggestions (called when project context changes significantly)
+    func clearAISuggestions() {
+        aiSuggestions = []
+        aiElementSuggestions = []
     }
 
     // MARK: - Draft Management

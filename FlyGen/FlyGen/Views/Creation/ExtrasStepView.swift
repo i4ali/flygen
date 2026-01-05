@@ -22,8 +22,7 @@ struct ExtrasStepView: View {
     }
 
     private var suggestedElements: [String] {
-        guard let category = viewModel.project?.category else { return [] }
-        return CategoryConfiguration.suggestionsFor(category)
+        viewModel.aiElementSuggestions
     }
 
     private var suggestedAvoidElements: [String] {
@@ -32,8 +31,7 @@ struct ExtrasStepView: View {
     }
 
     private var suggestedSpecialInstructions: [String] {
-        guard let category = viewModel.project?.category else { return [] }
-        return CategoryConfiguration.specialInstructionSuggestionsFor(category)
+        viewModel.aiSuggestions
     }
 
     var body: some View {
@@ -100,6 +98,13 @@ struct ExtrasStepView: View {
             if let elements = viewModel.project?.visuals.avoidElements, !elements.isEmpty {
                 avoidElementsText = elements.joined(separator: ", ")
             }
+
+            // Load AI-generated suggestions if not already loaded
+            if viewModel.aiSuggestions.isEmpty {
+                Task {
+                    await viewModel.loadAISuggestions()
+                }
+            }
         }
     }
 
@@ -128,12 +133,21 @@ struct ExtrasStepView: View {
             }
 
             // Suggestions
-            if !suggestedElements.isEmpty {
-                VStack(alignment: .leading, spacing: FGSpacing.xs) {
-                    Text("Suggestions")
-                        .font(FGTypography.caption)
-                        .foregroundColor(FGColors.textTertiary)
+            VStack(alignment: .leading, spacing: FGSpacing.xs) {
+                Text("Suggestions")
+                    .font(FGTypography.caption)
+                    .foregroundColor(FGColors.textTertiary)
 
+                if viewModel.isLoadingSuggestions {
+                    HStack(spacing: FGSpacing.xs) {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                        Text("Generating suggestions...")
+                            .font(FGTypography.caption)
+                            .foregroundColor(FGColors.textTertiary)
+                    }
+                    .padding(.vertical, FGSpacing.sm)
+                } else if !suggestedElements.isEmpty {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: FGSpacing.xs) {
                             ForEach(suggestedElements, id: \.self) { element in
@@ -247,12 +261,21 @@ struct ExtrasStepView: View {
             )
 
             // Suggestion chips for special instructions
-            if !suggestedSpecialInstructions.isEmpty {
-                VStack(alignment: .leading, spacing: FGSpacing.xs) {
-                    Text("Suggestions")
-                        .font(FGTypography.caption)
-                        .foregroundColor(FGColors.textTertiary)
+            VStack(alignment: .leading, spacing: FGSpacing.xs) {
+                Text("Suggestions")
+                    .font(FGTypography.caption)
+                    .foregroundColor(FGColors.textTertiary)
 
+                if viewModel.isLoadingSuggestions {
+                    HStack(spacing: FGSpacing.xs) {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                        Text("Generating suggestions...")
+                            .font(FGTypography.caption)
+                            .foregroundColor(FGColors.textTertiary)
+                    }
+                    .padding(.vertical, FGSpacing.sm)
+                } else if !suggestedSpecialInstructions.isEmpty {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: FGSpacing.xs) {
                             ForEach(suggestedSpecialInstructions, id: \.self) { suggestion in
