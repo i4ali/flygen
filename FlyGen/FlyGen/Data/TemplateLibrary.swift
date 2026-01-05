@@ -57,6 +57,42 @@ struct TemplateLibrary {
             previewDescription: "Perfect for workshop series, camps, festivals, and events spanning multiple dates"
         ),
 
+        FlyerTemplate(
+            id: "event_wedding_invitation",
+            name: "Wedding Invitation",
+            category: .event,
+            textContent: TextContent(
+                headline: "[Name] & [Name]",
+                subheadline: "Request the pleasure of your company",
+                venueName: "[Venue Name]",
+                address: "[Address]",
+                ctaText: "RSVP by [Date]",
+                website: "[wedding-website.com]"
+            ),
+            colors: ColorSettings(preset: .pastel, backgroundType: .light),
+            visuals: VisualSettings(style: .elegantLuxury, mood: .romantic),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Elegant design for wedding invitations and engagement announcements"
+        ),
+
+        FlyerTemplate(
+            id: "event_corporate_invitation",
+            name: "Corporate Invitation",
+            category: .event,
+            textContent: TextContent(
+                headline: "[Event Name]",
+                subheadline: "[Company Name] invites you",
+                venueName: "[Venue]",
+                address: "[Address]",
+                ctaText: "Register Now",
+                website: "[registration-link.com]"
+            ),
+            colors: ColorSettings(preset: .cool, backgroundType: .dark),
+            visuals: VisualSettings(style: .corporateProfessional, mood: .professional),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Professional invitation for corporate events, galas, and business gatherings"
+        ),
+
         // MARK: - Announcement Templates
         FlyerTemplate(
             id: "announcement_newsletter",
@@ -72,6 +108,54 @@ struct TemplateLibrary {
             visuals: VisualSettings(style: .watercolorArtistic, mood: .friendly),
             output: OutputSettings(aspectRatio: .portrait),
             previewDescription: "Perfect for health tips, educational content, newsletters, and informational flyers"
+        ),
+
+        FlyerTemplate(
+            id: "announcement_business_newsletter",
+            name: "Business Newsletter",
+            category: .announcement,
+            textContent: TextContent(
+                headline: "[Company] Monthly Update",
+                subheadline: "[Month Year] Edition",
+                bodyText: "In This Issue:\n• [Headline 1]\n• [Headline 2]\n• [Headline 3]\n\n[Main article content goes here...]",
+                ctaText: "Read More"
+            ),
+            colors: ColorSettings(preset: .cool, backgroundType: .light),
+            visuals: VisualSettings(style: .corporateProfessional, mood: .professional),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Professional design for company updates, monthly newsletters, and business communications"
+        ),
+
+        FlyerTemplate(
+            id: "announcement_greeting_card",
+            name: "Greeting Card",
+            category: .announcement,
+            textContent: TextContent(
+                headline: "[Your Greeting Message]",
+                subheadline: "With Love & Best Wishes",
+                bodyText: "[Your personal message here...]\n\nThinking of you and wishing you all the best.",
+                ctaText: "[Your Name]"
+            ),
+            colors: ColorSettings(preset: .pastel, backgroundType: .light),
+            visuals: VisualSettings(style: .watercolorArtistic, mood: .friendly),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Warm design for birthday wishes, thank you cards, and congratulations"
+        ),
+
+        FlyerTemplate(
+            id: "announcement_farewell_card",
+            name: "Farewell Card",
+            category: .announcement,
+            textContent: TextContent(
+                headline: "Happy Retirement!",
+                subheadline: "Congratulations [Name]",
+                bodyText: "[Years] years of dedication and excellence.\n\nThank you for your service, leadership, and friendship.\n\nWishing you the best in your next chapter!",
+                ctaText: "Best Wishes"
+            ),
+            colors: ColorSettings(preset: .warm, backgroundType: .light),
+            visuals: VisualSettings(style: .handDrawnOrganic, mood: .inspirational),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Heartfelt design for retirement, farewell, and goodbye messages"
         ),
 
         // MARK: - Sale Templates
@@ -110,7 +194,7 @@ struct TemplateLibrary {
             previewDescription: "Elegant design for seasonal promotions and collections"
         ),
 
-        // MARK: - Restaurant Template
+        // MARK: - Restaurant Templates
         FlyerTemplate(
             id: "restaurant_special",
             name: "Daily Special",
@@ -129,7 +213,26 @@ struct TemplateLibrary {
             previewDescription: "Appetizing design for daily specials and menu highlights"
         ),
 
-        // MARK: - Party Template
+        FlyerTemplate(
+            id: "restaurant_menu_highlights",
+            name: "Menu Highlights",
+            category: .restaurantFood,
+            textContent: TextContent(
+                headline: "Our Menu",
+                subheadline: "[Restaurant Name]",
+                bodyText: "[Dish 1] - $[XX]\n[Dish 2] - $[XX]\n[Dish 3] - $[XX]",
+                venueName: "[Restaurant Name]",
+                address: "[Address]",
+                phone: "[Phone Number]",
+                website: "[website.com]"
+            ),
+            colors: ColorSettings(preset: .earthTones, backgroundType: .light),
+            visuals: VisualSettings(style: .elegantLuxury, mood: .elegant, imageryType: .photoRealistic),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Elegant menu design showcasing your restaurant's offerings"
+        ),
+
+        // MARK: - Party Templates
         FlyerTemplate(
             id: "party_birthday",
             name: "Birthday Celebration",
@@ -148,6 +251,46 @@ struct TemplateLibrary {
             visuals: VisualSettings(style: .playfulFun, mood: .festive),
             output: OutputSettings(aspectRatio: .portrait),
             previewDescription: "Fun and colorful design for birthday parties"
+        ),
+
+        FlyerTemplate(
+            id: "party_invitation_general",
+            name: "Party Invitation",
+            category: .partyCelebration,
+            textContent: TextContent(
+                headline: "You're Invited!",
+                subheadline: "[Event Type] Party",
+                date: "[Date]",
+                time: "[Time]",
+                venueName: "[Host Name]'s Place",
+                address: "[Address]",
+                ctaText: "RSVP",
+                phone: "[Contact]"
+            ),
+            colors: ColorSettings(preset: .neon, backgroundType: .dark),
+            visuals: VisualSettings(style: .playfulFun, mood: .festive),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Versatile invitation design for any party or celebration"
+        ),
+
+        FlyerTemplate(
+            id: "party_holiday_celebration",
+            name: "Holiday Party",
+            category: .partyCelebration,
+            textContent: TextContent(
+                headline: "[Holiday] Celebration!",
+                subheadline: "Join us for a festive gathering",
+                date: "[Date]",
+                time: "[Time]",
+                venueName: "[Location]",
+                address: "[Address]",
+                ctaText: "RSVP",
+                phone: "[Contact]"
+            ),
+            colors: ColorSettings(preset: .warm, backgroundType: .dark),
+            visuals: VisualSettings(style: .playfulFun, mood: .festive),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Festive design for Christmas, New Year, Halloween, and seasonal celebrations"
         ),
 
         // MARK: - Fitness Template

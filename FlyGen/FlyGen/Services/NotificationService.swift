@@ -1,7 +1,7 @@
 import UserNotifications
 import SwiftUI
 
-/// Service for managing credit reminder notifications
+/// Service for managing credit reminder and seasonal engagement notifications
 /// Handles both local system notifications and in-app alerts
 @MainActor
 class NotificationService: ObservableObject {
@@ -14,6 +14,9 @@ class NotificationService: ObservableObject {
     /// Notification identifier for cancellation
     private let creditReminderIdentifier = "com.flygen.creditReminder"
 
+    /// Prefix for seasonal notification identifiers
+    private let seasonalNotificationPrefix = "com.flygen.seasonal."
+
     // MARK: - UserDefaults Keys
 
     private enum Keys {
@@ -21,6 +24,7 @@ class NotificationService: ObservableObject {
         static let notificationScheduled = "notificationService.notificationScheduled"
         static let hasShownInAppAlert = "notificationService.hasShownInAppAlert"
         static let notificationPermissionAsked = "notificationService.notificationPermissionAsked"
+        static let remindersEnabled = "notificationService.remindersEnabled"
     }
 
     // MARK: - Published State
@@ -48,6 +52,25 @@ class NotificationService: ObservableObject {
     private var notificationPermissionAsked: Bool {
         get { UserDefaults.standard.bool(forKey: Keys.notificationPermissionAsked) }
         set { UserDefaults.standard.set(newValue, forKey: Keys.notificationPermissionAsked) }
+    }
+
+    /// Whether reminder notifications are enabled (default: true)
+    var remindersEnabled: Bool {
+        get {
+            // Default to true if key doesn't exist
+            if UserDefaults.standard.object(forKey: Keys.remindersEnabled) == nil {
+                return true
+            }
+            return UserDefaults.standard.bool(forKey: Keys.remindersEnabled)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.remindersEnabled)
+            if newValue {
+                Task { await scheduleSeasonalNotifications() }
+            } else {
+                cancelAllSeasonalNotifications()
+            }
+        }
     }
 
     // MARK: - Initialization
@@ -205,5 +228,82 @@ class NotificationService: ObservableObject {
         let center = UNUserNotificationCenter.current()
         let settings = await center.notificationSettings()
         notificationPermissionStatus = settings.authorizationStatus
+    }
+
+    // MARK: - Seasonal Notifications
+
+    /// Schedule notifications for upcoming seasonal occasions
+    func scheduleSeasonalNotifications() async {
+        guard remindersEnabled else { return }
+
+        let center = UNUserNotificationCenter.current()
+        let settings = await center.notificationSettings()
+
+        guard settings.authorizationStatus == .authorized else {
+            print("NotificationService: Notifications not authorized for seasonal reminders")
+            return
+        }
+
+        // Cancel existing seasonal notifications first
+        cancelAllSeasonalNotifications()
+
+        // Get next 4 upcoming occasions
+        let upcomingOccasions = SeasonalOccasion.upcomingOccasions(count: 4)
+
+        for occasion in upcomingOccasions {
+            await scheduleSeasonalNotification(for: occasion)
+        }
+
+        print("NotificationService: Scheduled \(upcomingOccasions.count) seasonal notifications")
+    }
+
+    /// Schedule a notification for a specific occasion
+    private func scheduleSeasonalNotification(for occasion: SeasonalOccasion) async {
+        guard let notificationDate = occasion.nextNotificationDate() else { return }
+
+        let center = UNUserNotificationCenter.current()
+
+        // Create notification content
+        let content = UNMutableNotificationContent()
+        content.title = occasion.notificationTitle
+        content.body = occasion.notificationBody
+        content.sound = .default
+        content.userInfo = [
+            "occasionId": occasion.id,
+            "suggestedCategory": occasion.suggestedCategory.rawValue
+        ]
+
+        // Create calendar-based trigger
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: notificationDate)
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+
+        // Create request with unique identifier
+        let identifier = seasonalNotificationPrefix + occasion.id
+        let request = UNNotificationRequest(
+            identifier: identifier,
+            content: content,
+            trigger: trigger
+        )
+
+        do {
+            try await center.add(request)
+            print("NotificationService: Scheduled \(occasion.name) for \(notificationDate)")
+        } catch {
+            print("NotificationService: Failed to schedule \(occasion.name): \(error)")
+        }
+    }
+
+    /// Cancel all scheduled seasonal notifications
+    func cancelAllSeasonalNotifications() {
+        let center = UNUserNotificationCenter.current()
+
+        // Get all seasonal notification identifiers
+        let identifiers = SeasonalOccasion.all.map { seasonalNotificationPrefix + $0.id }
+
+        center.removePendingNotificationRequests(withIdentifiers: identifiers)
+        center.removeDeliveredNotifications(withIdentifiers: identifiers)
+
+        print("NotificationService: Cancelled all seasonal notifications")
     }
 }

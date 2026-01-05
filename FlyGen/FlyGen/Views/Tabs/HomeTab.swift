@@ -7,6 +7,7 @@ struct HomeTab: View {
     @Query private var userProfiles: [UserProfile]
     @State private var showingTemplates = false
     @State private var showingCreditPurchase = false
+    @State private var showingDiscardDraftAlert = false
 
     private var credits: Int {
         userProfiles.first?.credits ?? 3
@@ -134,6 +135,21 @@ struct HomeTab: View {
                     .disabled(credits <= 0)
                     .padding(.horizontal, FGSpacing.xl)
 
+                    // Resume Draft banner
+                    if viewModel.hasPendingDraft && credits > 0 {
+                        DraftBanner(
+                            categoryName: viewModel.draftCategoryName ?? "Flyer",
+                            onResume: {
+                                viewModel.loadDraft()
+                            },
+                            onDiscard: {
+                                showingDiscardDraftAlert = true
+                            }
+                        )
+                        .padding(.horizontal, FGSpacing.screenHorizontal)
+                        .padding(.top, FGSpacing.sm)
+                    }
+
                     // Credits warning
                     if credits <= 0 {
                         WarningBanner(
@@ -161,7 +177,76 @@ struct HomeTab: View {
             .sheet(isPresented: $showingCreditPurchase) {
                 CreditPurchaseSheet()
             }
+            .alert("Discard Draft?", isPresented: $showingDiscardDraftAlert) {
+                Button("Discard", role: .destructive) {
+                    viewModel.discardDraft()
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("Your unfinished flyer will be permanently deleted.")
+            }
         }
+    }
+}
+
+// MARK: - Draft Banner
+
+/// Banner showing there's an unfinished draft that can be resumed
+private struct DraftBanner: View {
+    let categoryName: String
+    let onResume: () -> Void
+    let onDiscard: () -> Void
+
+    var body: some View {
+        HStack(spacing: FGSpacing.sm) {
+            Image(systemName: "doc.badge.clock")
+                .font(.title3)
+                .foregroundColor(FGColors.accentPrimary)
+
+            VStack(alignment: .leading, spacing: FGSpacing.xxxs) {
+                Text("Unfinished \(categoryName)")
+                    .font(FGTypography.labelLarge)
+                    .foregroundColor(FGColors.textPrimary)
+
+                Text("Continue where you left off")
+                    .font(FGTypography.caption)
+                    .foregroundColor(FGColors.textSecondary)
+            }
+
+            Spacer()
+
+            HStack(spacing: FGSpacing.xs) {
+                Button {
+                    onDiscard()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(FGColors.textTertiary)
+                        .padding(FGSpacing.xs)
+                        .background(FGColors.backgroundTertiary)
+                        .clipShape(Circle())
+                }
+
+                Button {
+                    onResume()
+                } label: {
+                    Text("Resume")
+                        .font(FGTypography.labelSmall)
+                        .foregroundColor(FGColors.textOnAccent)
+                        .padding(.horizontal, FGSpacing.md)
+                        .padding(.vertical, FGSpacing.sm)
+                        .background(FGColors.accentPrimary)
+                        .clipShape(Capsule())
+                }
+            }
+        }
+        .padding(FGSpacing.md)
+        .background(FGColors.surfaceDefault)
+        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+        .overlay(
+            RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
+                .stroke(FGColors.accentPrimary.opacity(0.3), lineWidth: 1)
+        )
     }
 }
 

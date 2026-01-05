@@ -264,7 +264,7 @@ CATEGORY_TEXT_FIELDS: Dict[FlyerCategory, List[str]] = {
     FlyerCategory.EVENT: ["headline", "subheadline", "date", "venue_name", "address", "cta_text", "website"],
     FlyerCategory.SALE_PROMO: ["headline", "subheadline", "discount_text", "date", "address", "cta_text", "fine_print", "website"],
     FlyerCategory.ANNOUNCEMENT: ["headline", "subheadline", "body_text", "date", "cta_text"],
-    FlyerCategory.RESTAURANT_FOOD: ["headline", "subheadline", "venue_name", "address", "phone", "website", "price", "cta_text"],
+    FlyerCategory.RESTAURANT_FOOD: ["headline", "subheadline", "body_text", "venue_name", "address", "phone", "website", "price", "cta_text"],
     FlyerCategory.REAL_ESTATE: ["headline", "price", "address", "body_text", "phone", "email", "website"],
     FlyerCategory.JOB_POSTING: ["headline", "subheadline", "body_text", "cta_text", "email", "website"],
     FlyerCategory.CLASS_WORKSHOP: ["headline", "subheadline", "date", "venue_name", "price", "cta_text"],

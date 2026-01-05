@@ -31,6 +31,11 @@ struct ExtrasStepView: View {
         return CategoryConfiguration.avoidSuggestionsFor(category)
     }
 
+    private var suggestedSpecialInstructions: [String] {
+        guard let category = viewModel.project?.category else { return [] }
+        return CategoryConfiguration.specialInstructionSuggestionsFor(category)
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: FGSpacing.xl) {
@@ -241,9 +246,27 @@ struct ExtrasStepView: View {
                     .stroke(FGColors.borderSubtle, lineWidth: 1)
             )
 
-            Text("Example: \"Use a clean layout with text at the top\"")
-                .font(FGTypography.caption)
-                .foregroundColor(FGColors.textTertiary)
+            // Suggestion chips for special instructions
+            if !suggestedSpecialInstructions.isEmpty {
+                VStack(alignment: .leading, spacing: FGSpacing.xs) {
+                    Text("Suggestions")
+                        .font(FGTypography.caption)
+                        .foregroundColor(FGColors.textTertiary)
+
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: FGSpacing.xs) {
+                            ForEach(suggestedSpecialInstructions, id: \.self) { suggestion in
+                                SuggestionChip(
+                                    text: suggestion,
+                                    isAdded: viewModel.project?.specialInstructions?.contains(suggestion) ?? false
+                                ) {
+                                    addSpecialInstructionSuggestion(suggestion)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -537,6 +560,15 @@ struct ExtrasStepView: View {
             avoidElementsText = element
         } else if !avoidElementsText.contains(element) {
             avoidElementsText += ", \(element)"
+        }
+    }
+
+    private func addSpecialInstructionSuggestion(_ suggestion: String) {
+        let currentInstructions = viewModel.project?.specialInstructions ?? ""
+        if currentInstructions.isEmpty {
+            viewModel.project?.specialInstructions = suggestion
+        } else if !currentInstructions.contains(suggestion) {
+            viewModel.project?.specialInstructions = currentInstructions + ". " + suggestion
         }
     }
 }

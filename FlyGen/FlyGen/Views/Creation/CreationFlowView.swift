@@ -3,6 +3,7 @@ import SwiftUI
 struct CreationFlowView: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
     @Environment(\.dismiss) private var dismiss
+    @State private var showingCancelConfirmation = false
 
     var body: some View {
         NavigationStack {
@@ -61,8 +62,12 @@ struct CreationFlowView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
-                        viewModel.cancelCreation()
-                        dismiss()
+                        // Show confirmation if there's project data
+                        if viewModel.project != nil {
+                            showingCancelConfirmation = true
+                        } else {
+                            dismiss()
+                        }
                     } label: {
                         HStack(spacing: FGSpacing.xxs) {
                             Image(systemName: "xmark")
@@ -84,6 +89,21 @@ struct CreationFlowView: View {
             .fullScreenCover(isPresented: $viewModel.showingResult) {
                 ResultView(viewModel: viewModel)
             }
+            .confirmationDialog("Save your progress?", isPresented: $showingCancelConfirmation, titleVisibility: .visible) {
+                Button("Save Draft") {
+                    viewModel.saveDraft()
+                    viewModel.cancelCreation()
+                    dismiss()
+                }
+                Button("Discard", role: .destructive) {
+                    viewModel.discardDraft()
+                    viewModel.cancelCreation()
+                    dismiss()
+                }
+                Button("Keep Editing", role: .cancel) {}
+            } message: {
+                Text("Your flyer will be saved so you can continue later.")
+            }
         }
         .preferredColorScheme(.dark)
     }
@@ -96,7 +116,12 @@ struct CreationFlowView: View {
             if viewModel.canGoBack {
                 Button {
                     withAnimation(FGAnimations.spring) {
-                        viewModel.goToPreviousStep()
+                        // Handle intent sub-navigation on category step
+                        if viewModel.currentStep == .category && viewModel.selectedIntent != nil {
+                            viewModel.backToIntentSelection()
+                        } else {
+                            viewModel.goToPreviousStep()
+                        }
                     }
                 } label: {
                     HStack(spacing: FGSpacing.xs) {

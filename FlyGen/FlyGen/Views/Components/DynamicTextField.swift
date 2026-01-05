@@ -7,6 +7,8 @@ struct DynamicTextField: View {
     @Binding var text: String
     var isFocused: FocusState<TextFieldType?>.Binding
 
+    @State private var showExpandedEditor = false
+
     var body: some View {
         VStack(alignment: .leading, spacing: FGSpacing.xs) {
             // Label with required indicator
@@ -28,6 +30,17 @@ struct DynamicTextField: View {
                     Text("\(text.count)")
                         .font(FGTypography.captionSmall)
                         .foregroundColor(FGColors.textTertiary)
+                }
+
+                // Expand button for multiline fields
+                if field.isMultiline {
+                    Button {
+                        showExpandedEditor = true
+                    } label: {
+                        Image(systemName: "arrow.up.left.and.arrow.down.right")
+                            .font(.system(size: 14))
+                            .foregroundColor(FGColors.textTertiary)
+                    }
                 }
             }
 
@@ -70,6 +83,13 @@ struct DynamicTextField: View {
                     .textInputAutocapitalization(autocapitalization)
             }
 
+        }
+        .sheet(isPresented: $showExpandedEditor) {
+            ExpandedTextEditorSheet(
+                text: $text,
+                title: field.label,
+                placeholder: field.placeholder
+            )
         }
     }
 

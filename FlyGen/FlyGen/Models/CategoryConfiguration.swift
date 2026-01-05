@@ -96,7 +96,7 @@ struct CategoryConfiguration {
         .event: [.headline, .subheadline, .scheduleEntries, .venueName, .address, .ctaText, .website],
         .salePromo: [.headline, .subheadline, .discountText, .date, .address, .ctaText, .finePrint, .website],
         .announcement: [.headline, .subheadline, .bodyText, .date, .ctaText],
-        .restaurantFood: [.headline, .subheadline, .venueName, .address, .phone, .website, .price, .ctaText],
+        .restaurantFood: [.headline, .subheadline, .bodyText, .venueName, .address, .phone, .website, .price, .ctaText],
         .realEstate: [.headline, .price, .address, .bodyText, .phone, .email, .website],
         .jobPosting: [.headline, .subheadline, .bodyText, .ctaText, .email, .website],
         .classWorkshop: [.headline, .subheadline, .scheduleEntries, .venueName, .price, .ctaText],
@@ -144,6 +144,95 @@ struct CategoryConfiguration {
         "people", "faces", "hands", "text", "watermarks", "logos", "blurry images", "low quality", "copyrighted content"
     ]
 
+    /// Expert-level special instruction suggestions by category
+    /// These are specific, actionable visual/compositional techniques
+    static let suggestedSpecialInstructions: [FlyerCategory: [String]] = [
+        .event: [
+            "Venue silhouette integrated into background",
+            "Spotlight effect on key event details",
+            "Decorative frame matching event theme",
+            "Event props silhouetted in corners",
+            "Invitation-style elegant border"
+        ],
+        .salePromo: [
+            "Starburst explosion behind discount number",
+            "Products arranged in grid showcase",
+            "Price slash effect on original price",
+            "Shopping bags as corner accents",
+            "Urgency countdown timer visual"
+        ],
+        .announcement: [
+            "Spotlight beam on headline",
+            "Breaking news banner across top",
+            "Official stamp or seal effect",
+            "Arrows pointing to key info",
+            "Megaphone radiating message"
+        ],
+        .restaurantFood: [
+            "Arrange food photos as border around the frame",
+            "Show steam rising from hot dishes",
+            "Overhead flat-lay food photography style",
+            "Fresh ingredients scattered in corners",
+            "Close-up texture of signature dish as background"
+        ],
+        .realEstate: [
+            "Property photo as full-bleed background",
+            "Floor plan as subtle watermark",
+            "Window frame composition with view",
+            "Architectural details as border pattern",
+            "Key amenity icons in corners"
+        ],
+        .jobPosting: [
+            "Company workspace as subtle background",
+            "Career ladder or growth stairs visual",
+            "Team collaboration silhouettes",
+            "Industry tools framing text",
+            "Professional environment glimpse"
+        ],
+        .classWorkshop: [
+            "Hands-on demonstration as focal point",
+            "Tools of the craft as border",
+            "Step-by-step progression visual",
+            "Chalkboard texture background",
+            "Student work samples in corners"
+        ],
+        .grandOpening: [
+            "Ribbon cutting ceremony as focus",
+            "Storefront as full-bleed hero",
+            "Champagne splash celebration",
+            "Grand doorway perspective",
+            "Balloons releasing upward"
+        ],
+        .partyCelebration: [
+            "Balloon arch framing the text",
+            "Confetti explosion from center",
+            "Streamers flowing from corners",
+            "Party lights bokeh background",
+            "Age number made of balloons"
+        ],
+        .fitnessWellness: [
+            "Motion blur suggesting movement",
+            "Before/after split composition",
+            "Equipment silhouettes as border",
+            "Energy burst radiating outward",
+            "Sweat droplets for intensity"
+        ],
+        .nonprofitCharity: [
+            "Hands reaching together as symbol",
+            "Impact numbers as large callouts",
+            "Community gathering aerial view",
+            "Helping hands forming heart",
+            "Before/after transformation"
+        ],
+        .musicConcert: [
+            "Sound wave as decorative border",
+            "Stage lighting beams from center",
+            "Instrument silhouettes in corners",
+            "Crowd silhouette at bottom",
+            "Vinyl record motif as accent"
+        ]
+    ]
+
     /// Get the text fields for a specific category
     static func fieldsFor(_ category: FlyerCategory) -> [TextFieldType] {
         textFields[category] ?? [.headline, .subheadline, .bodyText]
@@ -157,5 +246,10 @@ struct CategoryConfiguration {
     /// Get suggested elements to avoid for a category
     static func avoidSuggestionsFor(_ category: FlyerCategory) -> [String] {
         suggestedAvoidElements[category] ?? commonAvoidElements
+    }
+
+    /// Get special instruction suggestions for a category
+    static func specialInstructionSuggestionsFor(_ category: FlyerCategory) -> [String] {
+        suggestedSpecialInstructions[category] ?? []
     }
 }

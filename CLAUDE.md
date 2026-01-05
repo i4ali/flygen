@@ -72,3 +72,19 @@ Test cases in `test_flyer.py` must only use fields defined in `CATEGORY_TEXT_FIE
 - Check `models.py` enum definitions before using any value
 
 **Quick validation:** Run `python test_flyer.py --list` to verify syntax, or `python -c "import test_flyer"` to check for import errors.
+
+### App Store Connect Screenshot Dimensions
+
+**iPhone screenshots must be one of these sizes:**
+
+| Orientation | Size |
+|-------------|------|
+| Portrait | 1284 × 2778px |
+| Landscape | 2778 × 1284px |
+| Portrait | 1242 × 2688px |
+| Landscape | 2688 × 1242px |
+
+**Resize command:**
+```bash
+sips -z 2778 1284 "input.png" --out "output.png"
+```

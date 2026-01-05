@@ -85,6 +85,10 @@ class FlyerCreationViewModel: ObservableObject {
     @Published var showingCreationFlow = false
     @Published var showingResult = false
 
+    // Intent selection (two-step flow)
+    @Published var selectedIntent: Intent?
+    @Published var showAllOutputTypes: Bool = false
+
     // Logo picker
     @Published var selectedLogoItem: PhotosPickerItem?
 
@@ -99,6 +103,18 @@ class FlyerCreationViewModel: ObservableObject {
     // MARK: - Services
 
     private let openRouterService = OpenRouterService()
+    private let draftService = DraftStorageService()
+
+    // MARK: - Draft State
+
+    @Published var hasPendingDraft: Bool = false
+
+    // MARK: - Initialization
+
+    init() {
+        // Check for pending draft on init
+        hasPendingDraft = draftService.hasDraft()
+    }
 
     // MARK: - Computed Properties
 
@@ -118,7 +134,8 @@ class FlyerCreationViewModel: ObservableObject {
     }
 
     var canGoBack: Bool {
-        currentStep.previous != nil
+        // Can go back if there's a previous step OR if on category step with intent selected
+        currentStep.previous != nil || (currentStep == .category && selectedIntent != nil)
     }
 
     var progress: Double {
@@ -188,6 +205,7 @@ class FlyerCreationViewModel: ObservableObject {
     func goToNextStep() {
         if let next = currentStep.next {
             currentStep = next
+            saveDraft()
         }
     }
 
@@ -195,6 +213,7 @@ class FlyerCreationViewModel: ObservableObject {
     func goToPreviousStep() {
         if let previous = currentStep.previous {
             currentStep = previous
+            saveDraft()
         }
     }
 
@@ -211,6 +230,69 @@ class FlyerCreationViewModel: ObservableObject {
         generationState = .idle
         generatedImageData = nil
         generatedFlyer = nil
+        selectedIntent = nil
+        showAllOutputTypes = false
+    }
+
+    // MARK: - Intent Selection (Two-Step Flow)
+
+    /// Select an intent and show filtered output types
+    func selectIntent(_ intent: Intent) {
+        selectedIntent = intent
+        showAllOutputTypes = false
+    }
+
+    /// Go back to intent selection
+    func backToIntentSelection() {
+        selectedIntent = nil
+        showAllOutputTypes = false
+    }
+
+    /// Toggle showing all output types regardless of intent
+    func toggleShowAllTypes() {
+        showAllOutputTypes.toggle()
+    }
+
+    // MARK: - Draft Management
+
+    /// Save current project as draft
+    func saveDraft() {
+        guard let project = project else { return }
+        draftService.saveDraft(project: project, currentStep: currentStep)
+        hasPendingDraft = true
+    }
+
+    /// Load the saved draft and resume creation flow
+    func loadDraft() {
+        guard let (project, step) = draftService.loadDraft() else { return }
+
+        self.project = project
+        self.currentStep = step
+        self.generationState = .idle
+        self.generatedImageData = nil
+        self.generatedFlyer = nil
+        self.showingCreationFlow = true
+    }
+
+    /// Discard the saved draft
+    func discardDraft() {
+        draftService.clearDraft()
+        hasPendingDraft = false
+    }
+
+    /// Check for pending draft (useful on app resume)
+    func checkForPendingDraft() {
+        hasPendingDraft = draftService.hasDraft()
+    }
+
+    /// Get draft category name for display
+    var draftCategoryName: String? {
+        draftService.draftCategoryName()
+    }
+
+    /// Get draft saved date for display
+    var draftSavedAt: Date? {
+        draftService.draftSavedAt()
     }
 
     /// Generate the flyer

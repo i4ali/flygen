@@ -59,6 +59,8 @@ struct ContentView: View {
         .task {
             await ensureUserProfileExists()
             await syncCreditsFromCloud()
+            // Schedule seasonal engagement notifications
+            await notificationService.scheduleSeasonalNotifications()
         }
         .onChange(of: cloudKitService.isSignedIn) { _, isSignedIn in
             if isSignedIn {
@@ -69,12 +71,20 @@ struct ContentView: View {
             }
         }
         .onChange(of: scenePhase) { _, newPhase in
-            if newPhase == .active {
+            switch newPhase {
+            case .active:
                 // Only check credits if user profile exists (credits are loaded)
                 // Avoids false "out of credits" alerts during initial data load
                 if let profile = userProfiles.first {
                     notificationService.onAppBecameActive(currentCredits: profile.credits)
                 }
+                // Check for pending draft on app resume
+                viewModel.checkForPendingDraft()
+            case .background:
+                // Save draft when app goes to background
+                viewModel.saveDraft()
+            default:
+                break
             }
         }
         .alert("Out of Credits", isPresented: $notificationService.shouldShowInAppAlert) {

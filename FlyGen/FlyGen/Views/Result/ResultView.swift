@@ -233,6 +233,9 @@ struct ResultView: View {
             saveToGallery()
         }
 
+        // Clear draft since flyer was successfully completed
+        viewModel.discardDraft()
+
         viewModel.cancelCreation()
         dismiss()
     }
