@@ -73,10 +73,14 @@ struct ContentView: View {
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
             case .active:
-                // Only check credits if user profile exists (credits are loaded)
-                // Avoids false "out of credits" alerts during initial data load
-                if let profile = userProfiles.first {
-                    notificationService.onAppBecameActive(currentCredits: profile.credits)
+                // Sync credits from CloudKit first, then check for out-of-credits alert
+                // This prevents false alerts when local credits are stale
+                Task {
+                    await syncCreditsFromCloud()
+                    // Check credits AFTER sync completes to ensure CloudKit is source of truth
+                    if let profile = userProfiles.first {
+                        notificationService.onAppBecameActive(currentCredits: profile.credits)
+                    }
                 }
                 // Check for pending draft on app resume
                 viewModel.checkForPendingDraft()

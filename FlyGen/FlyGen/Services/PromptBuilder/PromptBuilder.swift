@@ -113,18 +113,9 @@ struct PromptBuilder {
             sections.append("Additional requirements: \(instructions).")
         }
 
-        // 13. Logo integration (if provided)
-        if project.logoImageData != nil {
-            sections.append("""
-                IMPORTANT: Incorporate the provided logo image into the flyer design. \
-                Place it prominently but tastefully, ensuring it is clearly visible and \
-                integrates well with the overall design. The logo should be positioned \
-                appropriately (typically top or bottom of the flyer) without overwhelming \
-                the main content.
-                """)
-        }
+        // Note: Logo is no longer mentioned in prompt - it's composited programmatically after generation
 
-        // 14. User photo OR imagery description (mutually exclusive)
+        // 13. User photo OR imagery description (mutually exclusive)
         if project.userPhotoData != nil {
             sections.append("""
                 CRITICAL USER PHOTO INSTRUCTIONS: A user photo has been provided and MUST be incorporated into the flyer design. \

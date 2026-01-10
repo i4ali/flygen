@@ -78,14 +78,7 @@ actor OpenRouterService {
         // Build request content
         var content: [[String: Any]] = []
 
-        // Add logo if provided
-        if let logoData = logoImageData {
-            let base64Logo = logoData.base64EncodedString()
-            content.append([
-                "type": "image_url",
-                "image_url": ["url": "data:image/png;base64,\(base64Logo)"]
-            ])
-        }
+        // Note: Logo is no longer sent to API - it's composited programmatically after generation
 
         // Add user photo if provided
         if let photoData = userPhotoData {

@@ -371,6 +371,20 @@ class FlyerCreationViewModel: ObservableObject {
                 }
             }
 
+            // Apply logo if provided
+            if let logoData = project.logoImageData,
+               let logo = UIImage(data: logoData) {
+                let logoService = LogoCompositeService()
+                if let composited = await logoService.compositeLogo(
+                    onto: finalImage,
+                    logo: logo,
+                    position: project.logoPosition
+                ) {
+                    finalImage = composited
+                    finalImageData = composited.pngData() ?? finalImageData
+                }
+            }
+
             generatedImageData = finalImageData
             generationState = .success(finalImage)
 
@@ -432,6 +446,21 @@ class FlyerCreationViewModel: ObservableObject {
                 }
             }
 
+            // Apply logo if provided
+            if let project = project,
+               let logoData = project.logoImageData,
+               let logo = UIImage(data: logoData) {
+                let logoService = LogoCompositeService()
+                if let composited = await logoService.compositeLogo(
+                    onto: finalImage,
+                    logo: logo,
+                    position: project.logoPosition
+                ) {
+                    finalImage = composited
+                    finalImageData = composited.pngData() ?? finalImageData
+                }
+            }
+
             generatedImageData = finalImageData
             generationState = .success(finalImage)
 
@@ -490,6 +519,21 @@ class FlyerCreationViewModel: ObservableObject {
                 }
             }
 
+            // Apply logo if provided
+            if let project = project,
+               let logoData = project.logoImageData,
+               let logo = UIImage(data: logoData) {
+                let logoService = LogoCompositeService()
+                if let composited = await logoService.compositeLogo(
+                    onto: finalImage,
+                    logo: logo,
+                    position: project.logoPosition
+                ) {
+                    finalImage = composited
+                    finalImageData = composited.pngData() ?? finalImageData
+                }
+            }
+
             generatedImageData = finalImageData
             generationState = .success(finalImage)
 
@@ -543,6 +587,21 @@ class FlyerCreationViewModel: ObservableObject {
                    ) {
                     finalImage = composited
                     finalImageData = composited.pngData() ?? result.imageData
+                }
+            }
+
+            // Apply logo if provided
+            if let project = project,
+               let logoData = project.logoImageData,
+               let logo = UIImage(data: logoData) {
+                let logoService = LogoCompositeService()
+                if let composited = await logoService.compositeLogo(
+                    onto: finalImage,
+                    logo: logo,
+                    position: project.logoPosition
+                ) {
+                    finalImage = composited
+                    finalImageData = composited.pngData() ?? finalImageData
                 }
             }
 

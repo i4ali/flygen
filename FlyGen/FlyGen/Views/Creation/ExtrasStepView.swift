@@ -522,6 +522,9 @@ struct ExtrasStepView: View {
                     RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
                         .stroke(FGColors.borderSubtle, lineWidth: 1)
                 )
+
+                // Logo position picker
+                logoPositionPicker
             } else {
                 PhotosPicker(selection: $viewModel.selectedLogoItem, matching: .images) {
                     HStack(spacing: FGSpacing.sm) {
@@ -562,6 +565,32 @@ struct ExtrasStepView: View {
                 .onChange(of: viewModel.selectedLogoItem) { _, _ in
                     Task {
                         await viewModel.loadLogo()
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Logo Position Picker
+
+    private var logoPositionPicker: some View {
+        VStack(alignment: .leading, spacing: FGSpacing.sm) {
+            Text("Logo Position")
+                .font(FGTypography.label)
+                .foregroundColor(FGColors.textSecondary)
+
+            LazyVGrid(columns: [
+                GridItem(.flexible(), spacing: FGSpacing.sm),
+                GridItem(.flexible(), spacing: FGSpacing.sm)
+            ], spacing: FGSpacing.sm) {
+                ForEach(LogoPosition.allCases) { position in
+                    LogoPositionButton(
+                        position: position,
+                        isSelected: viewModel.project?.logoPosition == position
+                    ) {
+                        withAnimation(FGAnimations.spring) {
+                            viewModel.project?.logoPosition = position
+                        }
                     }
                 }
             }
@@ -651,6 +680,35 @@ struct SuggestionChip: View {
             return style == .include ? FGColors.accentPrimary.opacity(0.5) : FGColors.statusError.opacity(0.5)
         }
         return FGColors.borderSubtle
+    }
+}
+
+// MARK: - Logo Position Button
+
+struct LogoPositionButton: View {
+    let position: LogoPosition
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: FGSpacing.xs) {
+                Image(systemName: position.icon)
+                    .font(.system(size: 16))
+                Text(position.displayName)
+                    .font(FGTypography.label)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, FGSpacing.sm)
+            .background(isSelected ? FGColors.accentPrimary : FGColors.surfaceDefault)
+            .foregroundColor(isSelected ? FGColors.textOnAccent : FGColors.textSecondary)
+            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+            .overlay(
+                RoundedRectangle(cornerRadius: FGSpacing.buttonRadius)
+                    .stroke(isSelected ? FGColors.accentPrimary : FGColors.borderSubtle, lineWidth: 1)
+            )
+        }
+        .buttonStyle(FGCardButtonStyle())
     }
 }
 

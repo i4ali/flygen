@@ -1,5 +1,33 @@
 import Foundation
 
+/// Position options for logo placement on generated flyers
+enum LogoPosition: String, CaseIterable, Codable, Identifiable {
+    case topLeft = "top_left"
+    case topRight = "top_right"
+    case bottomLeft = "bottom_left"
+    case bottomRight = "bottom_right"
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .topLeft: return "Top Left"
+        case .topRight: return "Top Right"
+        case .bottomLeft: return "Bottom Left"
+        case .bottomRight: return "Bottom Right"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .topLeft: return "arrow.up.left.square"
+        case .topRight: return "arrow.up.right.square"
+        case .bottomLeft: return "arrow.down.left.square"
+        case .bottomRight: return "arrow.down.right.square"
+        }
+    }
+}
+
 struct FlyerProject: Codable, Identifiable, Equatable {
     let id: UUID
     var category: FlyerCategory
@@ -11,6 +39,7 @@ struct FlyerProject: Codable, Identifiable, Equatable {
     var targetAudience: String?
     var specialInstructions: String?
     var logoImageData: Data?
+    var logoPosition: LogoPosition = .topRight
     var userPhotoData: Data?           // User's uploaded photo for AI to incorporate
     var imageryDescription: String?     // Text description for AI-generated imagery
     var qrSettings: QRCodeSettings
@@ -42,6 +71,7 @@ struct FlyerProject: Codable, Identifiable, Equatable {
         self.targetAudience = source.targetAudience
         self.specialInstructions = source.specialInstructions
         self.logoImageData = source.logoImageData
+        self.logoPosition = source.logoPosition
         self.userPhotoData = source.userPhotoData
         self.imageryDescription = source.imageryDescription
         self.qrSettings = source.qrSettings
