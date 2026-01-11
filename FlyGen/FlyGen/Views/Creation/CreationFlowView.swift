@@ -41,7 +41,7 @@ struct CreationFlowView: View {
                         case .qrCode:
                             QRCodeStepView(viewModel: viewModel)
                         case .extras:
-                            ExtrasStepView(viewModel: viewModel)
+                            SmartExtrasStepView(viewModel: viewModel)
                         case .review:
                             ReviewStepView(viewModel: viewModel)
                         }

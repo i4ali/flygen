@@ -277,11 +277,8 @@ class FlyerCreationViewModel: ObservableObject {
             let result = try await suggestionService.generateSuggestions(for: project)
             aiElementSuggestions = result.elements
             aiSuggestions = result.specialInstructions
-        } catch SuggestionService.SuggestionError.rateLimited {
-            // Rate limited - keep existing AI suggestions, don't overwrite
-            print("Suggestions rate limited, keeping existing suggestions")
         } catch {
-            // Other errors - fall back to static category suggestions
+            // Fall back to static category suggestions on error
             print("AI suggestions failed, using fallback: \(error)")
             aiElementSuggestions = CategoryConfiguration.suggestionsFor(project.category)
             aiSuggestions = CategoryConfiguration.specialInstructionSuggestionsFor(project.category)

@@ -1,4 +1,5 @@
 import SwiftUI
+import PhotosUI
 
 struct QRCodeStepView: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
@@ -15,9 +16,9 @@ struct QRCodeStepView: View {
             VStack(alignment: .leading, spacing: FGSpacing.lg) {
                 // Header
                 FGStepHeader(
-                    title: "Add QR Code",
-                    subtitle: "Add a scannable link to your flyer (optional)",
-                    tooltipText: "QR codes help viewers quickly access your website or contact info"
+                    title: "Logo & QR Code",
+                    subtitle: "Add your logo and a scannable QR code",
+                    tooltipText: "Logo and QR codes help brand your flyer and provide quick access to information"
                 )
 
                 // Enable toggle
@@ -67,11 +68,160 @@ struct QRCodeStepView: View {
                     previewSection
                         .padding(.horizontal, FGSpacing.screenHorizontal)
                 }
+
+                // Divider before logo section
+                Rectangle()
+                    .fill(FGColors.borderSubtle)
+                    .frame(height: 1)
+                    .padding(.horizontal, FGSpacing.screenHorizontal)
+
+                // Logo section
+                logoSection
+                    .padding(.horizontal, FGSpacing.screenHorizontal)
             }
             .padding(.vertical, FGSpacing.lg)
         }
         .background(FGColors.backgroundPrimary)
         .scrollDismissesKeyboard(.interactively)
+    }
+
+    // MARK: - Logo Section
+
+    private var logoSection: some View {
+        VStack(alignment: .leading, spacing: FGSpacing.md) {
+            HStack {
+                Text("Logo")
+                    .font(FGTypography.h3)
+                    .foregroundColor(FGColors.textPrimary)
+
+                FGInfoBadge(text: "Optional")
+            }
+
+            if let logoData = viewModel.project?.logoImageData,
+               let uiImage = UIImage(data: logoData) {
+                // Show uploaded logo with position picker
+                uploadedLogoView(uiImage)
+            } else {
+                // Show upload button
+                logoUploadButton
+            }
+        }
+    }
+
+    private func uploadedLogoView(_ image: UIImage) -> some View {
+        VStack(spacing: FGSpacing.md) {
+            HStack(spacing: FGSpacing.md) {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 64)
+                    .clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: FGSpacing.inputRadius)
+                            .stroke(FGColors.borderSubtle, lineWidth: 1)
+                    )
+
+                VStack(alignment: .leading, spacing: FGSpacing.xxs) {
+                    Text("Logo uploaded")
+                        .font(FGTypography.label)
+                        .foregroundColor(FGColors.textPrimary)
+
+                    Text("Will be placed on your flyer")
+                        .font(FGTypography.caption)
+                        .foregroundColor(FGColors.textTertiary)
+                }
+
+                Spacer()
+
+                Button {
+                    withAnimation(FGAnimations.spring) {
+                        viewModel.clearLogo()
+                    }
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 24))
+                        .foregroundColor(FGColors.statusError)
+                }
+            }
+            .padding(FGSpacing.cardPadding)
+            .background(FGColors.surfaceDefault)
+            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+            .overlay(
+                RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
+                    .stroke(FGColors.borderSubtle, lineWidth: 1)
+            )
+
+            // Logo position picker
+            logoPositionPicker
+        }
+    }
+
+    private var logoUploadButton: some View {
+        PhotosPicker(selection: $viewModel.selectedLogoItem, matching: .images) {
+            HStack(spacing: FGSpacing.sm) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: FGSpacing.inputRadius)
+                        .fill(FGColors.backgroundTertiary)
+                        .frame(width: 48, height: 48)
+
+                    Image(systemName: "photo.badge.plus")
+                        .font(.system(size: 20))
+                        .foregroundColor(FGColors.accentPrimary)
+                }
+
+                VStack(alignment: .leading, spacing: FGSpacing.xxs) {
+                    Text("Add Your Logo")
+                        .font(FGTypography.labelLarge)
+                        .foregroundColor(FGColors.textPrimary)
+
+                    Text("PNG or JPG, transparent background works best")
+                        .font(FGTypography.caption)
+                        .foregroundColor(FGColors.textTertiary)
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(FGColors.textTertiary)
+            }
+            .padding(FGSpacing.cardPadding)
+            .background(FGColors.surfaceDefault)
+            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+            .overlay(
+                RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
+                    .stroke(FGColors.borderSubtle, lineWidth: 1)
+            )
+        }
+        .onChange(of: viewModel.selectedLogoItem) { _, _ in
+            Task {
+                await viewModel.loadLogo()
+            }
+        }
+    }
+
+    private var logoPositionPicker: some View {
+        VStack(alignment: .leading, spacing: FGSpacing.sm) {
+            Text("Logo Position")
+                .font(FGTypography.label)
+                .foregroundColor(FGColors.textSecondary)
+
+            LazyVGrid(columns: [
+                GridItem(.flexible(), spacing: FGSpacing.sm),
+                GridItem(.flexible(), spacing: FGSpacing.sm)
+            ], spacing: FGSpacing.sm) {
+                ForEach(LogoPosition.allCases) { position in
+                    LogoPositionButton(
+                        position: position,
+                        isSelected: viewModel.project?.logoPosition == position
+                    ) {
+                        withAnimation(FGAnimations.spring) {
+                            viewModel.project?.logoPosition = position
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // MARK: - Content Type Picker
@@ -358,6 +508,35 @@ extension Binding where Value == String? {
             get: { self.wrappedValue ?? "" },
             set: { self.wrappedValue = $0.isEmpty ? nil : $0 }
         )
+    }
+}
+
+// MARK: - Logo Position Button
+
+struct LogoPositionButton: View {
+    let position: LogoPosition
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: FGSpacing.xs) {
+                Image(systemName: position.icon)
+                    .font(.system(size: 16))
+                Text(position.displayName)
+                    .font(FGTypography.label)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, FGSpacing.sm)
+            .background(isSelected ? FGColors.accentPrimary : FGColors.surfaceDefault)
+            .foregroundColor(isSelected ? FGColors.textOnAccent : FGColors.textSecondary)
+            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+            .overlay(
+                RoundedRectangle(cornerRadius: FGSpacing.buttonRadius)
+                    .stroke(isSelected ? FGColors.accentPrimary : FGColors.borderSubtle, lineWidth: 1)
+            )
+        }
+        .buttonStyle(FGCardButtonStyle())
     }
 }
 

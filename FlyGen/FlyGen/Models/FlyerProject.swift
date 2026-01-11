@@ -43,6 +43,7 @@ struct FlyerProject: Codable, Identifiable, Equatable {
     var userPhotoData: Data?           // User's uploaded photo for AI to incorporate
     var imageryDescription: String?     // Text description for AI-generated imagery
     var qrSettings: QRCodeSettings
+    var smartExtras: SmartExtrasState
     let createdAt: Date
     var updatedAt: Date
 
@@ -55,6 +56,7 @@ struct FlyerProject: Codable, Identifiable, Equatable {
         self.visuals = VisualSettings()
         self.output = OutputSettings()
         self.qrSettings = QRCodeSettings()
+        self.smartExtras = SmartExtrasState()
         self.createdAt = Date()
         self.updatedAt = Date()
     }
@@ -75,6 +77,7 @@ struct FlyerProject: Codable, Identifiable, Equatable {
         self.userPhotoData = source.userPhotoData
         self.imageryDescription = source.imageryDescription
         self.qrSettings = source.qrSettings
+        self.smartExtras = SmartExtrasState()  // Reset to trigger fresh analysis in Step 8
         self.createdAt = Date()
         self.updatedAt = Date()
     }

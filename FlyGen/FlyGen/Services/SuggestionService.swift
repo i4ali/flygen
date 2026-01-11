@@ -10,24 +10,16 @@ struct SuggestionResult {
 actor SuggestionService {
     private let baseURL = "https://flygen-api.ali-muhammadimran.workers.dev"
     private let model = "openai/gpt-4o-mini"
-    private var lastCallTime: Date?
-    private let rateLimitInterval: TimeInterval = 60 // 1 minute
 
     enum SuggestionError: Error {
         case invalidURL
         case networkError(Error)
         case invalidResponse
         case noSuggestionsGenerated
-        case rateLimited
     }
 
     /// Generates contextual suggestions for both elements and special instructions
     func generateSuggestions(for project: FlyerProject) async throws -> SuggestionResult {
-        // Rate limit: 1 call per 60 seconds
-        if let lastCall = lastCallTime, Date().timeIntervalSince(lastCall) < rateLimitInterval {
-            throw SuggestionError.rateLimited
-        }
-
         guard let url = URL(string: baseURL) else {
             throw SuggestionError.invalidURL
         }
@@ -77,9 +69,7 @@ actor SuggestionService {
                 throw SuggestionError.invalidResponse
             }
 
-            let result = try parseSuggestions(from: data)
-            lastCallTime = Date() // Update after successful call
-            return result
+            return try parseSuggestions(from: data)
         } catch let error as SuggestionError {
             throw error
         } catch {

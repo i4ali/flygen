@@ -10,7 +10,9 @@
 		018C2423C0C86CE01329D1C1 /* PhotoLibraryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C61A47D28D08C6960017130 /* PhotoLibraryService.swift */; };
 		02C7FBC355F6A0B6897904C8 /* ProfileTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92EF130D6F0181711C3C8D15 /* ProfileTab.swift */; };
 		05236A51D1AADA5B81A322C2 /* NegativePrompts.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5F0A68F65B4BF9A1CFA475A /* NegativePrompts.swift */; };
-		0A5F72F3A177D8151F5B70D0 /* ExtrasStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2585C5073F35A6470775B3 /* ExtrasStepView.swift */; };
+		AASMARTSUG00001 /* SmartSuggestion.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBSMARTSUG00001 /* SmartSuggestion.swift */; };
+		AASMARTEXTRA001 /* SmartExtrasStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBSMARTEXTRA001 /* SmartExtrasStepView.swift */; };
+		AASMARTSUGSVC01 /* SmartSuggestionsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBSMARTSUGSVC01 /* SmartSuggestionsService.swift */; };
 		162CEFDA5FFBDD64CAE60392 /* ColorSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F81AFF070A145CF531597E /* ColorSettings.swift */; };
 		1FA1B5762E86758C83CEF517 /* OpenRouterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC1056727B410D483D6F9ADD /* OpenRouterService.swift */; };
 		216C56E6B218DA5C1BF072D8 /* RefinementBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF2FFDC8FE9FB5A25AA9DC55 /* RefinementBuilder.swift */; };
@@ -217,7 +219,9 @@
 		F6E4BF8C2207C43A1E6C895F /* SelectionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionCard.swift; sourceTree = "<group>"; };
 		F7A5464C24F5B8B13D097698 /* MoodStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodStepView.swift; sourceTree = "<group>"; };
 		F8CD1653EE523C3DC3B07690 /* SavedFlyer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedFlyer.swift; sourceTree = "<group>"; };
-		FA2585C5073F35A6470775B3 /* ExtrasStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtrasStepView.swift; sourceTree = "<group>"; };
+		BBSMARTSUG00001 /* SmartSuggestion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartSuggestion.swift; sourceTree = "<group>"; };
+		BBSMARTEXTRA001 /* SmartExtrasStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartExtrasStepView.swift; sourceTree = "<group>"; };
+		BBSMARTSUGSVC01 /* SmartSuggestionsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartSuggestionsService.swift; sourceTree = "<group>"; };
 		FB709BFEED3D9A7E60798343 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		FC1056727B410D483D6F9ADD /* OpenRouterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterService.swift; sourceTree = "<group>"; };
 		FCFDACA03D378A28BF9670D9 /* FlyerTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyerTemplate.swift; sourceTree = "<group>"; };
@@ -262,7 +266,7 @@
 				6C0B42D66AE1AED299093D64 /* CategoryStepView.swift */,
 				802D02689D38132C24042AFA /* ColorsStepView.swift */,
 				48A766390A874ED2612B3679 /* CreationFlowView.swift */,
-				FA2585C5073F35A6470775B3 /* ExtrasStepView.swift */,
+				BBSMARTEXTRA001 /* SmartExtrasStepView.swift */,
 				06A2021DD0B02DD6E91E8438 /* FormatStepView.swift */,
 				F7A5464C24F5B8B13D097698 /* MoodStepView.swift */,
 				ABD932742A9E1DC6131CEFEE /* QRCodeStepView.swift */,
@@ -498,6 +502,7 @@
 				BBSAMPLEFLYER0001 /* SampleFlyer.swift */,
 				F8CD1653EE523C3DC3B07690 /* SavedFlyer.swift */,
 				BBSEASONAL00001 /* SeasonalOccasion.swift */,
+				BBSMARTSUG00001 /* SmartSuggestion.swift */,
 				A4E86A123D7FDBB3C7C8AAEF /* TextContent.swift */,
 				FB709BFEED3D9A7E60798343 /* UserProfile.swift */,
 				22AD3ED9139C2DCCA31C6A01 /* VisualSettings.swift */,
@@ -529,6 +534,7 @@
 				E8B8C8492F364170AB2291CB /* NotificationService.swift */,
 				DE68BC1381C77E543EAE2C81 /* SuggestionService.swift */,
 				26B398317D4F2F08B799273C /* LogoCompositeService.swift */,
+				BBSMARTSUGSVC01 /* SmartSuggestionsService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -668,7 +674,9 @@
 				C3BBCCD7150492B2AC6789A0 /* CreationFlowView.swift in Sources */,
 				66727D08C7345522F2AE16F8 /* DynamicTextField.swift in Sources */,
 				AAEXPANDEDTEXT001 /* ExpandedTextEditorSheet.swift in Sources */,
-				0A5F72F3A177D8151F5B70D0 /* ExtrasStepView.swift in Sources */,
+				AASMARTSUG00001 /* SmartSuggestion.swift in Sources */,
+				AASMARTEXTRA001 /* SmartExtrasStepView.swift in Sources */,
+				AASMARTSUGSVC01 /* SmartSuggestionsService.swift in Sources */,
 				99D720E6840CE49CB75168A3 /* FlyGenApp.swift in Sources */,
 				8BD5EFEB2EE8CF7C00D38B1B /* ScheduleEntriesField.swift in Sources */,
 				5FB2D7F993C41590103B4627 /* FlyerCategory.swift in Sources */,

@@ -121,19 +121,34 @@ struct PromptBuilder {
                 CRITICAL USER PHOTO INSTRUCTIONS: A user photo has been provided and MUST be incorporated into the flyer design. \
                 Decide the optimal placement and size for the photo based on the overall composition - it could be a hero image, \
                 a smaller inset, or integrated into the background. \
-                IMPORTANT: Stylize the photo to match the flyer's visual aesthetic - apply appropriate color grading, \
-                filters, or artistic effects that harmonize with the chosen style (\(project.visuals.style.displayName)) \
-                and mood (\(project.visuals.mood.displayName)). \
-                The photo should integrate seamlessly while the subject remains clearly recognizable. \
+                IMPORTANT: Preserve the photo's original structure, subjects, and composition exactly as provided. \
+                You may apply color grading, filters, or artistic effects to match the flyer's style (\(project.visuals.style.displayName)) \
+                and mood (\(project.visuals.mood.displayName)), but do NOT alter, morph, or change the actual content of the photo. \
+                The subjects must remain clearly recognizable and unchanged. \
                 Do NOT crop out important subjects from the photo.
                 """)
         } else if let imageryDesc = project.imageryDescription, !imageryDesc.isEmpty {
-            sections.append("""
-                IMAGERY GENERATION: Generate custom visual imagery based on this description: "\(imageryDesc)". \
-                The generated imagery should match the flyer's style (\(project.visuals.style.displayName)), \
-                colors, and mood (\(project.visuals.mood.displayName)). \
-                Integrate this imagery as a key visual element within the composition.
-                """)
+            // For food/restaurant category, enforce photorealistic food photography for ALL dishes
+            if project.category == .restaurantFood {
+                sections.append("""
+                    FOOD IMAGERY - CRITICAL REQUIREMENTS: \
+                    You MUST show ALL of these dishes in the flyer: \(imageryDesc). \
+                    IMPORTANT: Every single dish listed must be clearly visible and separately identifiable in the image. \
+                    All food images MUST be photorealistic - real photographs taken with a professional camera. \
+                    NOT illustrations, NOT cartoons, NOT digital art, NOT vector graphics, NOT painted style. \
+                    Use consistent photographic style across ALL dishes: professional food photography, \
+                    natural lighting, realistic textures, shallow depth of field, appetizing presentation. \
+                    Arrange all dishes attractively within the composition - use a grid, collage, or artistic arrangement \
+                    so each dish is clearly showcased. The food should look delicious, fresh, and ready to eat.
+                    """)
+            } else {
+                sections.append("""
+                    IMAGERY GENERATION: Generate custom visual imagery based on this description: "\(imageryDesc)". \
+                    The generated imagery should match the flyer's style (\(project.visuals.style.displayName)), \
+                    colors, and mood (\(project.visuals.mood.displayName)). \
+                    Integrate this imagery as a key visual element within the composition.
+                    """)
+            }
         }
 
         // 15. Quality reminders (conditional based on NO_TEXT mode)

@@ -151,20 +151,6 @@ struct ContentView: View {
             }
             modelContext.insert(profile)
             try? modelContext.save()
-        } else if let profile = userProfiles.first {
-            // Migration: Reset users with old credit amounts to new default of 10
-            // This handles users from the old system (1 credit per generation)
-            // who have less than 10 credits - give them the new default
-            if profile.credits < 10 {
-                profile.credits = 10
-                profile.lastSyncedAt = Date()
-                try? modelContext.save()
-
-                // Sync the reset credits to CloudKit
-                Task {
-                    await cloudKitService.saveCredits(profile.credits)
-                }
-            }
         }
     }
 
