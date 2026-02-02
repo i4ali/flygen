@@ -80,6 +80,7 @@ class FlyerCreationViewModel: ObservableObject {
     @Published var project: FlyerProject?
     @Published var generationState: GenerationState = .idle
     @Published var generatedImageData: Data?
+    @Published var rawGeneratedImageData: Data?  // AI output before QR/logo compositing (for refinement)
     @Published var generatedFlyer: GeneratedFlyer?
     @Published var lastPrompt: String = ""
     @Published var showingCreationFlow = false
@@ -236,6 +237,7 @@ class FlyerCreationViewModel: ObservableObject {
         project = nil
         generationState = .idle
         generatedImageData = nil
+        rawGeneratedImageData = nil
         generatedFlyer = nil
         selectedIntent = nil
         showAllOutputTypes = false
@@ -350,6 +352,9 @@ class FlyerCreationViewModel: ObservableObject {
             let promptBuilder = PromptBuilder(project: project)
             lastPrompt = promptBuilder.build().mainPrompt
 
+            // Store raw AI output before compositing (for refinement)
+            rawGeneratedImageData = result.imageData
+
             // Apply QR code if enabled
             var finalImage = result.image
             var finalImageData = result.imageData
@@ -408,22 +413,38 @@ class FlyerCreationViewModel: ObservableObject {
     func refineFlyer(feedback: String) async {
         guard !lastPrompt.isEmpty else { return }
 
+        // Get the raw AI output (before QR/logo) for refinement
+        let previousFlyerData = rawGeneratedImageData
+
         generationState = .generating
 
-        let refinedPrompt = RefinementBuilder.buildRefinement(
-            originalPrompt: lastPrompt,
-            userFeedback: feedback
-        )
+        // Use image-aware prompt if we have a previous image
+        let refinedPrompt: String
+        if previousFlyerData != nil {
+            refinedPrompt = RefinementBuilder.buildRefinementWithImage(
+                originalPrompt: lastPrompt,
+                userFeedback: feedback
+            )
+        } else {
+            refinedPrompt = RefinementBuilder.buildRefinement(
+                originalPrompt: lastPrompt,
+                userFeedback: feedback
+            )
+        }
 
         do {
             let result = try await openRouterService.generateImage(
                 prompt: refinedPrompt,
                 aspectRatio: project?.output.aspectRatio ?? .portrait,
-                logoImageData: project?.logoImageData,
-                userPhotoData: project?.userPhotoData
+                logoImageData: nil,  // Don't send logo to API - composited after
+                userPhotoData: project?.userPhotoData,
+                previousFlyerData: previousFlyerData
             )
 
             lastPrompt = refinedPrompt
+
+            // Store raw AI output for subsequent refinements
+            rawGeneratedImageData = result.imageData
 
             // Apply QR code if enabled (preserve from original generation)
             var finalImage = result.image
@@ -484,6 +505,9 @@ class FlyerCreationViewModel: ObservableObject {
     func regenerateWithoutText() async {
         guard !lastPrompt.isEmpty else { return }
 
+        // Get the raw AI output for refinement context
+        let previousFlyerData = rawGeneratedImageData
+
         generationState = .generating
 
         let noTextPrompt = RefinementBuilder.buildNoTextRefinement(originalPrompt: lastPrompt)
@@ -492,11 +516,15 @@ class FlyerCreationViewModel: ObservableObject {
             let result = try await openRouterService.generateImage(
                 prompt: noTextPrompt,
                 aspectRatio: project?.output.aspectRatio ?? .portrait,
-                logoImageData: project?.logoImageData,
-                userPhotoData: project?.userPhotoData
+                logoImageData: nil,  // Don't send logo to API - composited after
+                userPhotoData: project?.userPhotoData,
+                previousFlyerData: previousFlyerData
             )
 
             lastPrompt = noTextPrompt
+
+            // Store raw AI output for subsequent refinements
+            rawGeneratedImageData = result.imageData
 
             // Apply QR code if enabled (preserve from original generation)
             var finalImage = result.image
@@ -563,11 +591,14 @@ class FlyerCreationViewModel: ObservableObject {
             let result = try await openRouterService.generateImage(
                 prompt: lastPrompt,
                 aspectRatio: newRatio,
-                logoImageData: project?.logoImageData,
+                logoImageData: nil,  // Don't send logo to API - composited after
                 userPhotoData: project?.userPhotoData
             )
 
             project?.output.aspectRatio = newRatio
+
+            // Store raw AI output for subsequent refinements
+            rawGeneratedImageData = result.imageData
 
             // Apply QR code if enabled (preserve from original generation)
             var finalImage = result.image

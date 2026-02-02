@@ -72,6 +72,7 @@ actor OpenRouterService {
         aspectRatio: AspectRatio,
         logoImageData: Data? = nil,
         userPhotoData: Data? = nil,
+        previousFlyerData: Data? = nil,
         startTime: Date = Date()
     ) async throws -> ImageGenerationResult {
 
@@ -79,6 +80,15 @@ actor OpenRouterService {
         var content: [[String: Any]] = []
 
         // Note: Logo is no longer sent to API - it's composited programmatically after generation
+
+        // Add previous flyer image for refinement (first so AI sees it before instructions)
+        if let previousData = previousFlyerData {
+            let base64Previous = previousData.base64EncodedString()
+            content.append([
+                "type": "image_url",
+                "image_url": ["url": "data:image/png;base64,\(base64Previous)"]
+            ])
+        }
 
         // Add user photo if provided
         if let photoData = userPhotoData {

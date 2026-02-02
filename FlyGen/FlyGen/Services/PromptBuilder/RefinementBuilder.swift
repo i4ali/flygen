@@ -78,4 +78,42 @@ struct RefinementBuilder {
                 """
         }
     }
+
+    /// Build a refinement prompt that references an existing flyer image
+    static func buildRefinementWithImage(originalPrompt: String, userFeedback: String) -> String {
+        let feedbackLower = userFeedback.lowercased()
+        var modifications = Set<String>()
+
+        // Check for matching patterns
+        for (pattern, modification) in feedbackPatterns {
+            if feedbackLower.contains(pattern) {
+                modifications.insert(modification)
+            }
+        }
+
+        // Build modification text
+        let modificationText: String
+        if !modifications.isEmpty {
+            modificationText = modifications.joined(separator: ", ")
+        } else {
+            modificationText = userFeedback
+        }
+
+        return """
+            I'm providing a flyer image that was previously generated. \
+            MODIFY this existing flyer while preserving its overall design, layout, and composition.
+
+            REQUESTED CHANGES: \(modificationText)
+
+            CRITICAL INSTRUCTIONS:
+            - Keep the same general layout and visual structure
+            - Preserve text content and positioning unless specifically asked to change it
+            - Maintain the same color scheme unless a color change is requested
+            - Apply ONLY the requested modifications
+            - The result should be recognizably similar to the original but with the improvements applied
+
+            ORIGINAL DESIGN CONTEXT:
+            \(originalPrompt)
+            """
+    }
 }
