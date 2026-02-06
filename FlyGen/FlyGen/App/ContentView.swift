@@ -8,13 +8,16 @@ struct ContentView: View {
     @StateObject private var viewModel = FlyerCreationViewModel()
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
     @AppStorage("hasSeenNewUserOffer") private var hasSeenNewUserOffer: Bool = false
+    @AppStorage("hasSeenBrandKitIntro") private var hasSeenBrandKitIntro: Bool = false
     @State private var showingSettings = false
     @State private var showingCreditPurchase = false
     @State private var showingNewUserOffer = false
+    @State private var showingBrandKitIntro = false
     @Environment(\.scenePhase) private var scenePhase
 
     @Environment(\.modelContext) private var modelContext
     @Query private var userProfiles: [UserProfile]
+    @Query private var brandKits: [BrandKit]
 
     private var credits: Int {
         userProfiles.first?.credits ?? 0
@@ -61,6 +64,14 @@ struct ContentView: View {
             await syncCreditsFromCloud()
             // Schedule seasonal engagement notifications
             await notificationService.scheduleSeasonalNotifications()
+            // Inject brand kit into view model
+            viewModel.brandKit = brandKits.first
+            // Show brand kit intro to existing users (one-time)
+            if hasCompletedOnboarding && !hasSeenBrandKitIntro {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    showingBrandKitIntro = true
+                }
+            }
         }
         .onChange(of: cloudKitService.isSignedIn) { _, isSignedIn in
             if isSignedIn {
@@ -69,6 +80,9 @@ struct ContentView: View {
                     await syncCreditsFromCloud()
                 }
             }
+        }
+        .onChange(of: brandKits.first?.updatedAt) { _, _ in
+            viewModel.brandKit = brandKits.first
         }
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
@@ -124,6 +138,12 @@ struct ContentView: View {
                     showingNewUserOffer = false
                 }
             )
+        }
+        .sheet(isPresented: $showingBrandKitIntro) {
+            BrandKitIntroSheet {
+                hasSeenBrandKitIntro = true
+                showingBrandKitIntro = false
+            }
         }
         .onChange(of: hasCompletedOnboarding) { _, completed in
             // Show new user offer after onboarding completes

@@ -57,16 +57,18 @@ class OnboardingViewModel: ObservableObject {
     enum OnboardingScreen: Int, CaseIterable {
         case welcome = 0
         case workflowDemo = 1
-        case categoryPreferences = 2
-        case languagePreferences = 3
-        case sampleLoading = 4
-        case sampleShowcase = 5
-        case aiGeneration = 6
+        case brandKit = 2
+        case categoryPreferences = 3
+        case languagePreferences = 4
+        case sampleLoading = 5
+        case sampleShowcase = 6
+        case aiGeneration = 7
 
         var title: String {
             switch self {
             case .welcome: return "Welcome"
             case .workflowDemo: return "How It Works"
+            case .brandKit: return "Brand Kit"
             case .categoryPreferences: return "Your Preferences"
             case .languagePreferences: return "Languages"
             case .sampleLoading: return "Loading"
@@ -217,6 +219,8 @@ class OnboardingViewModel: ObservableObject {
         case .sampleLoading:
             return true  // Auto-advances
         case .sampleShowcase:
+            return true
+        case .brandKit:
             return true
         case .aiGeneration:
             return true

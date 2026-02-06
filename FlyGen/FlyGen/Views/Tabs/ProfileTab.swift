@@ -6,8 +6,10 @@ struct ProfileTab: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var savedFlyers: [SavedFlyer]
     @Query private var userProfiles: [UserProfile]
+    @Query private var brandKits: [BrandKit]
     @State private var showingSettings = false
     @State private var showingCreditPurchase = false
+    @State private var showingBrandKit = false
 
     private var credits: Int {
         userProfiles.first?.credits ?? 3
@@ -22,6 +24,9 @@ struct ProfileTab: View {
 
                     // Stats section
                     statsSection
+
+                    // Brand Kit section
+                    brandKitSection
 
                     // iCloud section
                     iCloudSection
@@ -41,6 +46,9 @@ struct ProfileTab: View {
             .navigationTitle("Profile")
             .sheet(isPresented: $showingSettings) {
                 SettingsView()
+            }
+            .sheet(isPresented: $showingBrandKit) {
+                BrandKitView()
             }
             .sheet(isPresented: $showingCreditPurchase) {
                 CreditPurchaseSheet()
@@ -102,6 +110,66 @@ struct ProfileTab: View {
                 Divider()
                     .background(FGColors.borderSubtle)
                 StatRow(icon: "sparkles", title: "Credits Remaining", value: "\(credits)")
+            }
+            .background(FGColors.backgroundElevated)
+            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+            .overlay(
+                RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
+                    .stroke(FGColors.borderSubtle, lineWidth: 1)
+            )
+            .padding(.horizontal, FGSpacing.screenHorizontal)
+        }
+    }
+
+    // MARK: - Brand Kit Section
+
+    private var brandKitSection: some View {
+        VStack(alignment: .leading, spacing: FGSpacing.sm) {
+            Text("Brand Kit")
+                .font(FGTypography.h4)
+                .foregroundColor(FGColors.textSecondary)
+                .padding(.horizontal, FGSpacing.screenHorizontal)
+
+            Button {
+                showingBrandKit = true
+            } label: {
+                HStack(spacing: FGSpacing.md) {
+                    // Logo thumbnail or placeholder
+                    ZStack {
+                        RoundedRectangle(cornerRadius: FGSpacing.inputRadius)
+                            .fill(FGColors.accentPrimary.opacity(0.2))
+                            .frame(width: 50, height: 50)
+
+                        if let logoData = brandKits.first?.logoImageData,
+                           let uiImage = UIImage(data: logoData) {
+                            Image(uiImage: uiImage)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 50, height: 50)
+                                .clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
+                        } else {
+                            Image(systemName: "briefcase.fill")
+                                .font(.title2)
+                                .foregroundColor(FGColors.accentPrimary)
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: FGSpacing.xxxs) {
+                        Text(brandKits.first != nil ? "Edit Brand Kit" : "Set Up Brand Kit")
+                            .font(FGTypography.body)
+                            .foregroundColor(FGColors.textPrimary)
+                        Text(brandKits.first?.contentSummary ?? "Save logo, contact info & QR defaults")
+                            .font(FGTypography.caption)
+                            .foregroundColor(FGColors.textSecondary)
+                    }
+
+                    Spacer()
+
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(FGColors.textTertiary)
+                }
+                .padding(FGSpacing.cardPadding)
             }
             .background(FGColors.backgroundElevated)
             .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))

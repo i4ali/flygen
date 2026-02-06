@@ -13,6 +13,8 @@
 		AASMARTSUG00001 /* SmartSuggestion.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBSMARTSUG00001 /* SmartSuggestion.swift */; };
 		AASMARTEXTRA001 /* SmartExtrasStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBSMARTEXTRA001 /* SmartExtrasStepView.swift */; };
 		AASMARTSUGSVC01 /* SmartSuggestionsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBSMARTSUGSVC01 /* SmartSuggestionsService.swift */; };
+		AABRANDKIT00001 /* BrandKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBRANDKIT00001 /* BrandKit.swift */; };
+		AABRANDKITV0001 /* BrandKitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBRANDKITV0001 /* BrandKitView.swift */; };
 		162CEFDA5FFBDD64CAE60392 /* ColorSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F81AFF070A145CF531597E /* ColorSettings.swift */; };
 		1FA1B5762E86758C83CEF517 /* OpenRouterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC1056727B410D483D6F9ADD /* OpenRouterService.swift */; };
 		216C56E6B218DA5C1BF072D8 /* RefinementBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF2FFDC8FE9FB5A25AA9DC55 /* RefinementBuilder.swift */; };
@@ -59,6 +61,7 @@
 		8BF224BD2EE5FE9700E8776A /* LottieAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF224AE2EE5FE9700E8776A /* LottieAnimationView.swift */; };
 		8BF224BE2EE5FE9700E8776A /* OnboardingProgressIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF224B02EE5FE9700E8776A /* OnboardingProgressIndicator.swift */; };
 		8BF224BF2EE5FE9700E8776A /* WelcomeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF224B52EE5FE9700E8776A /* WelcomeScreen.swift */; };
+		8BF224C12EE5FE9700E8776A /* BrandKitScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF224C02EE5FE9700E8776A /* BrandKitScreen.swift */; };
 		8EAC2A0DC868190AA6F1A97B /* TextContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4E86A123D7FDBB3C7C8AAEF /* TextContent.swift */; };
 		9288B11FBCD6606AF08CDECC /* ColorsStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802D02689D38132C24042AFA /* ColorsStepView.swift */; };
 		95D0F8F627BD2D5768EFA97F /* StoreKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A127BBD1A88D83A876C6249C /* StoreKitService.swift */; };
@@ -142,6 +145,8 @@
 		4F62F08E46FF0DE6F50F5350 /* TextProminence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextProminence.swift; sourceTree = "<group>"; };
 		59D15DB4DE5A14E48E823DB9 /* SampleShowcaseScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SampleShowcaseScreen.swift; sourceTree = "<group>"; };
 		5B19FB9D5DD3973FDEA7EABC /* ImageryType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageryType.swift; sourceTree = "<group>"; };
+		BBBRANDKIT00001 /* BrandKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandKit.swift; sourceTree = "<group>"; };
+		BBBRANDKITV0001 /* BrandKitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandKitView.swift; sourceTree = "<group>"; };
 		5B77BF34CD3B703956CC91DE /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		64F969BABBE5624EFD6A441E /* FlyGenApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyGenApp.swift; sourceTree = "<group>"; };
 		68824529B837896DBABCE0F2 /* VisualStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualStyle.swift; sourceTree = "<group>"; };
@@ -175,6 +180,7 @@
 		8BF224B42EE5FE9700E8776A /* AIGenerationScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIGenerationScreen.swift; sourceTree = "<group>"; };
 		8BF224B52EE5FE9700E8776A /* WelcomeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeScreen.swift; sourceTree = "<group>"; };
 		8BF224B62EE5FE9700E8776A /* WorkflowDemoScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowDemoScreen.swift; sourceTree = "<group>"; };
+		8BF224C02EE5FE9700E8776A /* BrandKitScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandKitScreen.swift; sourceTree = "<group>"; };
 		8CE5F8A345997A42000089FD /* BackgroundType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundType.swift; sourceTree = "<group>"; };
 		8D909C2791FE2A8700E30AA4 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		91F81AFF070A145CF531597E /* ColorSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorSettings.swift; sourceTree = "<group>"; };
@@ -391,6 +397,7 @@
 			isa = PBXGroup;
 			children = (
 				8BF224B42EE5FE9700E8776A /* AIGenerationScreen.swift */,
+				8BF224C02EE5FE9700E8776A /* BrandKitScreen.swift */,
 				8BF224B52EE5FE9700E8776A /* WelcomeScreen.swift */,
 				8BF224B62EE5FE9700E8776A /* WorkflowDemoScreen.swift */,
 				1391F54EAEC68ADFEF21B253 /* CategoryPreferencesScreen.swift */,
@@ -492,6 +499,7 @@
 		D9889B5D1274828936CDC9DA /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				BBBRANDKIT00001 /* BrandKit.swift */,
 				6A59507810937320A7BE5896 /* CategoryConfiguration.swift */,
 				91F81AFF070A145CF531597E /* ColorSettings.swift */,
 				EDBC65359BBD8F17309A355E /* FlyerProject.swift */,
@@ -542,6 +550,7 @@
 		E2C5627C1AABFC8475D0FCA8 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				BBBRANDKITV0001 /* BrandKitView.swift */,
 				5B77BF34CD3B703956CC91DE /* SettingsView.swift */,
 			);
 			path = Settings;
@@ -664,6 +673,7 @@
 				8BF224BD2EE5FE9700E8776A /* LottieAnimationView.swift in Sources */,
 				8BF224BE2EE5FE9700E8776A /* OnboardingProgressIndicator.swift in Sources */,
 				8BF224BF2EE5FE9700E8776A /* WelcomeScreen.swift in Sources */,
+				8BF224C12EE5FE9700E8776A /* BrandKitScreen.swift in Sources */,
 				D958E07702A0C8EE2FE7C9F1 /* CloudKitService.swift in Sources */,
 				AADRAFTSVC00001 /* DraftStorageService.swift in Sources */,
 				277B13203FA5FBD8FC6CA8CB /* Color+Hex.swift in Sources */,
@@ -746,6 +756,8 @@
 				3FE4D7FCFD945CDE9225C7FD /* SampleLoadingScreen.swift in Sources */,
 				AEFA45546E3C5CFC25B13495 /* SuggestionService.swift in Sources */,
 				842C89BB1DB433DBCE3366A0 /* LogoCompositeService.swift in Sources */,
+				AABRANDKIT00001 /* BrandKit.swift in Sources */,
+				AABRANDKITV0001 /* BrandKitView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -73,6 +73,13 @@ struct InteractiveOnboardingView: View {
                     removal: .move(edge: .leading).combined(with: .opacity)
                 ))
 
+        case .brandKit:
+            BrandKitScreen()
+                .transition(.asymmetric(
+                    insertion: .move(edge: .trailing).combined(with: .opacity),
+                    removal: .move(edge: .leading).combined(with: .opacity)
+                ))
+
         case .categoryPreferences:
             CategoryPreferencesScreen(viewModel: viewModel)
                 .transition(.asymmetric(
@@ -188,6 +195,8 @@ struct InteractiveOnboardingView: View {
             return "Get Started"
         case .workflowDemo:
             return viewModel.canContinue ? "Continue" : "Try it out!"
+        case .brandKit:
+            return "Continue"
         case .categoryPreferences:
             return viewModel.selectedPreferences.isEmpty ? "Skip" : "Continue"
         case .languagePreferences:

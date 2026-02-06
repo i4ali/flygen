@@ -89,6 +89,17 @@ struct CreationFlowView: View {
             .fullScreenCover(isPresented: $viewModel.showingResult) {
                 ResultView(viewModel: viewModel)
             }
+            .alert("Apply Brand Kit?", isPresented: $viewModel.showingBrandKitPrompt) {
+                Button("Apply") {
+                    viewModel.pendingBrandKitAction?()
+                    viewModel.pendingBrandKitAction = nil
+                }
+                Button("Skip", role: .cancel) {
+                    viewModel.pendingBrandKitAction = nil
+                }
+            } message: {
+                Text("Pre-fill this flyer with your saved logo, QR code, and contact info?")
+            }
             .confirmationDialog("Save your progress?", isPresented: $showingCancelConfirmation, titleVisibility: .visible) {
                 Button("Save Draft") {
                     viewModel.saveDraft()

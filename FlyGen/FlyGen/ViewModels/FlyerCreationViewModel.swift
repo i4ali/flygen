@@ -96,6 +96,11 @@ class FlyerCreationViewModel: ObservableObject {
     // User photo picker
     @Published var selectedUserPhotoItem: PhotosPickerItem?
 
+    // Brand Kit
+    var brandKit: BrandKit?
+    @Published var showingBrandKitPrompt = false
+    var pendingBrandKitAction: (() -> Void)?
+
     // MARK: - Credit Management
 
     /// Callback triggered after each successful API call to deduct a credit
@@ -159,21 +164,34 @@ class FlyerCreationViewModel: ObservableObject {
         generationState = .idle
         generatedImageData = nil
         showingCreationFlow = true
+
+        if let brandKit = brandKit, brandKit.hasContent {
+            pendingBrandKitAction = { [weak self] in
+                self?.applyBrandKit(overwriteExisting: true)
+            }
+            showingBrandKitPrompt = true
+        }
     }
 
     /// Load a template and start the creation flow at Text Content step
     func loadTemplate(_ template: FlyerTemplate) {
         project = template.toProject()
 
-        // Clear fields that won't be visible in the form for this category
-        // This prevents hidden data from appearing in the generated flyer
-        clearNonVisibleFields()
-
         currentStep = .textContent
         generationState = .idle
         generatedImageData = nil
         generatedFlyer = nil
         showingCreationFlow = true
+
+        if let brandKit = brandKit, brandKit.hasContent {
+            pendingBrandKitAction = { [weak self] in
+                self?.applyBrandKit(overwriteExisting: false)
+                self?.clearNonVisibleFields()
+            }
+            showingBrandKitPrompt = true
+        } else {
+            clearNonVisibleFields()
+        }
     }
 
     /// Load a saved flyer's project as a template and start the creation flow
@@ -183,30 +201,42 @@ class FlyerCreationViewModel: ObservableObject {
         // Create a copy with new ID and timestamps
         project = FlyerProject(copyFrom: savedProject)
 
-        // Clear fields that won't be visible in the form for this category
-        // This prevents hidden data from appearing in the generated flyer
-        clearNonVisibleFields()
-
         currentStep = .textContent
         generationState = .idle
         generatedImageData = nil
         generatedFlyer = nil
         showingCreationFlow = true
+
+        if let brandKit = brandKit, brandKit.hasContent {
+            pendingBrandKitAction = { [weak self] in
+                self?.applyBrandKit(overwriteExisting: false)
+                self?.clearNonVisibleFields()
+            }
+            showingBrandKitPrompt = true
+        } else {
+            clearNonVisibleFields()
+        }
     }
 
     /// Load a sample flyer as a starting point and start the creation flow
     func loadFromSample(_ sample: SampleFlyer) {
         project = sample.toProject()
 
-        // Clear fields that won't be visible in the form for this category
-        // This prevents hidden data from appearing in the generated flyer
-        clearNonVisibleFields()
-
         currentStep = .textContent
         generationState = .idle
         generatedImageData = nil
         generatedFlyer = nil
         showingCreationFlow = true
+
+        if let brandKit = brandKit, brandKit.hasContent {
+            pendingBrandKitAction = { [weak self] in
+                self?.applyBrandKit(overwriteExisting: false)
+                self?.clearNonVisibleFields()
+            }
+            showingBrandKitPrompt = true
+        } else {
+            clearNonVisibleFields()
+        }
     }
 
     /// Move to the next step
@@ -711,6 +741,73 @@ class FlyerCreationViewModel: ObservableObject {
         if project?.imageryDescription != nil {
             // Clear photo since modes are mutually exclusive
             clearUserPhoto()
+        }
+    }
+
+    // MARK: - Brand Kit
+
+    /// Apply brand kit data to the current project
+    func applyBrandKit(overwriteExisting: Bool) {
+        guard let brandKit = brandKit, let _ = project else { return }
+
+        // Apply logo + position
+        if project?.logoImageData == nil || overwriteExisting {
+            if let logoData = brandKit.logoImageData {
+                project?.logoImageData = logoData
+                project?.logoPosition = brandKit.logoPosition
+            }
+        }
+
+        // Apply QR settings
+        if let qr = brandKit.qrSettings, qr.enabled {
+            if !project!.qrSettings.enabled || overwriteExisting {
+                project?.qrSettings = qr
+            }
+        }
+
+        // Apply contact info
+        applyBrandKitContactInfo(overwriteExisting: overwriteExisting)
+    }
+
+    /// Map brand kit contact fields to TextContent, respecting category configuration
+    private func applyBrandKitContactInfo(overwriteExisting: Bool) {
+        guard let brandKit = brandKit, let category = project?.category else { return }
+
+        let allowedFields = Set(CategoryConfiguration.fieldsFor(category))
+
+        // Phone
+        if allowedFields.contains(.phone),
+           let value = brandKit.phone, !value.isEmpty,
+           (project?.textContent.phone?.isEmpty != false || overwriteExisting) {
+            project?.textContent.phone = value
+        }
+
+        // Email
+        if allowedFields.contains(.email),
+           let value = brandKit.email, !value.isEmpty,
+           (project?.textContent.email?.isEmpty != false || overwriteExisting) {
+            project?.textContent.email = value
+        }
+
+        // Website
+        if allowedFields.contains(.website),
+           let value = brandKit.website, !value.isEmpty,
+           (project?.textContent.website?.isEmpty != false || overwriteExisting) {
+            project?.textContent.website = value
+        }
+
+        // Address
+        if allowedFields.contains(.address),
+           let value = brandKit.address, !value.isEmpty,
+           (project?.textContent.address?.isEmpty != false || overwriteExisting) {
+            project?.textContent.address = value
+        }
+
+        // Social Handle
+        if allowedFields.contains(.socialHandle),
+           let value = brandKit.socialHandle, !value.isEmpty,
+           (project?.textContent.socialHandle?.isEmpty != false || overwriteExisting) {
+            project?.textContent.socialHandle = value
         }
     }
 
