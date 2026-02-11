@@ -94,10 +94,6 @@ struct InteractiveOnboardingView: View {
             BrandKitScreen()
                 .transition(screenTransition)
 
-        case .quickBrandSetup:
-            QuickBrandSetupScreen(viewModel: viewModel)
-                .transition(screenTransition)
-
         case .buildingExperience:
             BuildingExperienceScreen(viewModel: viewModel) {
                 viewModel.goToNextScreen()
@@ -212,8 +208,6 @@ struct InteractiveOnboardingView: View {
         case .languagePreferences:
             return "Continue"
         case .brandKitIntro:
-            return "Continue"
-        case .quickBrandSetup:
             return "Continue"
         case .buildingExperience:
             return "" // No button shown

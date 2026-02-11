@@ -120,7 +120,6 @@
 		F927960154E78DFB295870BA /* QRCodeStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD932742A9E1DC6131CEFEE /* QRCodeStepView.swift */; };
 		AAUSERROLE000001 /* UserRole.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBUSERROLE000001 /* UserRole.swift */; };
 		AAUSERROLESCR001 /* UserRoleScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBUSERROLESCR001 /* UserRoleScreen.swift */; };
-		AAQUICKBRAND0001 /* QuickBrandSetupScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBQUICKBRAND0001 /* QuickBrandSetupScreen.swift */; };
 		AABUILDINGEXP001 /* BuildingExperienceScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBUILDINGEXP001 /* BuildingExperienceScreen.swift */; };
 		AAREADYTOCRE0001 /* ReadyToCreateScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBREADYTOCRE0001 /* ReadyToCreateScreen.swift */; };
 /* End PBXBuildFile section */
@@ -190,7 +189,6 @@
 		8BF224C02EE5FE9700E8776A /* BrandKitScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandKitScreen.swift; sourceTree = "<group>"; };
 		BBUSERROLE000001 /* UserRole.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserRole.swift; sourceTree = "<group>"; };
 		BBUSERROLESCR001 /* UserRoleScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserRoleScreen.swift; sourceTree = "<group>"; };
-		BBQUICKBRAND0001 /* QuickBrandSetupScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickBrandSetupScreen.swift; sourceTree = "<group>"; };
 		BBBUILDINGEXP001 /* BuildingExperienceScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildingExperienceScreen.swift; sourceTree = "<group>"; };
 		BBREADYTOCRE0001 /* ReadyToCreateScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadyToCreateScreen.swift; sourceTree = "<group>"; };
 		8CE5F8A345997A42000089FD /* BackgroundType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundType.swift; sourceTree = "<group>"; };
@@ -415,7 +413,6 @@
 				BBBUILDINGEXP001 /* BuildingExperienceScreen.swift */,
 				1391F54EAEC68ADFEF21B253 /* CategoryPreferencesScreen.swift */,
 				3302C6C00520142F3A090D56 /* LanguagePreferencesScreen.swift */,
-				BBQUICKBRAND0001 /* QuickBrandSetupScreen.swift */,
 				BBREADYTOCRE0001 /* ReadyToCreateScreen.swift */,
 				6B0CABCF6AF8194D73A15FAB /* SampleLoadingScreen.swift */,
 				59D15DB4DE5A14E48E823DB9 /* SampleShowcaseScreen.swift */,
@@ -695,7 +692,6 @@
 				8BF224C12EE5FE9700E8776A /* BrandKitScreen.swift in Sources */,
 				AAUSERROLE000001 /* UserRole.swift in Sources */,
 				AAUSERROLESCR001 /* UserRoleScreen.swift in Sources */,
-				AAQUICKBRAND0001 /* QuickBrandSetupScreen.swift in Sources */,
 				AABUILDINGEXP001 /* BuildingExperienceScreen.swift in Sources */,
 				AAREADYTOCRE0001 /* ReadyToCreateScreen.swift in Sources */,
 				D958E07702A0C8EE2FE7C9F1 /* CloudKitService.swift in Sources */,

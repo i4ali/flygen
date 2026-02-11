@@ -61,10 +61,9 @@ class OnboardingViewModel: ObservableObject {
         case categoryPreferences = 3
         case languagePreferences = 4
         case brandKitIntro = 5
-        case quickBrandSetup = 6
-        case buildingExperience = 7
-        case personalizedSamples = 8
-        case readyToCreate = 9
+        case buildingExperience = 6
+        case personalizedSamples = 7
+        case readyToCreate = 8
 
         var title: String {
             switch self {
@@ -74,7 +73,6 @@ class OnboardingViewModel: ObservableObject {
             case .categoryPreferences: return "Your Needs"
             case .languagePreferences: return "Languages"
             case .brandKitIntro: return "Brand Kit"
-            case .quickBrandSetup: return "Quick Setup"
             case .buildingExperience: return "Almost Ready"
             case .personalizedSamples: return "For You"
             case .readyToCreate: return "Let's Go"
@@ -83,7 +81,7 @@ class OnboardingViewModel: ObservableObject {
 
         var isSkippable: Bool {
             switch self {
-            case .userRole, .quickBrandSetup:
+            case .userRole:
                 return true
             default:
                 return false
@@ -102,12 +100,6 @@ class OnboardingViewModel: ObservableObject {
     @Published var selectedVisualStyle: VisualStyle?
     @Published var selectedMood: Mood?
     @Published var selectedColorScheme: ColorSchemePreset?
-
-    // MARK: - Quick Brand Setup
-
-    @Published var quickBusinessName: String = ""
-    @Published var quickWebsite: String = ""
-    @Published var quickLogoData: Data?
 
     // MARK: - Interactive Demo State (8 Steps)
 
@@ -256,8 +248,6 @@ class OnboardingViewModel: ObservableObject {
             return true // Can always continue
         case .brandKitIntro:
             return true
-        case .quickBrandSetup:
-            return true // Can skip
         case .buildingExperience:
             return true // Auto-advances
         case .personalizedSamples:
