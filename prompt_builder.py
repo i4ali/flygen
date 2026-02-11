@@ -29,6 +29,9 @@ CATEGORY_CONTEXT: Dict[FlyerCategory, str] = {
     FlyerCategory.FITNESS_WELLNESS: "fitness or wellness promotional flyer with energizing appeal",
     FlyerCategory.NONPROFIT_CHARITY: "nonprofit or charity flyer with heartfelt community appeal",
     FlyerCategory.MUSIC_CONCERT: "music event or concert flyer with dynamic artistic style",
+    FlyerCategory.SERVICE_BUSINESS: "A service business flyer promoting professional services. Should convey reliability, trustworthiness, and quality workmanship. Include clear contact information and service offerings",
+    FlyerCategory.BEAUTY_SALON: "A beauty or salon flyer promoting hair, nail, spa, or grooming services. Should convey glamour, self-care, and professional beauty expertise. Use elegant or trendy aesthetics",
+    FlyerCategory.CHURCH_RELIGIOUS: "A church or religious community flyer for worship services, faith events, or spiritual gatherings. Should convey warmth, hope, inclusivity, and reverence. Use peaceful, uplifting imagery",
 }
 
 
@@ -189,6 +192,9 @@ CATEGORY_NEGATIVE_PROMPTS: Dict[FlyerCategory, List[str]] = {
     FlyerCategory.FITNESS_WELLNESS: ["intimidating extreme imagery", "unhealthy appearance"],
     FlyerCategory.NONPROFIT_CHARITY: ["exploitative imagery", "guilt-inducing"],
     FlyerCategory.MUSIC_CONCERT: ["static boring composition", "silent feeling"],
+    FlyerCategory.SERVICE_BUSINESS: ["cluttered tool imagery", "overly technical"],
+    FlyerCategory.BEAUTY_SALON: ["messy unkempt appearance", "clinical medical imagery"],
+    FlyerCategory.CHURCH_RELIGIOUS: ["political symbols", "controversial imagery", "dark occult imagery"],
 }
 
 

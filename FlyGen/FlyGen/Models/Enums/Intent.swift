@@ -63,11 +63,11 @@ enum Intent: String, CaseIterable, Identifiable {
         case .invite:
             return [.eventFlyer, .weddingInvitation, .corporateInvitation, .concertPoster]
         case .promote:
-            return [.saleFlyer, .fitnessPromotion, .menuFoodSpecial, .propertyListing, .jobRecruitmentFlyer]
+            return [.saleFlyer, .fitnessPromotion, .menuFoodSpecial, .propertyListing, .jobRecruitmentFlyer, .serviceFlyer, .salonBeautyFlyer]
         case .inform:
             return [.newsletter, .greetingCard, .farewellCard]
         case .community:
-            return [.classWorkshopFlyer, .fundraiserFlyer]
+            return [.classWorkshopFlyer, .fundraiserFlyer, .churchFaithFlyer]
         }
     }
 }

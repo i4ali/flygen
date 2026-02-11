@@ -13,6 +13,9 @@ enum FlyerCategory: String, CaseIterable, Codable, Identifiable {
     case fitnessWellness = "fitness_wellness"
     case nonprofitCharity = "nonprofit_charity"
     case musicConcert = "music_concert"
+    case serviceBusiness = "service_business"
+    case beautySalon = "beauty_salon"
+    case churchReligious = "church_religious"
 
     var id: String { rawValue }
 
@@ -30,6 +33,9 @@ enum FlyerCategory: String, CaseIterable, Codable, Identifiable {
         case .fitnessWellness: return "Fitness / Wellness"
         case .nonprofitCharity: return "Nonprofit / Charity"
         case .musicConcert: return "Music / Concert"
+        case .serviceBusiness: return "Service Business"
+        case .beautySalon: return "Beauty & Salon"
+        case .churchReligious: return "Church & Faith"
         }
     }
 
@@ -47,6 +53,9 @@ enum FlyerCategory: String, CaseIterable, Codable, Identifiable {
         case .fitnessWellness: return "figure.run"
         case .nonprofitCharity: return "heart"
         case .musicConcert: return "music.note"
+        case .serviceBusiness: return "wrench.and.screwdriver"
+        case .beautySalon: return "scissors"
+        case .churchReligious: return "building.columns"
         }
     }
 
@@ -64,6 +73,9 @@ enum FlyerCategory: String, CaseIterable, Codable, Identifiable {
         case .fitnessWellness: return "💪"
         case .nonprofitCharity: return "❤️"
         case .musicConcert: return "🎵"
+        case .serviceBusiness: return "🔧"
+        case .beautySalon: return "💇"
+        case .churchReligious: return "⛪"
         }
     }
 }

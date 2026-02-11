@@ -1497,6 +1497,184 @@ Resources: www.nwsaturdayschool.org/safety""",
         )
     },
 
+    # =========================================================================
+    # CHURCH & FAITH FLYERS
+    # =========================================================================
+
+    49: {
+        "name": "Sunday Worship Service",
+        "description": "Church: Weekly Sunday service invitation with full details",
+        "project": FlyerProject(
+            category=FlyerCategory.CHURCH_RELIGIOUS,
+            text_content=TextContent(
+                headline="JOIN US THIS SUNDAY",
+                subheadline="Grace Community Church",
+                body_text="Worship Service • Children's Ministry • Fellowship Lunch",
+                date="Every Sunday",
+                time="10:00 AM",
+                venue_name="Grace Community Church",
+                address="1500 Faith Avenue, Houston TX 77002",
+                phone="(713) 555-PRAY",
+                website="www.gracecommunity.org",
+                cta_text="All Are Welcome"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.WARM,
+                background_type=BackgroundType.LIGHT
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.ELEGANT_LUXURY,
+                mood=Mood.INSPIRATIONAL,
+                text_prominence=TextProminence.DOMINANT
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            )
+        )
+    },
+
+    50: {
+        "name": "Christmas Eve Service",
+        "description": "Church: Holiday service with minimal fields",
+        "project": FlyerProject(
+            category=FlyerCategory.CHURCH_RELIGIOUS,
+            text_content=TextContent(
+                headline="CHRISTMAS EVE SERVICE",
+                subheadline="Celebrate the Season of Joy",
+                date="December 24, 2025",
+                time="7:00 PM",
+                venue_name="First Baptist Church",
+                cta_text="Bring Your Family"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.WARM,
+                background_type=BackgroundType.DARK
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.WATERCOLOR_ARTISTIC,
+                mood=Mood.FESTIVE
+            ),
+            output=OutputSettings(aspect_ratio=AspectRatio.PORTRAIT_4_5)
+        )
+    },
+
+    # =========================================================================
+    # BEAUTY & SALON FLYERS
+    # =========================================================================
+
+    47: {
+        "name": "Salon Grand Opening",
+        "description": "Beauty salon: New salon opening with welcome offer and social handle",
+        "project": FlyerProject(
+            category=FlyerCategory.BEAUTY_SALON,
+            text_content=TextContent(
+                headline="GLOW UP STUDIO",
+                subheadline="Now Open in Downtown",
+                body_text="Services:\n• Hair Color & Highlights\n• Balayage & Ombre\n• Keratin Treatments\n• Bridal Packages",
+                address="789 Beauty Blvd, Suite 200, Austin TX",
+                phone="(512) 555-GLOW",
+                website="www.glowupstudio.com",
+                social_handle="@glowupstudio",
+                discount_text="50% Off First Visit",
+                cta_text="Book Now!"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.PASTEL,
+                background_type=BackgroundType.LIGHT
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.GRADIENT_MODERN,
+                mood=Mood.FRIENDLY,
+                text_prominence=TextProminence.BALANCED
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            )
+        )
+    },
+
+    48: {
+        "name": "Barber Shop Classic",
+        "description": "Beauty salon: Traditional barber shop with minimal fields",
+        "project": FlyerProject(
+            category=FlyerCategory.BEAUTY_SALON,
+            text_content=TextContent(
+                headline="KING'S CUTS BARBER SHOP",
+                subheadline="Classic Cuts & Clean Shaves",
+                address="456 Main Street, Houston TX",
+                phone="(713) 555-CUTS",
+                cta_text="Walk-ins Welcome"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.MONOCHROME,
+                background_type=BackgroundType.DARK
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.RETRO_VINTAGE,
+                mood=Mood.PROFESSIONAL
+            ),
+            output=OutputSettings(aspect_ratio=AspectRatio.PORTRAIT_4_5)
+        )
+    },
+
+    # =========================================================================
+    # SERVICE BUSINESS FLYERS
+    # =========================================================================
+
+    45: {
+        "name": "Cleaning Service - Full Details",
+        "description": "Service business: Professional cleaning service with all fields populated",
+        "project": FlyerProject(
+            category=FlyerCategory.SERVICE_BUSINESS,
+            text_content=TextContent(
+                headline="SPARKLE & SHINE CLEANING",
+                subheadline="Professional Home & Office Cleaning",
+                body_text="Our Services:\n• Deep House Cleaning\n• Office & Commercial\n• Move-In/Move-Out\n• Weekly & Bi-Weekly Plans\n• Window Cleaning\n• Carpet Shampooing",
+                phone="(555) 234-5678",
+                email="info@sparkleclean.com",
+                website="www.sparkleclean.com",
+                address="Serving Greater Houston Area",
+                price="Starting at $99",
+                discount_text="20% Off First Clean",
+                cta_text="Book Your Clean Today!"
+            ),
+            colors=ColorSettings(
+                preset=ColorSchemePreset.COOL,
+                background_type=BackgroundType.LIGHT
+            ),
+            visuals=VisualSettings(
+                style=VisualStyle.MODERN_MINIMAL,
+                mood=Mood.PROFESSIONAL,
+                text_prominence=TextProminence.DOMINANT
+            ),
+            output=OutputSettings(
+                aspect_ratio=AspectRatio.PORTRAIT_4_5,
+                model="nano-banana-pro"
+            )
+        )
+    },
+
+    46: {
+        "name": "Handyman - Minimal Fields",
+        "description": "Service business: Handyman with minimal fields (headline + phone + bodyText)",
+        "project": FlyerProject(
+            category=FlyerCategory.SERVICE_BUSINESS,
+            text_content=TextContent(
+                headline="MIKE'S HANDYMAN SERVICE",
+                phone="(555) 987-6543",
+                body_text="Plumbing • Electrical • Drywall • Painting • Furniture Assembly • General Repairs"
+            ),
+            colors=ColorSettings(preset=ColorSchemePreset.WARM),
+            visuals=VisualSettings(
+                style=VisualStyle.BOLD_VIBRANT,
+                mood=Mood.FRIENDLY
+            ),
+            output=OutputSettings(aspect_ratio=AspectRatio.PORTRAIT_4_5)
+        )
+    },
+
     44: {
         "name": "Christmas Greeting Card - Family",
         "description": "Festive family Christmas card with warm holiday wishes and elegant winter styling",

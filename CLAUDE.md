@@ -73,6 +73,10 @@ Test cases in `test_flyer.py` must only use fields defined in `CATEGORY_TEXT_FIE
 
 **Quick validation:** Run `python test_flyer.py --list` to verify syntax, or `python -c "import test_flyer"` to check for import errors.
 
+### iOS Build Device
+
+Use **iPhone 17 Pro** simulator for building and testing.
+
 ### App Store Connect Screenshot Dimensions
 
 **iPhone screenshots must be one of these sizes:**

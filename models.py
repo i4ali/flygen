@@ -27,6 +27,9 @@ class FlyerCategory(Enum):
     FITNESS_WELLNESS = "fitness_wellness"
     NONPROFIT_CHARITY = "nonprofit_charity"
     MUSIC_CONCERT = "music_concert"
+    SERVICE_BUSINESS = "service_business"
+    BEAUTY_SALON = "beauty_salon"
+    CHURCH_RELIGIOUS = "church_religious"
     
     @property
     def display_name(self) -> str:
@@ -43,6 +46,9 @@ class FlyerCategory(Enum):
             "fitness_wellness": "Fitness / Wellness",
             "nonprofit_charity": "Nonprofit / Charity",
             "music_concert": "Music / Concert",
+            "service_business": "Service Business",
+            "beauty_salon": "Beauty & Salon",
+            "church_religious": "Church & Faith",
         }
         return names.get(self.value, self.value)
 
@@ -273,6 +279,9 @@ CATEGORY_TEXT_FIELDS: Dict[FlyerCategory, List[str]] = {
     FlyerCategory.FITNESS_WELLNESS: ["headline", "subheadline", "date", "time", "venue_name", "address", "price", "discount_text", "cta_text", "phone"],
     FlyerCategory.NONPROFIT_CHARITY: ["headline", "subheadline", "body_text", "date", "time", "venue_name", "address", "cta_text", "phone", "email", "website"],
     FlyerCategory.MUSIC_CONCERT: ["headline", "subheadline", "date", "time", "venue_name", "address", "price", "cta_text", "website"],
+    FlyerCategory.SERVICE_BUSINESS: ["headline", "subheadline", "body_text", "phone", "email", "website", "address", "price", "discount_text", "cta_text"],
+    FlyerCategory.BEAUTY_SALON: ["headline", "subheadline", "body_text", "address", "phone", "website", "social_handle", "discount_text", "cta_text", "price"],
+    FlyerCategory.CHURCH_RELIGIOUS: ["headline", "subheadline", "body_text", "date", "time", "venue_name", "address", "phone", "website", "cta_text"],
 }
 
 # Suggested visual elements by category
@@ -288,4 +297,7 @@ CATEGORY_SUGGESTED_ELEMENTS: Dict[FlyerCategory, List[str]] = {
     FlyerCategory.FITNESS_WELLNESS: ["fitness silhouettes", "wellness symbols", "nature elements"],
     FlyerCategory.NONPROFIT_CHARITY: ["helping hands", "heart motifs", "community symbols"],
     FlyerCategory.MUSIC_CONCERT: ["musical notes", "instruments", "sound waves", "stage lights"],
+    FlyerCategory.SERVICE_BUSINESS: ["tools and equipment icons", "before/after visual", "service checklist", "trust badges"],
+    FlyerCategory.BEAUTY_SALON: ["makeup brushes", "hair styling tools", "mirror frame", "beauty product bottles"],
+    FlyerCategory.CHURCH_RELIGIOUS: ["cross or faith symbol", "dove", "open book", "stained glass pattern"],
 }

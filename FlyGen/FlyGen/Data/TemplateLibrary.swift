@@ -194,6 +194,43 @@ struct TemplateLibrary {
             previewDescription: "Elegant design for seasonal promotions and collections"
         ),
 
+        FlyerTemplate(
+            id: "sale_bogo",
+            name: "BOGO / Bundle Deal",
+            category: .salePromo,
+            textContent: TextContent(
+                headline: "Buy One Get One FREE",
+                subheadline: "This Weekend Only",
+                date: "[Date]",
+                address: "[Store Address]",
+                discountText: "BOGO on All Items",
+                ctaText: "Shop Now",
+                finePrint: "While supplies last"
+            ),
+            colors: ColorSettings(preset: .warm, backgroundType: .light),
+            visuals: VisualSettings(style: .playfulFun, mood: .exciting),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Fun and attention-grabbing design for BOGO and bundle deals"
+        ),
+
+        FlyerTemplate(
+            id: "sale_product_launch",
+            name: "New Product Launch",
+            category: .salePromo,
+            textContent: TextContent(
+                headline: "Introducing [Product]",
+                subheadline: "Now Available",
+                date: "[Launch Date]",
+                address: "[Store Address]",
+                ctaText: "Be First to Try It",
+                website: "[website.com]"
+            ),
+            colors: ColorSettings(preset: .neon, backgroundType: .dark),
+            visuals: VisualSettings(style: .gradientModern, mood: .exciting),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Modern design for product launches and new arrivals"
+        ),
+
         // MARK: - Restaurant Templates
         FlyerTemplate(
             id: "restaurant_special",
@@ -230,6 +267,43 @@ struct TemplateLibrary {
             visuals: VisualSettings(style: .elegantLuxury, mood: .elegant, imageryType: .photoRealistic),
             output: OutputSettings(aspectRatio: .portrait),
             previewDescription: "Elegant menu design showcasing your restaurant's offerings"
+        ),
+
+        FlyerTemplate(
+            id: "restaurant_happy_hour",
+            name: "Happy Hour Special",
+            category: .restaurantFood,
+            textContent: TextContent(
+                headline: "Happy Hour",
+                subheadline: "Half-Price Drinks & Apps",
+                bodyText: "Featured Specials:\n• House Margaritas $5\n• Draft Beer $3\n• Wings & Nachos 50% Off",
+                venueName: "[Restaurant Name]",
+                address: "[Address]",
+                ctaText: "See You at 5!",
+                phone: "[Phone Number]"
+            ),
+            colors: ColorSettings(preset: .warm, backgroundType: .dark),
+            visuals: VisualSettings(style: .neonGlow, mood: .festive),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Vibrant design for happy hour deals and drink specials"
+        ),
+
+        FlyerTemplate(
+            id: "restaurant_food_truck",
+            name: "Food Truck / Pop-Up",
+            category: .restaurantFood,
+            textContent: TextContent(
+                headline: "[Truck Name] Is Coming!",
+                subheadline: "Street Food You'll Love",
+                bodyText: "On the Menu:\n• [Dish 1]\n• [Dish 2]\n• [Dish 3]",
+                address: "[Location]",
+                ctaText: "Find Us This Weekend",
+                website: "[website.com]"
+            ),
+            colors: ColorSettings(preset: .warm, backgroundType: .light),
+            visuals: VisualSettings(style: .playfulFun, mood: .exciting),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Fun design for food trucks, pop-ups, and street food events"
         ),
 
         // MARK: - Party Templates
@@ -313,6 +387,61 @@ struct TemplateLibrary {
             previewDescription: "Energetic design for gym promotions and fitness classes"
         ),
 
+        FlyerTemplate(
+            id: "fitness_yoga",
+            name: "Yoga & Meditation Class",
+            category: .fitnessWellness,
+            textContent: TextContent(
+                headline: "Find Your Inner Peace",
+                subheadline: "Beginner-Friendly Yoga",
+                date: "[Date]",
+                time: "[Time]",
+                venueName: "[Studio Name]",
+                price: "First Class Free",
+                ctaText: "Reserve Your Mat"
+            ),
+            colors: ColorSettings(preset: .pastel, backgroundType: .light),
+            visuals: VisualSettings(style: .watercolorArtistic, mood: .calm),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Serene design for yoga, meditation, and mindfulness classes"
+        ),
+
+        FlyerTemplate(
+            id: "fitness_personal_training",
+            name: "Personal Training Special",
+            category: .fitnessWellness,
+            textContent: TextContent(
+                headline: "Transform Your Body",
+                subheadline: "1-on-1 Personal Training",
+                discountText: "Free Consultation",
+                ctaText: "Start Your Journey",
+                phone: "[Phone Number]"
+            ),
+            colors: ColorSettings(preset: .neon, backgroundType: .dark),
+            visuals: VisualSettings(style: .boldVibrant, mood: .exciting),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "High-energy design for personal training and fitness coaching"
+        ),
+
+        FlyerTemplate(
+            id: "fitness_wellness_retreat",
+            name: "Wellness Retreat",
+            category: .fitnessWellness,
+            textContent: TextContent(
+                headline: "Weekend Wellness Retreat",
+                subheadline: "Recharge Mind, Body & Soul",
+                date: "[Date]",
+                venueName: "[Retreat Name]",
+                address: "[Location]",
+                price: "$199/person",
+                ctaText: "Limited Spots Available"
+            ),
+            colors: ColorSettings(preset: .earthTones, backgroundType: .light),
+            visuals: VisualSettings(style: .elegantLuxury, mood: .calm),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Peaceful design for wellness retreats and spa getaways"
+        ),
+
         // MARK: - Music Template
         FlyerTemplate(
             id: "music_concert",
@@ -333,6 +462,44 @@ struct TemplateLibrary {
             visuals: VisualSettings(style: .neonGlow, mood: .exciting),
             output: OutputSettings(aspectRatio: .portrait),
             previewDescription: "Bold design for concerts, shows, and live performances"
+        ),
+
+        FlyerTemplate(
+            id: "music_dj_night",
+            name: "DJ Night / Club Event",
+            category: .musicConcert,
+            textContent: TextContent(
+                headline: "Friday Night Live",
+                subheadline: "DJ [Name] Spinning All Night",
+                date: "[Date]",
+                time: "10 PM - 2 AM",
+                venueName: "[Club Name]",
+                price: "$15 Cover",
+                ctaText: "Get On The List"
+            ),
+            colors: ColorSettings(preset: .neon, backgroundType: .dark),
+            visuals: VisualSettings(style: .neonGlow, mood: .exciting),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Electric design for DJ nights, club events, and dance parties"
+        ),
+
+        FlyerTemplate(
+            id: "music_open_mic",
+            name: "Open Mic Night",
+            category: .musicConcert,
+            textContent: TextContent(
+                headline: "Open Mic Night",
+                subheadline: "Share Your Talent",
+                date: "[Date]",
+                time: "8 PM",
+                venueName: "[Venue Name]",
+                address: "[Address]",
+                ctaText: "Sign Up to Perform"
+            ),
+            colors: ColorSettings(preset: .warm, backgroundType: .dark),
+            visuals: VisualSettings(style: .retroVintage, mood: .friendly),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Warm retro design for open mic nights and acoustic sessions"
         ),
 
         // MARK: - Real Estate Templates
@@ -523,6 +690,195 @@ struct TemplateLibrary {
             visuals: VisualSettings(style: .watercolorArtistic, mood: .friendly),
             output: OutputSettings(aspectRatio: .portrait),
             previewDescription: "Warm design for community service and volunteer events"
+        ),
+
+        // MARK: - Church & Faith Templates
+        FlyerTemplate(
+            id: "church_sunday_service",
+            name: "Sunday Service",
+            category: .churchReligious,
+            textContent: TextContent(
+                headline: "Join Us This Sunday",
+                subheadline: "All Are Welcome",
+                date: "[Date]",
+                time: "10:00 AM",
+                venueName: "[Church Name]",
+                address: "[Address]",
+                ctaText: "Come As You Are"
+            ),
+            colors: ColorSettings(preset: .warm, backgroundType: .light),
+            visuals: VisualSettings(style: .elegantLuxury, mood: .inspirational),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Warm and inviting design for weekly worship service invitations"
+        ),
+
+        FlyerTemplate(
+            id: "church_bible_study",
+            name: "Bible Study / Youth Group",
+            category: .churchReligious,
+            textContent: TextContent(
+                headline: "Bible Study Wednesday",
+                subheadline: "Growing Together in Faith",
+                date: "[Date]",
+                time: "7:00 PM",
+                venueName: "[Church Name]",
+                ctaText: "All Ages Welcome",
+                phone: "[Phone Number]"
+            ),
+            colors: ColorSettings(preset: .cool, backgroundType: .light),
+            visuals: VisualSettings(style: .modernMinimal, mood: .friendly),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Clean design for Bible study groups and fellowship gatherings"
+        ),
+
+        FlyerTemplate(
+            id: "church_holiday_service",
+            name: "Holiday Service",
+            category: .churchReligious,
+            textContent: TextContent(
+                headline: "Christmas Eve Service",
+                subheadline: "Celebrate the Season of Joy",
+                date: "[Date]",
+                time: "[Time]",
+                venueName: "[Church Name]",
+                address: "[Address]",
+                ctaText: "Bring Your Family"
+            ),
+            colors: ColorSettings(preset: .warm, backgroundType: .dark),
+            visuals: VisualSettings(style: .watercolorArtistic, mood: .festive),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Festive design for Christmas, Easter, and special holiday services"
+        ),
+
+        // MARK: - Beauty & Salon Templates
+        FlyerTemplate(
+            id: "beauty_price_list",
+            name: "Salon Price List",
+            category: .beautySalon,
+            textContent: TextContent(
+                headline: "Pamper Yourself",
+                bodyText: "Our Services:\n• Haircut & Style - $45+\n• Color & Highlights - $85+\n• Manicure & Pedicure - $55\n• Facial Treatment - $65\n• Lash Extensions - $120",
+                address: "[Salon Address]",
+                ctaText: "Book Your Appointment",
+                phone: "[Phone Number]",
+                socialHandle: "@[yoursalon]"
+            ),
+            colors: ColorSettings(preset: .pastel, backgroundType: .light),
+            visuals: VisualSettings(style: .elegantLuxury, mood: .elegant),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Elegant price list design for salons and spas"
+        ),
+
+        FlyerTemplate(
+            id: "beauty_new_client",
+            name: "New Client Special",
+            category: .beautySalon,
+            textContent: TextContent(
+                headline: "Welcome to [Salon Name]",
+                discountText: "50% Off First Visit",
+                ctaText: "Claim Your Offer",
+                phone: "[Phone Number]",
+                website: "[website.com]",
+                socialHandle: "@[yoursalon]"
+            ),
+            colors: ColorSettings(preset: .warm, backgroundType: .light),
+            visuals: VisualSettings(style: .gradientModern, mood: .friendly),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Attractive welcome offer for first-time salon customers"
+        ),
+
+        FlyerTemplate(
+            id: "beauty_barber",
+            name: "Barber Shop",
+            category: .beautySalon,
+            textContent: TextContent(
+                headline: "Classic Cuts & Clean Shaves",
+                subheadline: "Traditional Barbering",
+                bodyText: "Services:\n• Classic Haircut\n• Hot Towel Shave\n• Beard Trim & Shape\n• Kids Cuts",
+                address: "[Shop Address]",
+                ctaText: "Walk-ins Welcome",
+                phone: "[Phone Number]"
+            ),
+            colors: ColorSettings(preset: .monochrome, backgroundType: .dark),
+            visuals: VisualSettings(style: .retroVintage, mood: .professional),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Classic design for barber shops and men's grooming"
+        ),
+
+        // MARK: - Service Business Templates
+        FlyerTemplate(
+            id: "service_cleaning",
+            name: "Cleaning Service",
+            category: .serviceBusiness,
+            textContent: TextContent(
+                headline: "Sparkling Clean Homes",
+                subheadline: "Professional Cleaning Services",
+                bodyText: "Our Services:\n• Deep House Cleaning\n• Office Cleaning\n• Move-In/Move-Out\n• Weekly & Bi-Weekly Plans",
+                discountText: "20% Off First Clean",
+                ctaText: "Book Today",
+                phone: "[Phone Number]",
+                website: "[website.com]"
+            ),
+            colors: ColorSettings(preset: .cool, backgroundType: .light),
+            visuals: VisualSettings(style: .modernMinimal, mood: .professional),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Professional flyer for home and office cleaning services"
+        ),
+
+        FlyerTemplate(
+            id: "service_handyman",
+            name: "Handyman & Repair",
+            category: .serviceBusiness,
+            textContent: TextContent(
+                headline: "Your Local Handyman",
+                subheadline: "No Job Too Small",
+                bodyText: "Services Include:\n• Plumbing Repairs\n• Electrical Fixes\n• Drywall & Painting\n• Furniture Assembly",
+                address: "[Service Area]",
+                ctaText: "Call for Free Estimate",
+                phone: "[Phone Number]"
+            ),
+            colors: ColorSettings(preset: .warm, backgroundType: .light),
+            visuals: VisualSettings(style: .boldVibrant, mood: .friendly),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Eye-catching flyer for handyman and general repair services"
+        ),
+
+        FlyerTemplate(
+            id: "service_landscaping",
+            name: "Lawn Care & Landscaping",
+            category: .serviceBusiness,
+            textContent: TextContent(
+                headline: "Beautiful Lawns Start Here",
+                subheadline: "Full-Service Landscaping",
+                bodyText: "What We Offer:\n• Lawn Mowing & Edging\n• Tree & Shrub Trimming\n• Garden Design\n• Seasonal Cleanup",
+                price: "Starting at $49",
+                ctaText: "Get a Free Quote",
+                phone: "[Phone Number]",
+                website: "[website.com]"
+            ),
+            colors: ColorSettings(preset: .earthTones, backgroundType: .light),
+            visuals: VisualSettings(style: .handDrawnOrganic, mood: .calm),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Natural design for lawn care and landscaping businesses"
+        ),
+
+        FlyerTemplate(
+            id: "service_general",
+            name: "General Services",
+            category: .serviceBusiness,
+            textContent: TextContent(
+                headline: "Professional [Service] You Can Trust",
+                subheadline: "Licensed & Insured",
+                bodyText: "Why Choose Us:\n• Experienced Professionals\n• Satisfaction Guaranteed\n• Competitive Pricing\n• Free Consultations",
+                ctaText: "Schedule Now",
+                phone: "[Phone Number]",
+                email: "[email@example.com]",
+                website: "[website.com]"
+            ),
+            colors: ColorSettings(preset: .cool, backgroundType: .light),
+            visuals: VisualSettings(style: .corporateProfessional, mood: .professional),
+            output: OutputSettings(aspectRatio: .portrait),
+            previewDescription: "Professional flyer for tutoring, pet sitting, and general services"
         ),
 
         FlyerTemplate(

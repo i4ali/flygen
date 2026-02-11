@@ -104,7 +104,10 @@ struct CategoryConfiguration {
         .partyCelebration: [.headline, .subheadline, .date, .time, .venueName, .address, .ctaText, .phone],
         .fitnessWellness: [.headline, .subheadline, .date, .time, .venueName, .address, .price, .discountText, .ctaText, .phone],
         .nonprofitCharity: [.headline, .subheadline, .bodyText, .date, .time, .venueName, .address, .ctaText, .phone, .email, .website],
-        .musicConcert: [.headline, .subheadline, .date, .time, .venueName, .address, .price, .ctaText, .website]
+        .musicConcert: [.headline, .subheadline, .date, .time, .venueName, .address, .price, .ctaText, .website],
+        .serviceBusiness: [.headline, .subheadline, .bodyText, .phone, .email, .website, .address, .price, .discountText, .ctaText],
+        .beautySalon: [.headline, .subheadline, .bodyText, .address, .phone, .website, .socialHandle, .discountText, .ctaText, .price],
+        .churchReligious: [.headline, .subheadline, .bodyText, .date, .time, .venueName, .address, .phone, .website, .ctaText]
     ]
 
     /// Suggested visual elements to include by category
@@ -120,7 +123,10 @@ struct CategoryConfiguration {
         .partyCelebration: ["balloons", "confetti", "party decorations", "streamers", "party hats", "gift boxes", "cake", "sparklers", "bunting", "disco ball"],
         .fitnessWellness: ["fitness silhouettes", "wellness symbols", "nature elements", "dumbbells", "yoga poses", "heart rate", "water droplets", "leaves", "energy rays"],
         .nonprofitCharity: ["helping hands", "heart motifs", "community symbols", "globe", "ribbon", "donation box", "unity circle", "caring hands", "hope symbols"],
-        .musicConcert: ["musical notes", "instruments", "sound waves", "stage lights", "vinyl records", "microphone", "equalizer bars", "guitar silhouette", "concert crowd silhouette"]
+        .musicConcert: ["musical notes", "instruments", "sound waves", "stage lights", "vinyl records", "microphone", "equalizer bars", "guitar silhouette", "concert crowd silhouette"],
+        .serviceBusiness: ["tools and equipment icons", "before/after visual", "service checklist", "trust badges", "star ratings", "service area map", "guarantee badge", "professional uniform"],
+        .beautySalon: ["makeup brushes", "hair styling tools", "mirror frame", "beauty product bottles", "scissors and combs", "floral accents", "elegant swirls", "glitter effects"],
+        .churchReligious: ["cross or faith symbol", "dove", "open book", "stained glass pattern", "candle light", "praying hands", "church silhouette", "olive branch"]
     ]
 
     /// Suggested visual elements to avoid by category
@@ -136,7 +142,10 @@ struct CategoryConfiguration {
         .partyCelebration: ["people", "faces", "hands", "sad imagery", "dark colors", "corporate elements"],
         .fitnessWellness: ["people", "faces", "hands", "before/after imagery", "unhealthy food", "injury imagery", "extreme body images"],
         .nonprofitCharity: ["people", "faces", "hands", "graphic imagery", "political symbols", "controversial content"],
-        .musicConcert: ["people", "faces", "hands", "modern tech for retro themes", "silent imagery", "office settings"]
+        .musicConcert: ["people", "faces", "hands", "modern tech for retro themes", "silent imagery", "office settings"],
+        .serviceBusiness: ["people", "faces", "hands", "cluttered tool imagery", "low quality stock photos", "overly technical diagrams"],
+        .beautySalon: ["people", "faces", "hands", "messy hair", "unflattering angles", "clinical medical imagery"],
+        .churchReligious: ["people", "faces", "hands", "political symbols", "controversial imagery", "dark occult imagery"]
     ]
 
     /// Common elements to avoid (used as fallback)
@@ -230,6 +239,27 @@ struct CategoryConfiguration {
             "Instrument silhouettes in corners",
             "Crowd silhouette at bottom",
             "Vinyl record motif as accent"
+        ],
+        .serviceBusiness: [
+            "Before/after transformation showcase",
+            "Service checklist layout with checkmarks",
+            "Tools and equipment border framing",
+            "Customer testimonial highlight",
+            "Service area coverage map"
+        ],
+        .beautySalon: [
+            "Glamorous product showcase",
+            "Before/after transformation",
+            "Price list card layout",
+            "Luxury spa atmosphere",
+            "Bold color palette with metallic accents"
+        ],
+        .churchReligious: [
+            "Stained glass window background effect",
+            "Soft light rays from above",
+            "Scripture verse as decorative element",
+            "Church building silhouette skyline",
+            "Peaceful nature scene with faith symbols"
         ]
     ]
 

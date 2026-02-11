@@ -36,6 +36,15 @@ enum OutputType: String, CaseIterable, Identifiable {
     // Nonprofit
     case fundraiserFlyer = "fundraiser"
 
+    // Service Business
+    case serviceFlyer = "service_flyer"
+
+    // Beauty & Salon
+    case salonBeautyFlyer = "salon_beauty"
+
+    // Church & Faith
+    case churchFaithFlyer = "church_faith"
+
     var id: String { rawValue }
 
     /// The underlying FlyerCategory this output type maps to
@@ -65,6 +74,12 @@ enum OutputType: String, CaseIterable, Identifiable {
             return .classWorkshop
         case .fundraiserFlyer:
             return .nonprofitCharity
+        case .serviceFlyer:
+            return .serviceBusiness
+        case .salonBeautyFlyer:
+            return .beautySalon
+        case .churchFaithFlyer:
+            return .churchReligious
         }
     }
 
@@ -88,6 +103,9 @@ enum OutputType: String, CaseIterable, Identifiable {
         case .menuFoodSpecial: return "Menu / Food Special"
         case .classWorkshopFlyer: return "Class / Workshop"
         case .fundraiserFlyer: return "Fundraiser"
+        case .serviceFlyer: return "Service Flyer"
+        case .salonBeautyFlyer: return "Salon / Beauty Flyer"
+        case .churchFaithFlyer: return "Church / Faith Flyer"
         }
     }
 
@@ -111,6 +129,9 @@ enum OutputType: String, CaseIterable, Identifiable {
         case .menuFoodSpecial: return "fork.knife"
         case .classWorkshopFlyer: return "book"
         case .fundraiserFlyer: return "heart"
+        case .serviceFlyer: return "wrench.and.screwdriver"
+        case .salonBeautyFlyer: return "scissors"
+        case .churchFaithFlyer: return "building.columns"
         }
     }
 
@@ -134,6 +155,9 @@ enum OutputType: String, CaseIterable, Identifiable {
         case .menuFoodSpecial: return "🍽️"
         case .classWorkshopFlyer: return "📚"
         case .fundraiserFlyer: return "❤️"
+        case .serviceFlyer: return "🔧"
+        case .salonBeautyFlyer: return "💇"
+        case .churchFaithFlyer: return "⛪"
         }
     }
 
@@ -157,6 +181,9 @@ enum OutputType: String, CaseIterable, Identifiable {
         case .menuFoodSpecial: return "Restaurant menus, daily specials, and food promos"
         case .classWorkshopFlyer: return "Courses, tutorials, and educational sessions"
         case .fundraiserFlyer: return "Charity events, donations, and community causes"
+        case .serviceFlyer: return "Cleaning, repair, landscaping, and professional services"
+        case .salonBeautyFlyer: return "Hair salon, barber, spa, and beauty service promotions"
+        case .churchFaithFlyer: return "Worship services, faith events, and religious gatherings"
         }
     }
 
@@ -167,11 +194,11 @@ enum OutputType: String, CaseIterable, Identifiable {
             return .celebrate
         case .eventFlyer, .weddingInvitation, .corporateInvitation, .concertPoster:
             return .invite
-        case .saleFlyer, .fitnessPromotion, .menuFoodSpecial, .propertyListing, .jobRecruitmentFlyer:
+        case .saleFlyer, .fitnessPromotion, .menuFoodSpecial, .propertyListing, .jobRecruitmentFlyer, .serviceFlyer, .salonBeautyFlyer:
             return .promote
         case .newsletter, .greetingCard, .farewellCard:
             return .inform
-        case .classWorkshopFlyer, .fundraiserFlyer:
+        case .classWorkshopFlyer, .fundraiserFlyer, .churchFaithFlyer:
             return .community
         }
     }
