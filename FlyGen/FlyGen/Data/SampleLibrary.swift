@@ -496,6 +496,32 @@ struct SampleLibrary {
             output: OutputSettings(aspectRatio: .portrait),
             targetAudience: "Shia Muslim community, Urdu-speaking families",
             specialInstructions: "Elegant and respectful religious invitation design"
+        ),
+
+        // MARK: - Barber Shop - Classic Cuts
+        SampleFlyer(
+            id: "sample_barber_shop",
+            imageName: "sample_barber_shop",
+            name: "Classic Cuts & Clean Shaves",
+            category: .beautySalon,
+            textContent: TextContent(
+                headline: "CLASSIC CUTS & CLEAN SHAVES",
+                subheadline: "Traditional Barbering",
+                bodyText: "Services:\n• Classic Haircut\n• Hot Towel Shave\n• Beard Trim & Shape\n• Kids Cuts",
+                address: "9675 Jones Road, Houston, TX",
+                discountText: "UP TO 20% OFF",
+                ctaText: "WALK-INS WELCOME",
+                phone: "713-456-9876"
+            ),
+            colors: ColorSettings(preset: .blackGold, backgroundType: .dark),
+            visuals: VisualSettings(
+                style: .retroVintage,
+                mood: .professional,
+                textProminence: .balanced,
+                includeElements: ["barber pole", "vintage barber chair", "scissors", "shaving brush"]
+            ),
+            output: OutputSettings(aspectRatio: .portrait),
+            targetAudience: "Men looking for traditional barbershop services"
         )
     ]
 

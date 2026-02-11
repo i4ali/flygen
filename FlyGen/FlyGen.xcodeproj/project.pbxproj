@@ -53,6 +53,7 @@
 		8BE98D282EE5FA3A005A4DC3 /* onboarding-qrcode.json in Resources */ = {isa = PBXBuildFile; fileRef = 8BE98D292EE5FA3A005A4DC3 /* onboarding-qrcode.json */; };
 		8BE98D2A2EE5FA3A005A4DC3 /* onboarding-colors.json in Resources */ = {isa = PBXBuildFile; fileRef = 8BE98D2B2EE5FA3A005A4DC3 /* onboarding-colors.json */; };
 		8BE98D2C2EE5FA3A005A4DC3 /* onboarding-ready.json in Resources */ = {isa = PBXBuildFile; fileRef = 8BE98D2D2EE5FA3A005A4DC3 /* onboarding-ready.json */; };
+		AAONBAIANALYS01 /* onboarding-ai-analysis.json in Resources */ = {isa = PBXBuildFile; fileRef = BBONBAIANALYS01 /* onboarding-ai-analysis.json */; };
 		8BF224B82EE5FE9700E8776A /* AIGenerationScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF224B42EE5FE9700E8776A /* AIGenerationScreen.swift */; };
 		8BF224B92EE5FE9700E8776A /* InteractiveOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF224B32EE5FE9700E8776A /* InteractiveOnboardingView.swift */; };
 		8BF224BA2EE5FE9700E8776A /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF224B12EE5FE9700E8776A /* OnboardingViewModel.swift */; };
@@ -117,6 +118,11 @@
 		F315B5B3E510D452B864EFA8 /* MoodStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A5464C24F5B8B13D097698 /* MoodStepView.swift */; };
 		F698469DE0F1EF731F03ACB7 /* QRCodeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BF8F3456115A7D92EB1F149 /* QRCodeService.swift */; };
 		F927960154E78DFB295870BA /* QRCodeStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD932742A9E1DC6131CEFEE /* QRCodeStepView.swift */; };
+		AAUSERROLE000001 /* UserRole.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBUSERROLE000001 /* UserRole.swift */; };
+		AAUSERROLESCR001 /* UserRoleScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBUSERROLESCR001 /* UserRoleScreen.swift */; };
+		AAQUICKBRAND0001 /* QuickBrandSetupScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBQUICKBRAND0001 /* QuickBrandSetupScreen.swift */; };
+		AABUILDINGEXP001 /* BuildingExperienceScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBUILDINGEXP001 /* BuildingExperienceScreen.swift */; };
+		AAREADYTOCRE0001 /* ReadyToCreateScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBREADYTOCRE0001 /* ReadyToCreateScreen.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -172,6 +178,7 @@
 		8BE98D292EE5FA3A005A4DC3 /* onboarding-qrcode.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "onboarding-qrcode.json"; sourceTree = "<group>"; };
 		8BE98D2B2EE5FA3A005A4DC3 /* onboarding-colors.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "onboarding-colors.json"; sourceTree = "<group>"; };
 		8BE98D2D2EE5FA3A005A4DC3 /* onboarding-ready.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "onboarding-ready.json"; sourceTree = "<group>"; };
+		BBONBAIANALYS01 /* onboarding-ai-analysis.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "onboarding-ai-analysis.json"; sourceTree = "<group>"; };
 		8BF224AE2EE5FE9700E8776A /* LottieAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottieAnimationView.swift; sourceTree = "<group>"; };
 		8BF224AF2EE5FE9700E8776A /* MockSelectionChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSelectionChip.swift; sourceTree = "<group>"; };
 		8BF224B02EE5FE9700E8776A /* OnboardingProgressIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingProgressIndicator.swift; sourceTree = "<group>"; };
@@ -181,6 +188,11 @@
 		8BF224B52EE5FE9700E8776A /* WelcomeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeScreen.swift; sourceTree = "<group>"; };
 		8BF224B62EE5FE9700E8776A /* WorkflowDemoScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowDemoScreen.swift; sourceTree = "<group>"; };
 		8BF224C02EE5FE9700E8776A /* BrandKitScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandKitScreen.swift; sourceTree = "<group>"; };
+		BBUSERROLE000001 /* UserRole.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserRole.swift; sourceTree = "<group>"; };
+		BBUSERROLESCR001 /* UserRoleScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserRoleScreen.swift; sourceTree = "<group>"; };
+		BBQUICKBRAND0001 /* QuickBrandSetupScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickBrandSetupScreen.swift; sourceTree = "<group>"; };
+		BBBUILDINGEXP001 /* BuildingExperienceScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildingExperienceScreen.swift; sourceTree = "<group>"; };
+		BBREADYTOCRE0001 /* ReadyToCreateScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadyToCreateScreen.swift; sourceTree = "<group>"; };
 		8CE5F8A345997A42000089FD /* BackgroundType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundType.swift; sourceTree = "<group>"; };
 		8D909C2791FE2A8700E30AA4 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		91F81AFF070A145CF531597E /* ColorSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorSettings.swift; sourceTree = "<group>"; };
@@ -312,6 +324,7 @@
 				BBINTENT0000001 /* Intent.swift */,
 				BBOUTPUTTYPE00001 /* OutputType.swift */,
 				340B5206B7FAD148FFC4FA90 /* Mood.swift */,
+				BBUSERROLE000001 /* UserRole.swift */,
 				4F62F08E46FF0DE6F50F5350 /* TextProminence.swift */,
 				68824529B837896DBABCE0F2 /* VisualStyle.swift */,
 			);
@@ -369,6 +382,7 @@
 			isa = PBXGroup;
 			children = (
 				8BE98D192EE5FA3A005A4DC3 /* ai-generation-magic.json */,
+				BBONBAIANALYS01 /* onboarding-ai-analysis.json */,
 				8BE98D232EE5FA3A005A4DC3 /* onboarding-category.json */,
 				8BE98D2B2EE5FA3A005A4DC3 /* onboarding-colors.json */,
 				8BE98D272EE5FA3A005A4DC3 /* onboarding-logo.json */,
@@ -398,12 +412,16 @@
 			children = (
 				8BF224B42EE5FE9700E8776A /* AIGenerationScreen.swift */,
 				8BF224C02EE5FE9700E8776A /* BrandKitScreen.swift */,
+				BBBUILDINGEXP001 /* BuildingExperienceScreen.swift */,
+				1391F54EAEC68ADFEF21B253 /* CategoryPreferencesScreen.swift */,
+				3302C6C00520142F3A090D56 /* LanguagePreferencesScreen.swift */,
+				BBQUICKBRAND0001 /* QuickBrandSetupScreen.swift */,
+				BBREADYTOCRE0001 /* ReadyToCreateScreen.swift */,
+				6B0CABCF6AF8194D73A15FAB /* SampleLoadingScreen.swift */,
+				59D15DB4DE5A14E48E823DB9 /* SampleShowcaseScreen.swift */,
+				BBUSERROLESCR001 /* UserRoleScreen.swift */,
 				8BF224B52EE5FE9700E8776A /* WelcomeScreen.swift */,
 				8BF224B62EE5FE9700E8776A /* WorkflowDemoScreen.swift */,
-				1391F54EAEC68ADFEF21B253 /* CategoryPreferencesScreen.swift */,
-				59D15DB4DE5A14E48E823DB9 /* SampleShowcaseScreen.swift */,
-				3302C6C00520142F3A090D56 /* LanguagePreferencesScreen.swift */,
-				6B0CABCF6AF8194D73A15FAB /* SampleLoadingScreen.swift */,
 			);
 			path = Screens;
 			sourceTree = "<group>";
@@ -650,6 +668,7 @@
 				8BE98D282EE5FA3A005A4DC3 /* onboarding-qrcode.json in Resources */,
 				8BE98D2A2EE5FA3A005A4DC3 /* onboarding-colors.json in Resources */,
 				8BE98D2C2EE5FA3A005A4DC3 /* onboarding-ready.json in Resources */,
+				AAONBAIANALYS01 /* onboarding-ai-analysis.json in Resources */,
 				99A104086420FCC441766ECB /* FlyGenProducts.storekit in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -674,6 +693,11 @@
 				8BF224BE2EE5FE9700E8776A /* OnboardingProgressIndicator.swift in Sources */,
 				8BF224BF2EE5FE9700E8776A /* WelcomeScreen.swift in Sources */,
 				8BF224C12EE5FE9700E8776A /* BrandKitScreen.swift in Sources */,
+				AAUSERROLE000001 /* UserRole.swift in Sources */,
+				AAUSERROLESCR001 /* UserRoleScreen.swift in Sources */,
+				AAQUICKBRAND0001 /* QuickBrandSetupScreen.swift in Sources */,
+				AABUILDINGEXP001 /* BuildingExperienceScreen.swift in Sources */,
+				AAREADYTOCRE0001 /* ReadyToCreateScreen.swift in Sources */,
 				D958E07702A0C8EE2FE7C9F1 /* CloudKitService.swift in Sources */,
 				AADRAFTSVC00001 /* DraftStorageService.swift in Sources */,
 				277B13203FA5FBD8FC6CA8CB /* Color+Hex.swift in Sources */,

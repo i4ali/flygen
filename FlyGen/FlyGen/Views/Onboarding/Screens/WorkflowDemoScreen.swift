@@ -4,6 +4,7 @@ import SwiftUI
 struct WorkflowDemoScreen: View {
     @ObservedObject var viewModel: OnboardingViewModel
     @State private var animateContent = false
+    @State private var visiblePills: Set<Int> = []
 
     var body: some View {
         VStack(spacing: 0) {
@@ -79,6 +80,8 @@ struct WorkflowDemoScreen: View {
             return .blue
         case .colors:
             return .purple
+        case .aiAnalysis:
+            return FGColors.accentPrimary
         case .ready:
             return FGColors.accentGradientEnd
         }
@@ -122,6 +125,8 @@ struct WorkflowDemoScreen: View {
                     qrCodeContent
                 case .colors:
                     colorsContent
+                case .aiAnalysis:
+                    aiAnalysisContent
                 case .ready:
                     readyContent
                 }
@@ -135,14 +140,14 @@ struct WorkflowDemoScreen: View {
             Spacer()
 
             // Tap hint
-            if viewModel.demoStep != .ready {
+            if viewModel.demoStep != .ready && viewModel.demoStep != .aiAnalysis {
                 Text("Tap anywhere to skip ahead")
                     .font(FGTypography.caption)
                     .foregroundColor(FGColors.textSecondary)
-                    .padding(.bottom, FGSpacing.sm)
             }
         }
         .padding(.top, FGSpacing.lg)
+        .padding(.bottom, FGSpacing.xl)
         .padding(.horizontal, FGSpacing.screenHorizontal)
         .opacity(animateContent ? 1 : 0)
         .offset(y: animateContent ? 0 : 30)
@@ -152,7 +157,7 @@ struct WorkflowDemoScreen: View {
 
     private var progressDots: some View {
         HStack(spacing: FGSpacing.xs) {
-            ForEach(0..<7) { index in
+            ForEach(0..<8) { index in
                 Circle()
                     .fill(index <= viewModel.demoStep.rawValue ? currentAccentColor : FGColors.borderSubtle)
                     .frame(width: index == viewModel.demoStep.rawValue ? 10 : 6,
@@ -170,7 +175,7 @@ struct WorkflowDemoScreen: View {
                 AutoSelectChip(
                     title: category.rawValue,
                     emoji: category.emoji,
-                    isSelected: viewModel.selectedCategory == category
+                    isSelected: viewModel.selectedMockCategory == category
                 )
             }
         }
@@ -182,7 +187,7 @@ struct WorkflowDemoScreen: View {
                 AutoSelectChip(
                     title: style.rawValue,
                     emoji: style.emoji,
-                    isSelected: viewModel.selectedStyle == style
+                    isSelected: viewModel.selectedMockStyle == style
                 )
             }
         }
@@ -260,8 +265,94 @@ struct WorkflowDemoScreen: View {
             ForEach(OnboardingViewModel.MockColorTheme.allCases) { theme in
                 ColorThemeChip(
                     theme: theme,
-                    isSelected: viewModel.selectedColorTheme == theme
+                    isSelected: viewModel.selectedMockColorTheme == theme
                 )
+            }
+        }
+    }
+
+    private var aiAnalysisContent: some View {
+        VStack(spacing: FGSpacing.lg) {
+            // Analyzing text
+            if visiblePills.isEmpty {
+                HStack(spacing: FGSpacing.xs) {
+                    Text("Analyzing")
+                        .font(FGTypography.body)
+                        .foregroundColor(FGColors.textSecondary)
+
+                    // Animated dots
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: FGColors.accentPrimary))
+                        .scaleEffect(0.8)
+                }
+                .transition(.opacity)
+            }
+
+            // Visual suggestion pills
+            HStack(spacing: FGSpacing.sm) {
+                // Palette pill
+                AISuggestionPill(
+                    icon: nil,
+                    colors: viewModel.selectedMockColorTheme?.colors ?? [.cyan, .pink, .yellow],
+                    label: "Palette",
+                    isVisible: visiblePills.contains(0)
+                )
+
+                // Typography pill
+                AISuggestionPill(
+                    icon: nil,
+                    customContent: AnyView(
+                        Text("Aa")
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                            .foregroundColor(FGColors.textPrimary)
+                    ),
+                    label: "Typography",
+                    isVisible: visiblePills.contains(1)
+                )
+
+                // Background pill
+                AISuggestionPill(
+                    icon: nil,
+                    customContent: AnyView(
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(
+                                LinearGradient(
+                                    colors: [FGColors.accentPrimary, FGColors.accentSecondary],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .frame(width: 24, height: 16)
+                    ),
+                    label: "Background",
+                    isVisible: visiblePills.contains(2)
+                )
+
+                // Layout pill
+                AISuggestionPill(
+                    icon: "square.grid.2x2",
+                    label: "Layout",
+                    isVisible: visiblePills.contains(3)
+                )
+            }
+        }
+        .onAppear {
+            startPillAnimations()
+        }
+        .onDisappear {
+            visiblePills.removeAll()
+        }
+    }
+
+    private func startPillAnimations() {
+        visiblePills.removeAll()
+
+        // Stagger pill appearances
+        for index in 0..<4 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(index) * 0.3) {
+                withAnimation(FGAnimations.spring) {
+                    _ = visiblePills.insert(index)
+                }
             }
         }
     }
@@ -272,10 +363,10 @@ struct WorkflowDemoScreen: View {
             VStack(spacing: FGSpacing.sm) {
                 // Row 1: Category + Style
                 HStack(spacing: FGSpacing.sm) {
-                    if let category = viewModel.selectedCategory {
+                    if let category = viewModel.selectedMockCategory {
                         SummaryBadge(emoji: category.emoji, label: category.rawValue)
                     }
-                    if let style = viewModel.selectedStyle {
+                    if let style = viewModel.selectedMockStyle {
                         SummaryBadge(emoji: style.emoji, label: style.rawValue)
                     }
                 }
@@ -288,7 +379,7 @@ struct WorkflowDemoScreen: View {
                     if viewModel.hasQRCode {
                         SummaryBadge(icon: "qrcode", label: "QR Code")
                     }
-                    if let theme = viewModel.selectedColorTheme {
+                    if let theme = viewModel.selectedMockColorTheme {
                         SummaryBadge(colors: theme.colors, label: theme.rawValue)
                     }
                 }
@@ -459,6 +550,59 @@ private struct SummaryBadge: View {
             Capsule()
                 .stroke(FGColors.accentPrimary.opacity(0.5), lineWidth: 1)
         )
+    }
+}
+
+/// AI suggestion pill for the analysis step
+private struct AISuggestionPill: View {
+    var icon: String? = nil
+    var colors: [Color]? = nil
+    var customContent: AnyView? = nil
+    let label: String
+    let isVisible: Bool
+
+    var body: some View {
+        VStack(spacing: FGSpacing.xxs) {
+            // Visual element
+            ZStack {
+                Circle()
+                    .fill(FGColors.surfaceHover)
+                    .frame(width: 44, height: 44)
+
+                if let colors = colors {
+                    // Color dots
+                    HStack(spacing: 3) {
+                        ForEach(0..<min(colors.count, 3), id: \.self) { index in
+                            Circle()
+                                .fill(colors[index])
+                                .frame(width: 10, height: 10)
+                        }
+                    }
+                } else if let customContent = customContent {
+                    customContent
+                } else if let icon = icon {
+                    Image(systemName: icon)
+                        .font(.system(size: 18))
+                        .foregroundColor(FGColors.accentPrimary)
+                }
+            }
+            .overlay(
+                Circle()
+                    .stroke(FGColors.accentPrimary.opacity(0.5), lineWidth: 1.5)
+            )
+            .shadow(
+                color: FGColors.accentPrimary.opacity(0.3),
+                radius: isVisible ? 8 : 0
+            )
+
+            // Label
+            Text(label)
+                .font(.system(size: 10, weight: .medium))
+                .foregroundColor(FGColors.textSecondary)
+        }
+        .scaleEffect(isVisible ? 1.0 : 0.8)
+        .opacity(isVisible ? 1.0 : 0.0)
+        .animation(FGAnimations.spring, value: isVisible)
     }
 }
 

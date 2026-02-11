@@ -1,6 +1,6 @@
 import SwiftUI
 
-// MARK: - User Preference Type
+// MARK: - User Preference Type (Legacy - kept for backwards compatibility)
 
 /// Simplified user-facing preference options that map to internal FlyerCategory values
 enum UserPreferenceType: String, CaseIterable, Identifiable {
@@ -52,35 +52,64 @@ enum UserPreferenceType: String, CaseIterable, Identifiable {
 @MainActor
 class OnboardingViewModel: ObservableObject {
 
-    // MARK: - Screen Navigation
+    // MARK: - Screen Navigation (10 screens)
 
     enum OnboardingScreen: Int, CaseIterable {
         case welcome = 0
         case workflowDemo = 1
-        case brandKit = 2
+        case userRole = 2
         case categoryPreferences = 3
         case languagePreferences = 4
-        case sampleLoading = 5
-        case sampleShowcase = 6
-        case aiGeneration = 7
+        case brandKitIntro = 5
+        case quickBrandSetup = 6
+        case buildingExperience = 7
+        case personalizedSamples = 8
+        case readyToCreate = 9
 
         var title: String {
             switch self {
             case .welcome: return "Welcome"
             case .workflowDemo: return "How It Works"
-            case .brandKit: return "Brand Kit"
-            case .categoryPreferences: return "Your Preferences"
+            case .userRole: return "About You"
+            case .categoryPreferences: return "Your Needs"
             case .languagePreferences: return "Languages"
-            case .sampleLoading: return "Loading"
-            case .sampleShowcase: return "What's Possible"
-            case .aiGeneration: return "AI Magic"
+            case .brandKitIntro: return "Brand Kit"
+            case .quickBrandSetup: return "Quick Setup"
+            case .buildingExperience: return "Almost Ready"
+            case .personalizedSamples: return "For You"
+            case .readyToCreate: return "Let's Go"
+            }
+        }
+
+        var isSkippable: Bool {
+            switch self {
+            case .userRole, .quickBrandSetup:
+                return true
+            default:
+                return false
             }
         }
     }
 
     @Published var currentScreen: OnboardingScreen = .welcome
 
-    // MARK: - Interactive Demo State (7 Steps)
+    // MARK: - User Role Selection
+
+    @Published var selectedUserRole: UserRole?
+
+    // MARK: - Visual Preferences (single selections for streamlined flow)
+
+    @Published var selectedVisualStyle: VisualStyle?
+    @Published var selectedMood: Mood?
+    @Published var selectedColorScheme: ColorSchemePreset?
+
+    // MARK: - Quick Brand Setup
+
+    @Published var quickBusinessName: String = ""
+    @Published var quickWebsite: String = ""
+    @Published var quickLogoData: Data?
+
+    // MARK: - Interactive Demo State (8 Steps)
 
     enum DemoStep: Int, CaseIterable {
         case category = 0
@@ -89,7 +118,8 @@ class OnboardingViewModel: ObservableObject {
         case logo = 3
         case qrCode = 4
         case colors = 5
-        case ready = 6
+        case aiAnalysis = 6
+        case ready = 7
 
         var title: String {
             switch self {
@@ -99,11 +129,16 @@ class OnboardingViewModel: ObservableObject {
             case .logo: return "Upload Your Logo"
             case .qrCode: return "Add a QR Code"
             case .colors: return "Choose Colors"
+            case .aiAnalysis: return "AI Enhances Your Flyer"
             case .ready: return "Ready to Create!"
             }
         }
 
         var stepNumber: Int {
+            // AI Analysis and Ready don't show step numbers
+            if self == .aiAnalysis || self == .ready {
+                return 0
+            }
             return rawValue + 1
         }
 
@@ -115,6 +150,7 @@ class OnboardingViewModel: ObservableObject {
             case .logo: return "onboarding-logo"
             case .qrCode: return "onboarding-qrcode"
             case .colors: return "onboarding-colors"
+            case .aiAnalysis: return "onboarding-ai-analysis"
             case .ready: return "onboarding-ready"
             }
         }
@@ -122,7 +158,7 @@ class OnboardingViewModel: ObservableObject {
 
     @Published var demoStep: DemoStep = .category
 
-    // MARK: - Mock Selections
+    // MARK: - Mock Selections (for workflow demo)
 
     enum MockCategory: String, CaseIterable, Identifiable {
         case event = "Event"
@@ -174,9 +210,9 @@ class OnboardingViewModel: ObservableObject {
         }
     }
 
-    @Published var selectedCategory: MockCategory?
-    @Published var selectedStyle: MockStyle?
-    @Published var selectedColorTheme: MockColorTheme?
+    @Published var selectedMockCategory: MockCategory?
+    @Published var selectedMockStyle: MockStyle?
+    @Published var selectedMockColorTheme: MockColorTheme?
 
     // Text detail mock data
     @Published var mockHeadline: String = ""
@@ -212,28 +248,43 @@ class OnboardingViewModel: ObservableObject {
             return true
         case .workflowDemo:
             return demoStep == .ready
+        case .userRole:
+            return true // Can skip or select
         case .categoryPreferences:
-            return true  // Can always continue (skip is allowed)
+            return true // Can always continue (skip is allowed)
         case .languagePreferences:
-            return true  // Can always continue
-        case .sampleLoading:
-            return true  // Auto-advances
-        case .sampleShowcase:
+            return true // Can always continue
+        case .brandKitIntro:
             return true
-        case .brandKit:
+        case .quickBrandSetup:
+            return true // Can skip
+        case .buildingExperience:
+            return true // Auto-advances
+        case .personalizedSamples:
             return true
-        case .aiGeneration:
+        case .readyToCreate:
             return true
         }
     }
 
     var isLastScreen: Bool {
-        currentScreen == .aiGeneration
+        currentScreen == .readyToCreate
     }
 
-    // MARK: - Category Preferences
+    // MARK: - Category Preferences (Direct selection of FlyerCategory)
 
+    @Published var selectedFlyerCategories: Set<FlyerCategory> = []
+
+    /// Legacy: for backwards compatibility with old preference type
     @Published var selectedPreferences: Set<UserPreferenceType> = []
+
+    func toggleFlyerCategory(_ category: FlyerCategory) {
+        if selectedFlyerCategories.contains(category) {
+            selectedFlyerCategories.remove(category)
+        } else {
+            selectedFlyerCategories.insert(category)
+        }
+    }
 
     func togglePreference(_ preference: UserPreferenceType) {
         if selectedPreferences.contains(preference) {
@@ -243,9 +294,17 @@ class OnboardingViewModel: ObservableObject {
         }
     }
 
-    /// Get all selected categories (flattened from user preferences)
+    /// Get all selected categories (now using direct FlyerCategory selection)
     var selectedCategories: [FlyerCategory] {
-        selectedPreferences.flatMap { $0.mappedCategories }
+        Array(selectedFlyerCategories)
+    }
+
+    /// Pre-select categories based on user role
+    func applyRoleRecommendations() {
+        guard let role = selectedUserRole else { return }
+        for category in role.recommendedCategories {
+            selectedFlyerCategories.insert(category)
+        }
     }
 
     // MARK: - Language Preferences
@@ -265,7 +324,50 @@ class OnboardingViewModel: ObservableObject {
 
     /// Check if sample showcase should be shown (only if preferences were selected)
     var shouldShowSampleShowcase: Bool {
-        !selectedPreferences.isEmpty
+        !selectedFlyerCategories.isEmpty
+    }
+
+    /// Check if any style preferences were set
+    var hasStylePreferences: Bool {
+        selectedVisualStyle != nil || selectedMood != nil || selectedColorScheme != nil
+    }
+
+    /// Personalized sample filtering using ALL preferences
+    var personalizedSamples: [SampleFlyer] {
+        let candidates = SampleLibrary.samples
+
+        let scored = candidates.map { sample -> (SampleFlyer, Int) in
+            var score = 0
+
+            // Language match (highest priority)
+            if selectedLanguages.contains(sample.language) { score += 100 }
+
+            // Category match
+            if selectedFlyerCategories.contains(sample.category) { score += 75 }
+
+            // Visual style match
+            if let style = selectedVisualStyle, sample.visuals.style == style {
+                score += 40
+            }
+
+            // Mood match
+            if let mood = selectedMood, sample.visuals.mood == mood {
+                score += 30
+            }
+
+            // Color scheme match
+            if let scheme = selectedColorScheme, sample.colors.preset == scheme {
+                score += 20
+            }
+
+            return (sample, score)
+        }
+
+        return scored
+            .filter { $0.1 > 0 }
+            .sorted { $0.1 > $1.1 }
+            .prefix(6)
+            .map { $0.0 }
     }
 
     /// Get samples filtered by selected categories AND languages with smart fallbacks
@@ -318,17 +420,14 @@ class OnboardingViewModel: ObservableObject {
 
         var nextScreen = OnboardingScreen(rawValue: currentScreen.rawValue + 1)
 
-        // Skip language preferences, loading, AND sample showcase if no categories selected
-        if nextScreen == .languagePreferences && !shouldShowSampleShowcase {
-            nextScreen = .aiGeneration
+        // Apply role recommendations when leaving userRole screen
+        if currentScreen == .userRole {
+            applyRoleRecommendations()
         }
-        // Skip loading and sample showcase if no categories selected
-        else if nextScreen == .sampleLoading && !shouldShowSampleShowcase {
-            nextScreen = .aiGeneration
-        }
-        // Skip sample showcase if no categories selected (in case we're coming from loading)
-        else if nextScreen == .sampleShowcase && !shouldShowSampleShowcase {
-            nextScreen = .aiGeneration
+
+        // Skip personalizedSamples if no categories selected
+        if nextScreen == .personalizedSamples && !shouldShowSampleShowcase {
+            nextScreen = .readyToCreate
         }
 
         if let nextIndex = nextScreen {
@@ -345,7 +444,14 @@ class OnboardingViewModel: ObservableObject {
     func goToPreviousScreen() {
         guard !isTransitioning, canGoBack else { return }
 
-        if let prevIndex = OnboardingScreen(rawValue: currentScreen.rawValue - 1) {
+        var prevScreen = OnboardingScreen(rawValue: currentScreen.rawValue - 1)
+
+        // Skip personalizedSamples when going back if no categories selected
+        if prevScreen == .personalizedSamples && !shouldShowSampleShowcase {
+            prevScreen = .buildingExperience
+        }
+
+        if let prevIndex = prevScreen {
             isTransitioning = true
             withAnimation(FGAnimations.slowEase) {
                 currentScreen = prevIndex
@@ -354,6 +460,11 @@ class OnboardingViewModel: ObservableObject {
                 self.isTransitioning = false
             }
         }
+    }
+
+    func skipCurrentScreen() {
+        // Just advance to next screen without setting values
+        goToNextScreen()
     }
 
     func skip() {
@@ -394,11 +505,11 @@ class OnboardingViewModel: ObservableObject {
         withAnimation(FGAnimations.spring) {
             switch demoStep {
             case .category:
-                selectedCategory = .event
+                selectedMockCategory = .event
                 demoStep = .style
 
             case .style:
-                selectedStyle = .modern
+                selectedMockStyle = .modern
                 demoStep = .textDetails
 
             case .textDetails:
@@ -416,10 +527,17 @@ class OnboardingViewModel: ObservableObject {
                 demoStep = .colors
 
             case .colors:
-                selectedColorTheme = .vibrant
+                selectedMockColorTheme = .vibrant
+                demoStep = .aiAnalysis
+                // Stop regular timer and use custom delay for AI step
+                stopAutoDemo()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
+                    self?.advanceToNextStep()
+                }
+
+            case .aiAnalysis:
                 demoStep = .ready
                 showContinueButton = true
-                stopAutoDemo()
 
             case .ready:
                 break
@@ -430,9 +548,9 @@ class OnboardingViewModel: ObservableObject {
     // MARK: - Reset
 
     func resetDemo() {
-        selectedCategory = nil
-        selectedStyle = nil
-        selectedColorTheme = nil
+        selectedMockCategory = nil
+        selectedMockStyle = nil
+        selectedMockColorTheme = nil
         mockHeadline = ""
         mockDate = ""
         mockLocation = ""

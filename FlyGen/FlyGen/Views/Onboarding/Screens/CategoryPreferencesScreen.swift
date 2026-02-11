@@ -1,21 +1,19 @@
 import SwiftUI
 
-/// Screen 3: Category preferences selection
+/// Screen 4: Category preferences selection - shows all 15 FlyerCategory values
 struct CategoryPreferencesScreen: View {
     @ObservedObject var viewModel: OnboardingViewModel
     @State private var animateContent = false
 
     private let columns = [
-        GridItem(.flexible(), spacing: FGSpacing.md),
-        GridItem(.flexible(), spacing: FGSpacing.md)
+        GridItem(.flexible(), spacing: FGSpacing.sm),
+        GridItem(.flexible(), spacing: FGSpacing.sm),
+        GridItem(.flexible(), spacing: FGSpacing.sm)
     ]
 
     var body: some View {
         VStack(spacing: 0) {
-            Spacer()
-                .frame(height: FGSpacing.xl)
-
-            // Header
+            // Header (fixed)
             VStack(spacing: FGSpacing.sm) {
                 Text("What do you create?")
                     .font(FGTypography.displaySmall)
@@ -30,36 +28,45 @@ struct CategoryPreferencesScreen: View {
                     .opacity(animateContent ? 1 : 0)
                     .offset(y: animateContent ? 0 : 20)
             }
+            .padding(.top, FGSpacing.lg)
+            .padding(.bottom, FGSpacing.md)
 
-            Spacer()
-                .frame(height: FGSpacing.xl)
-
-            // Preference grid (2 columns, 6 items)
-            LazyVGrid(columns: columns, spacing: FGSpacing.md) {
-                ForEach(UserPreferenceType.allCases) { preference in
-                    PreferenceChip(
-                        preference: preference,
-                        isSelected: viewModel.selectedPreferences.contains(preference)
-                    ) {
-                        withAnimation(FGAnimations.spring) {
-                            viewModel.togglePreference(preference)
+            // Scrollable category grid
+            ScrollView(showsIndicators: false) {
+                LazyVGrid(columns: columns, spacing: FGSpacing.sm) {
+                    ForEach(FlyerCategory.allCases) { category in
+                        FlyerCategoryChip(
+                            category: category,
+                            isSelected: viewModel.selectedFlyerCategories.contains(category),
+                            isRecommended: isRecommended(category)
+                        ) {
+                            withAnimation(FGAnimations.spring) {
+                                viewModel.toggleFlyerCategory(category)
+                            }
+                            let impact = UIImpactFeedbackGenerator(style: .light)
+                            impact.impactOccurred()
                         }
+                        .opacity(animateContent ? 1 : 0)
+                        .scaleEffect(animateContent ? 1 : 0.9)
                     }
-                    .opacity(animateContent ? 1 : 0)
-                    .scaleEffect(animateContent ? 1 : 0.8)
                 }
+                .padding(.horizontal, FGSpacing.screenHorizontal)
+                .padding(.bottom, FGSpacing.lg)
             }
-            .padding(.horizontal, FGSpacing.screenHorizontal)
-
-            Spacer()
 
             // Selection count hint
-            if !viewModel.selectedPreferences.isEmpty {
-                Text("\(viewModel.selectedPreferences.count) selected")
-                    .font(FGTypography.caption)
-                    .foregroundColor(FGColors.accentSecondary)
-                    .padding(.bottom, FGSpacing.md)
-                    .transition(.opacity)
+            if !viewModel.selectedFlyerCategories.isEmpty {
+                HStack(spacing: FGSpacing.xs) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 14))
+                        .foregroundColor(FGColors.accentPrimary)
+
+                    Text("\(viewModel.selectedFlyerCategories.count) selected")
+                        .font(FGTypography.caption)
+                        .foregroundColor(FGColors.accentSecondary)
+                }
+                .padding(.bottom, FGSpacing.md)
+                .transition(.opacity)
             }
         }
         .onAppear {
@@ -68,31 +75,49 @@ struct CategoryPreferencesScreen: View {
             }
         }
     }
+
+    /// Check if a category is recommended based on user role
+    private func isRecommended(_ category: FlyerCategory) -> Bool {
+        guard let role = viewModel.selectedUserRole else { return false }
+        return role.recommendedCategories.contains(category)
+    }
 }
 
-// MARK: - Preference Chip
+// MARK: - Category Chip
 
-private struct PreferenceChip: View {
-    let preference: UserPreferenceType
+private struct FlyerCategoryChip: View {
+    let category: FlyerCategory
     let isSelected: Bool
+    let isRecommended: Bool
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: FGSpacing.sm) {
-                Image(systemName: preference.icon)
-                    .font(.system(size: 28))
-                    .foregroundColor(isSelected ? FGColors.textOnAccent : FGColors.accentSecondary)
+            VStack(spacing: FGSpacing.xs) {
+                // Icon with recommended badge
+                ZStack(alignment: .topTrailing) {
+                    Image(systemName: category.icon)
+                        .font(.system(size: 24))
+                        .foregroundColor(isSelected ? FGColors.textOnAccent : FGColors.accentPrimary)
 
-                Text(preference.displayName)
-                    .font(FGTypography.labelLarge)
+                    // Recommended indicator
+                    if isRecommended && !isSelected {
+                        Circle()
+                            .fill(FGColors.accentSecondary)
+                            .frame(width: 8, height: 8)
+                            .offset(x: 4, y: -4)
+                    }
+                }
+
+                Text(category.displayName)
+                    .font(FGTypography.caption)
                     .foregroundColor(isSelected ? FGColors.textOnAccent : FGColors.textPrimary)
                     .lineLimit(2)
                     .multilineTextAlignment(.center)
                     .minimumScaleFactor(0.8)
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 100)
+            .frame(height: 85)
             .background(
                 RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
                     .fill(isSelected ? FGColors.accentPrimary : FGColors.surfaceDefault)
@@ -100,7 +125,8 @@ private struct PreferenceChip: View {
             .overlay(
                 RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
                     .stroke(
-                        isSelected ? FGColors.accentPrimary : FGColors.borderSubtle,
+                        isSelected ? FGColors.accentPrimary :
+                            (isRecommended ? FGColors.accentSecondary.opacity(0.5) : FGColors.borderSubtle),
                         lineWidth: isSelected ? 2 : 1
                     )
             )

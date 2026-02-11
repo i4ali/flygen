@@ -40,6 +40,13 @@ struct WelcomeScreen: View {
 
             // Text content
             VStack(spacing: FGSpacing.md) {
+                // Time-based greeting
+                Text(timeBasedGreeting)
+                    .font(FGTypography.h3)
+                    .foregroundColor(FGColors.accentPrimary)
+                    .opacity(animateContent ? 1 : 0)
+                    .offset(y: animateContent ? 0 : 20)
+
                 Text("Welcome to FlyGen")
                     .font(FGTypography.displayMedium)
                     .foregroundColor(FGColors.textPrimary)
@@ -62,6 +69,20 @@ struct WelcomeScreen: View {
             withAnimation(FGAnimations.spring.delay(0.2)) {
                 animateContent = true
             }
+        }
+    }
+
+    // MARK: - Time-based Greeting
+
+    private var timeBasedGreeting: String {
+        let hour = Calendar.current.component(.hour, from: Date())
+        switch hour {
+        case 5..<12:
+            return "Good morning"
+        case 12..<17:
+            return "Good afternoon"
+        default:
+            return "Good evening"
         }
     }
 }

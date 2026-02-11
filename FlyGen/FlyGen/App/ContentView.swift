@@ -43,10 +43,23 @@ struct ContentView: View {
             } else if hasCompletedOnboarding {
                 MainTabView(viewModel: viewModel, showingSettings: $showingSettings)
             } else {
-                OnboardingContainerView { selectedCategories in
-                    // Save selected categories to user profile
+                OnboardingContainerView { selectedCategories, viewModel in
+                    // Save all preferences to user profile
                     if let profile = userProfiles.first {
+                        // Categories
                         profile.setPreferredCategories(selectedCategories)
+
+                        // User role
+                        profile.setUserRole(viewModel.selectedUserRole)
+
+                        // Visual preferences
+                        profile.setPreferredVisualStyle(viewModel.selectedVisualStyle)
+                        profile.setPreferredMood(viewModel.selectedMood)
+                        profile.setPreferredColorScheme(viewModel.selectedColorScheme)
+
+                        // Languages
+                        profile.setPreferredLanguages(Array(viewModel.selectedLanguages))
+
                         try? modelContext.save()
 
                         // Sync to CloudKit

@@ -259,9 +259,26 @@ struct PromptBuilder {
             }
         }
 
-        // Body text - chunk long text for better accuracy
+        // Body text - handle bullet lists specially to keep items atomic
         if let bodyText = text.bodyText, !bodyText.isEmpty {
-            if bodyText.split(separator: " ").count > 10 {
+            // Check if this is a bullet list (contains • or lines starting with -)
+            let lines = bodyText.components(separatedBy: .newlines).filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+            let isBulletList = lines.contains { line in
+                let trimmed = line.trimmingCharacters(in: .whitespaces)
+                return trimmed.hasPrefix("•") || trimmed.hasPrefix("-") || trimmed.hasPrefix("*")
+            }
+
+            if isBulletList {
+                // Process each line as an atomic unit - wrap in brackets to prevent splitting
+                parts.append("Body content list - IMPORTANT: Each list item is ONE unit, do NOT split items across columns:")
+                for line in lines {
+                    let trimmed = line.trimmingCharacters(in: .whitespaces)
+                    if trimmed.isEmpty { continue }
+                    let spelled = spellOut(trimmed)
+                    // Wrap in brackets to indicate atomic unit
+                    parts.append("  List item [KEEP TOGETHER]: \"\(trimmed)\" (SPELLING: \(spelled)).")
+                }
+            } else if bodyText.split(separator: " ").count > 10 {
                 parts.append("Body content (display across multiple lines/sections):")
                 for chunk in chunkText(bodyText, maxWords: 8) {
                     let spelled = spellOut(chunk)

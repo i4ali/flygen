@@ -45,8 +45,6 @@ Test cases in `test_flyer.py` must only use fields defined in `CATEGORY_TEXT_FIE
 **Quick reference (common categories):**
 - EVENT: `headline`, `subheadline`, `date`, `venue_name`, `address`, `cta_text`, `website`
 - SALE_PROMO: `headline`, `subheadline`, `discount_text`, `date`, `address`, `cta_text`, `fine_print`, `website`
-- REAL_ESTATE: `headline`, `price`, `address`, `body_text`, `phone`, `email`, `website`
-- ANNOUNCEMENT: `headline`, `subheadline`, `body_text`, `date`, `cta_text`
 
 **Quick validation:** For each test case, its `TextContent` fields must be a subset of `CATEGORY_TEXT_FIELDS[category]`.
 
@@ -92,3 +90,33 @@ Use **iPhone 17 Pro** simulator for building and testing.
 ```bash
 sips -z 2778 1284 "input.png" --out "output.png"
 ```
+
+### Adding Files to Xcode Project Programmatically
+
+When adding new resource files (like Lottie animations, images, etc.) to the iOS project, you must edit `FlyGen.xcodeproj/project.pbxproj` in **4 places**:
+
+1. **PBXBuildFile section** - Add build file entry:
+   ```
+   AAONBAIANALYS01 /* filename.json in Resources */ = {isa = PBXBuildFile; fileRef = BBONBAIANALYS01 /* filename.json */; };
+   ```
+
+2. **PBXFileReference section** - Add file reference:
+   ```
+   BBONBAIANALYS01 /* filename.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "filename.json"; sourceTree = "<group>"; };
+   ```
+
+3. **PBXGroup section** - Add to the appropriate group (e.g., Animations):
+   ```
+   BBONBAIANALYS01 /* filename.json */,
+   ```
+
+4. **PBXResourcesBuildPhase section** - Add to Resources build phase:
+   ```
+   AAONBAIANALYS01 /* filename.json in Resources */,
+   ```
+
+**Tips:**
+- Use unique IDs (e.g., `AAONBAIANALYS01` for build file, `BBONBAIANALYS01` for file reference)
+- Search for similar existing files to find the exact insertion points
+- Use `grep -n "existing-file.json" project.pbxproj` to find all 4 locations
+- `lastKnownFileType` values: `text.json` for JSON, `image.png` for PNG, `sourcecode.swift` for Swift
