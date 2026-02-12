@@ -50,7 +50,7 @@ struct DynamicTextField: View {
                     .font(FGTypography.body)
                     .foregroundColor(FGColors.textPrimary)
                     .scrollContentBackground(.hidden)
-                    .frame(minHeight: 100)
+                    .frame(minHeight: field == .bodyText ? 140 : 100)
                     .padding(FGSpacing.sm)
                     .background(FGColors.surfaceDefault)
                     .clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))

@@ -127,8 +127,8 @@ class OnboardingViewModel: ObservableObject {
         }
 
         var stepNumber: Int {
-            // AI Analysis and Ready don't show step numbers
-            if self == .aiAnalysis || self == .ready {
+            // Ready doesn't show step number
+            if self == .ready {
                 return 0
             }
             return rawValue + 1

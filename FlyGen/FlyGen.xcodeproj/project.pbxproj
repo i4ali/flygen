@@ -32,6 +32,7 @@
 		64C32D608A4EFC6C72A370D6 /* VisualStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68824529B837896DBABCE0F2 /* VisualStyle.swift */; };
 		6576A29683D25BA73B38F93B /* RefinementSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB654DCA88FF679FBEFB358 /* RefinementSheet.swift */; };
 		66727D08C7345522F2AE16F8 /* DynamicTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12BBCEF15B2AF34A5A490D50 /* DynamicTextField.swift */; };
+		AADOCPICKVIEW01 /* DocumentPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBDOCPICKVIEW01 /* DocumentPickerView.swift */; };
 		6C12C05D86292A4CD215C4C6 /* FlyerProject.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDBC65359BBD8F17309A355E /* FlyerProject.swift */; };
 		7657D1662281381A3D0FF455 /* SampleShowcaseScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59D15DB4DE5A14E48E823DB9 /* SampleShowcaseScreen.swift */; };
 		7AA28B261F949897D5FC2C5E /* FlyerTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCFDACA03D378A28BF9670D9 /* FlyerTemplate.swift */; };
@@ -133,6 +134,7 @@
 		0D3E46940C3FF0B96D5406A0 /* FlyGenProducts.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = FlyGenProducts.storekit; sourceTree = "<group>"; };
 		10FCE45EBD805D38DC2CB792 /* TemplatePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplatePreviewView.swift; sourceTree = "<group>"; };
 		12BBCEF15B2AF34A5A490D50 /* DynamicTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicTextField.swift; sourceTree = "<group>"; };
+		BBDOCPICKVIEW01 /* DocumentPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPickerView.swift; sourceTree = "<group>"; };
 		1391F54EAEC68ADFEF21B253 /* CategoryPreferencesScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CategoryPreferencesScreen.swift; sourceTree = "<group>"; };
 		181849BBD35235AF52FED857 /* FlyGen.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlyGen.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		184D25D42BAC7CE7B252BF86 /* iCloudRequiredView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iCloudRequiredView.swift; sourceTree = "<group>"; };
@@ -439,6 +441,7 @@
 			children = (
 				8BD5EFEA2EE8CF7C00D38B1B /* ScheduleEntriesField.swift */,
 				12BBCEF15B2AF34A5A490D50 /* DynamicTextField.swift */,
+				BBDOCPICKVIEW01 /* DocumentPickerView.swift */,
 				BBEXPANDEDTEXT001 /* ExpandedTextEditorSheet.swift */,
 				BB00000000000008 /* FGButtons.swift */,
 				BB00000000000006 /* FGTooltip.swift */,
@@ -703,6 +706,7 @@
 				CFBB57982774AF66F39B14FB /* ContentView.swift in Sources */,
 				C3BBCCD7150492B2AC6789A0 /* CreationFlowView.swift in Sources */,
 				66727D08C7345522F2AE16F8 /* DynamicTextField.swift in Sources */,
+				AADOCPICKVIEW01 /* DocumentPickerView.swift in Sources */,
 				AAEXPANDEDTEXT001 /* ExpandedTextEditorSheet.swift in Sources */,
 				AASMARTSUG00001 /* SmartSuggestion.swift in Sources */,
 				AASMARTEXTRA001 /* SmartExtrasStepView.swift in Sources */,

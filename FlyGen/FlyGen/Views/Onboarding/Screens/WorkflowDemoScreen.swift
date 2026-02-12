@@ -98,7 +98,7 @@ struct WorkflowDemoScreen: View {
             // Step title with step number
             VStack(spacing: FGSpacing.xxs) {
                 if viewModel.demoStep != .ready {
-                    Text("Step \(viewModel.demoStep.stepNumber) of 6")
+                    Text("Step \(viewModel.demoStep.stepNumber) of 7")
                         .font(FGTypography.caption)
                         .foregroundColor(FGColors.textSecondary)
                 }
