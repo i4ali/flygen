@@ -78,4 +78,16 @@ enum FlyerCategory: String, CaseIterable, Codable, Identifiable {
         case .churchReligious: return "⛪"
         }
     }
+
+    /// Categories that typically feature people (performers, instructors, birthday subjects, etc.)
+    /// For these categories, AI will analyze content to determine how many photo upload slots to show
+    var isPeopleBased: Bool {
+        switch self {
+        case .musicConcert, .classWorkshop, .partyCelebration,
+             .fitnessWellness, .event:
+            return true
+        default:
+            return false
+        }
+    }
 }

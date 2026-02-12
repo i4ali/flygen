@@ -74,7 +74,9 @@ actor SmartSuggestionsService {
               "icon": "SF Symbol name",
               "detectedItems": ["item1", "item2", "item3", "item4", "item5"] (MUST include EVERY item from body text),
               "allowsUpload": true,
-              "allowsAIGeneration": true or false
+              "allowsAIGeneration": true or false,
+              "allowsMultiplePhotos": true or false,
+              "photoCount": 1
             }
           ],
           "elementSuggestions": ["element1", "element2", "element3", "element4", "element5", "element6"]
@@ -91,6 +93,20 @@ actor SmartSuggestionsService {
           - Be culturally aware (Islamic events, Hindu festivals, Christian holidays, etc.)
           - Match the mood (festive, somber, urgent, elegant, etc.)
 
+        CRITICAL FOR PEOPLE-BASED CATEGORIES (concerts, classes, parties, fitness, events with performers):
+        - Set allowsMultiplePhotos: true for photo suggestions featuring people
+        - Analyze the flyer content (headline, body text) to count people mentioned
+        - Set photoCount to match the exact number of people/performers detected
+        - Default to photoCount: 1 if unclear
+        - No hard maximum - if 10 people mentioned, return photoCount: 10
+        - Examples:
+          - "DJ Night with Mike" → photoCount: 1
+          - "Live Music by The Duo" → photoCount: 2
+          - "Yoga with Sarah, Mike & Lisa" → photoCount: 3
+          - "The Full Band: John, Paul, George, Ringo" → photoCount: 4
+          - "Birthday party for the twins" → photoCount: 2
+          - "10-piece orchestra" → photoCount: 10
+
         CRITICAL FOR FOOD/RESTAURANT FLYERS:
         - You MUST include EVERY dish name found in the body text in detectedItems
         - NEVER stop at 3 items - include ALL items found
@@ -98,6 +114,13 @@ actor SmartSuggestionsService {
         - If body text has 4 items, return exactly 4 items in detectedItems
         - If body text has 10 items, return exactly 10 items in detectedItems
         - Count the items in the input and verify your output has the same count
+        - Set allowsMultiplePhotos: true for food/restaurant categories
+        - Set photoCount to match the exact number of dishes detected in detectedItems
+        - Example: If body text has "Margherita Pizza, Caesar Salad, Chicken Parmesan"
+          → detectedItems: ["Margherita Pizza", "Caesar Salad", "Chicken Parmesan"]
+          → allowsMultiplePhotos: true
+          → photoCount: 3
+        - User can upload real photos of their dishes
 
         Return ONLY the JSON object, no other text.
         """
@@ -189,6 +212,8 @@ actor SmartSuggestionsService {
                     let detectedItems = photoDict["detectedItems"] as? [String]
                     let allowsUpload = photoDict["allowsUpload"] as? Bool ?? true
                     let allowsAIGeneration = photoDict["allowsAIGeneration"] as? Bool ?? false
+                    let allowsMultiplePhotos = photoDict["allowsMultiplePhotos"] as? Bool ?? false
+                    let photoCount = photoDict["photoCount"] as? Int ?? 1
 
                     let suggestion = PhotoSuggestion(
                         title: title,
@@ -196,7 +221,9 @@ actor SmartSuggestionsService {
                         icon: icon,
                         detectedItems: detectedItems,
                         allowsUpload: allowsUpload,
-                        allowsAIGeneration: allowsAIGeneration
+                        allowsAIGeneration: allowsAIGeneration,
+                        allowsMultiplePhotos: allowsMultiplePhotos,
+                        photoCount: max(1, photoCount)  // Ensure at least 1
                     )
                     photoSuggestions.append(suggestion)
                 }

@@ -467,7 +467,7 @@ class FlyerCreationViewModel: ObservableObject {
                 prompt: refinedPrompt,
                 aspectRatio: project?.output.aspectRatio ?? .portrait,
                 logoImageData: nil,  // Don't send logo to API - composited after
-                userPhotoData: project?.userPhotoData,
+                userPhotosData: project?.userPhotosData ?? [],
                 previousFlyerData: previousFlyerData
             )
 
@@ -547,7 +547,7 @@ class FlyerCreationViewModel: ObservableObject {
                 prompt: noTextPrompt,
                 aspectRatio: project?.output.aspectRatio ?? .portrait,
                 logoImageData: nil,  // Don't send logo to API - composited after
-                userPhotoData: project?.userPhotoData,
+                userPhotosData: project?.userPhotosData ?? [],
                 previousFlyerData: previousFlyerData
             )
 
@@ -622,7 +622,7 @@ class FlyerCreationViewModel: ObservableObject {
                 prompt: lastPrompt,
                 aspectRatio: newRatio,
                 logoImageData: nil,  // Don't send logo to API - composited after
-                userPhotoData: project?.userPhotoData
+                userPhotosData: project?.userPhotosData ?? []
             )
 
             project?.output.aspectRatio = newRatio
@@ -714,13 +714,13 @@ class FlyerCreationViewModel: ObservableObject {
         project?.logoImageData = nil
     }
 
-    /// Load user photo from PhotosPickerItem
+    /// Load user photo from PhotosPickerItem (appends to existing photos)
     func loadUserPhoto() async {
         guard let item = selectedUserPhotoItem else { return }
 
         do {
             if let data = try await item.loadTransferable(type: Data.self) {
-                project?.userPhotoData = data
+                project?.userPhotosData.append(data)
                 // Clear imagery description since modes are mutually exclusive
                 project?.imageryDescription = nil
             }
@@ -729,10 +729,10 @@ class FlyerCreationViewModel: ObservableObject {
         }
     }
 
-    /// Clear the selected user photo
+    /// Clear all user photos
     func clearUserPhoto() {
         selectedUserPhotoItem = nil
-        project?.userPhotoData = nil
+        project?.userPhotosData.removeAll()
     }
 
     /// Set imagery description and clear photo (mutually exclusive)

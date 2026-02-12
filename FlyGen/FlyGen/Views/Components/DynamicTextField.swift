@@ -32,6 +32,19 @@ struct DynamicTextField: View {
                         .foregroundColor(FGColors.textTertiary)
                 }
 
+                // Clear button for multiline fields (in header)
+                if field.isMultiline && !text.isEmpty {
+                    Button {
+                        withAnimation(FGAnimations.quickEaseOut) {
+                            text = ""
+                        }
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 16))
+                            .foregroundColor(FGColors.textTertiary)
+                    }
+                }
+
                 // Expand button for multiline fields
                 if field.isMultiline {
                     Button {
@@ -63,24 +76,39 @@ struct DynamicTextField: View {
                     )
                     .focused(isFocused, equals: field)
             } else {
-                TextField(field.placeholder, text: $text)
-                    .font(FGTypography.body)
-                    .foregroundColor(FGColors.textPrimary)
-                    .textFieldStyle(.plain)
-                    .padding(FGSpacing.sm)
-                    .background(FGColors.surfaceDefault)
-                    .clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: FGSpacing.inputRadius)
-                            .stroke(
-                                isFocused.wrappedValue == field ? FGColors.accentPrimary : FGColors.borderSubtle,
-                                lineWidth: isFocused.wrappedValue == field ? 2 : 1
-                            )
-                    )
-                    .focused(isFocused, equals: field)
-                    .keyboardType(keyboardType)
-                    .textContentType(contentType)
-                    .textInputAutocapitalization(autocapitalization)
+                HStack(spacing: FGSpacing.xs) {
+                    TextField(field.placeholder, text: $text)
+                        .font(FGTypography.body)
+                        .foregroundColor(FGColors.textPrimary)
+                        .textFieldStyle(.plain)
+                        .focused(isFocused, equals: field)
+                        .keyboardType(keyboardType)
+                        .textContentType(contentType)
+                        .textInputAutocapitalization(autocapitalization)
+
+                    // Clear button
+                    if !text.isEmpty {
+                        Button {
+                            withAnimation(FGAnimations.quickEaseOut) {
+                                text = ""
+                            }
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 18))
+                                .foregroundColor(FGColors.textTertiary)
+                        }
+                    }
+                }
+                .padding(FGSpacing.sm)
+                .background(FGColors.surfaceDefault)
+                .clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
+                .overlay(
+                    RoundedRectangle(cornerRadius: FGSpacing.inputRadius)
+                        .stroke(
+                            isFocused.wrappedValue == field ? FGColors.accentPrimary : FGColors.borderSubtle,
+                            lineWidth: isFocused.wrappedValue == field ? 2 : 1
+                        )
+                )
             }
 
         }

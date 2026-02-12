@@ -9,7 +9,7 @@ class DraftStorageService {
     private let draftKey = "activeDraft"
     private let draftImagesFolderName = "draft-images"
     private let logoFileName = "logo.dat"
-    private let userPhotoFileName = "userPhoto.dat"
+    private let userPhotosPrefix = "userPhoto_"  // Photos saved as userPhoto_0.dat, userPhoto_1.dat, etc.
 
     // MARK: - Data Model
 
@@ -51,11 +51,11 @@ class DraftStorageService {
         // Create a copy of the project without large image data
         var projectForStorage = project
         let logoData = project.logoImageData
-        let userPhotoData = project.userPhotoData
+        let userPhotosData = project.userPhotosData
 
         // Strip images from the project (will store separately)
         projectForStorage.logoImageData = nil
-        projectForStorage.userPhotoData = nil
+        projectForStorage.userPhotosData = []
 
         // Create draft data
         let draftData = DraftData(
@@ -70,9 +70,16 @@ class DraftStorageService {
             let encoded = try JSONEncoder().encode(draftData)
             UserDefaults.standard.set(encoded, forKey: draftKey)
 
-            // Save images to file system
+            // Save logo to file system
             saveImageData(logoData, fileName: logoFileName)
-            saveImageData(userPhotoData, fileName: userPhotoFileName)
+
+            // Clear old user photos and save new ones
+            clearUserPhotos()
+            for (index, photoData) in userPhotosData.enumerated() {
+                saveImageData(photoData, fileName: "\(userPhotosPrefix)\(index).dat")
+            }
+            // Save count for loading
+            UserDefaults.standard.set(userPhotosData.count, forKey: "userPhotosCount")
 
         } catch {
             print("Failed to save draft: \(error)")
@@ -90,7 +97,16 @@ class DraftStorageService {
         // Restore project with images
         var project = draftData.project
         project.logoImageData = loadImageData(fileName: logoFileName)
-        project.userPhotoData = loadImageData(fileName: userPhotoFileName)
+
+        // Load user photos array
+        let photosCount = UserDefaults.standard.integer(forKey: "userPhotosCount")
+        var userPhotos: [Data] = []
+        for index in 0..<photosCount {
+            if let photoData = loadImageData(fileName: "\(userPhotosPrefix)\(index).dat") {
+                userPhotos.append(photoData)
+            }
+        }
+        project.userPhotosData = userPhotos
 
         // Get the step (default to textContent if invalid)
         let step = CreationStep(rawValue: draftData.currentStepRawValue) ?? .textContent
@@ -104,7 +120,16 @@ class DraftStorageService {
 
         // Clean up image files
         deleteImageData(fileName: logoFileName)
-        deleteImageData(fileName: userPhotoFileName)
+        clearUserPhotos()
+        UserDefaults.standard.removeObject(forKey: "userPhotosCount")
+    }
+
+    /// Clear all user photo files
+    private func clearUserPhotos() {
+        let count = UserDefaults.standard.integer(forKey: "userPhotosCount")
+        for index in 0..<max(count, 20) {  // Clear up to 20 to be safe
+            deleteImageData(fileName: "\(userPhotosPrefix)\(index).dat")
+        }
     }
 
     // MARK: - Private Helpers

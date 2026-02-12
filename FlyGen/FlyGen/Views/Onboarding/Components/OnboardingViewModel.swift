@@ -400,6 +400,15 @@ class OnboardingViewModel: ObservableObject {
         var seen = Set<String>()
         result = result.filter { seen.insert($0.id).inserted }
 
+        // Priority 4: If still no results, show a variety of samples to showcase capabilities
+        if result.isEmpty {
+            // Return a diverse set of English samples
+            result = SampleLibrary.samples
+                .filter { $0.language == .english }
+                .prefix(6)
+                .map { $0 }
+        }
+
         return Array(result.prefix(6))
     }
 

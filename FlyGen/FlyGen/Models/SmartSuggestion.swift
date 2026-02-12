@@ -11,9 +11,16 @@ struct PhotoSuggestion: Identifiable, Equatable, Codable {
     let detectedItems: [String]?
     let allowsUpload: Bool
     let allowsAIGeneration: Bool
+    let allowsMultiplePhotos: Bool
+    let photoCount: Int
     var isEnabled: Bool
-    var uploadedPhotoData: Data?
+    var uploadedPhotosData: [Data]
     var aiGenerationPrompt: String?
+
+    /// Backward compatibility: returns the first uploaded photo
+    var uploadedPhotoData: Data? {
+        uploadedPhotosData.first
+    }
 
     init(
         id: UUID = UUID(),
@@ -23,8 +30,10 @@ struct PhotoSuggestion: Identifiable, Equatable, Codable {
         detectedItems: [String]? = nil,
         allowsUpload: Bool = true,
         allowsAIGeneration: Bool = false,
+        allowsMultiplePhotos: Bool = false,
+        photoCount: Int = 1,
         isEnabled: Bool = false,
-        uploadedPhotoData: Data? = nil,
+        uploadedPhotosData: [Data] = [],
         aiGenerationPrompt: String? = nil
     ) {
         self.id = id
@@ -34,8 +43,10 @@ struct PhotoSuggestion: Identifiable, Equatable, Codable {
         self.detectedItems = detectedItems
         self.allowsUpload = allowsUpload
         self.allowsAIGeneration = allowsAIGeneration
+        self.allowsMultiplePhotos = allowsMultiplePhotos
+        self.photoCount = photoCount
         self.isEnabled = isEnabled
-        self.uploadedPhotoData = uploadedPhotoData
+        self.uploadedPhotosData = uploadedPhotosData
         self.aiGenerationPrompt = aiGenerationPrompt
     }
 }
@@ -93,9 +104,16 @@ struct SmartExtrasState: Codable, Equatable {
         elementSuggestions.filter { $0.isEnabled }.map { $0.element }
     }
 
-    /// Returns the first uploaded photo data if any
+    /// Returns the first uploaded photo data if any (backward compatibility)
     var firstUploadedPhotoData: Data? {
-        photoSuggestions.first { $0.isEnabled && $0.uploadedPhotoData != nil }?.uploadedPhotoData
+        photoSuggestions.first { $0.isEnabled && !$0.uploadedPhotosData.isEmpty }?.uploadedPhotosData.first
+    }
+
+    /// Returns all uploaded photo data from enabled suggestions
+    var allUploadedPhotosData: [Data] {
+        photoSuggestions
+            .filter { $0.isEnabled }
+            .flatMap { $0.uploadedPhotosData }
     }
 
     /// Returns the first AI generation prompt if any
@@ -121,6 +139,8 @@ struct PhotoSuggestionResponse: Codable {
     let detectedItems: [String]?
     let allowsUpload: Bool
     let allowsAIGeneration: Bool
+    let allowsMultiplePhotos: Bool?
+    let photoCount: Int?
 
     /// Convert to PhotoSuggestion model
     func toPhotoSuggestion() -> PhotoSuggestion {
@@ -130,7 +150,9 @@ struct PhotoSuggestionResponse: Codable {
             icon: icon ?? "photo",
             detectedItems: detectedItems,
             allowsUpload: allowsUpload,
-            allowsAIGeneration: allowsAIGeneration
+            allowsAIGeneration: allowsAIGeneration,
+            allowsMultiplePhotos: allowsMultiplePhotos ?? false,
+            photoCount: photoCount ?? 1
         )
     }
 }

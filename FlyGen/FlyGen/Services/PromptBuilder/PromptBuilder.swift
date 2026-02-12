@@ -115,31 +115,72 @@ struct PromptBuilder {
 
         // Note: Logo is no longer mentioned in prompt - it's composited programmatically after generation
 
-        // 13. User photo OR imagery description (mutually exclusive)
-        if project.userPhotoData != nil {
-            sections.append("""
-                CRITICAL USER PHOTO INSTRUCTIONS: A user photo has been provided and MUST be incorporated into the flyer design. \
-                Decide the optimal placement and size for the photo based on the overall composition - it could be a hero image, \
-                a smaller inset, or integrated into the background. \
-                IMPORTANT: Preserve the photo's original structure, subjects, and composition exactly as provided. \
-                You may apply color grading, filters, or artistic effects to match the flyer's style (\(project.visuals.style.displayName)) \
-                and mood (\(project.visuals.mood.displayName)), but do NOT alter, morph, or change the actual content of the photo. \
-                The subjects must remain clearly recognizable and unchanged. \
-                Do NOT crop out important subjects from the photo.
-                """)
+        // 13. User photos OR imagery description (mutually exclusive)
+        if !project.userPhotosData.isEmpty {
+            let photoCount = project.userPhotosData.count
+            if photoCount == 1 {
+                // Single photo instructions
+                sections.append("""
+                    CRITICAL USER PHOTO INSTRUCTIONS: A user photo has been provided and MUST be incorporated into the flyer design. \
+                    Decide the optimal placement and size for the photo based on the overall composition - it could be a hero image, \
+                    a smaller inset, or integrated into the background. \
+                    IMPORTANT: Preserve the photo's original structure, subjects, and composition exactly as provided. \
+                    You may apply color grading, filters, or artistic effects to match the flyer's style (\(project.visuals.style.displayName)) \
+                    and mood (\(project.visuals.mood.displayName)), but do NOT alter, morph, or change the actual content of the photo. \
+                    The subjects must remain clearly recognizable and unchanged. \
+                    Do NOT crop out important subjects from the photo.
+                    """)
+            } else if project.category == .restaurantFood {
+                // Multiple dish photos - enumerate each one explicitly
+                let photoList = (1...photoCount).map { "Photo #\($0)" }.joined(separator: ", ")
+                sections.append("""
+                    CRITICAL MULTIPLE DISH PHOTOS - MUST INCLUDE ALL \(photoCount) PHOTOS: \
+                    You have been provided exactly \(photoCount) dish photos: \(photoList). \
+                    MANDATORY: Every single photo (\(photoList)) MUST appear in the final flyer. Do NOT skip any photo. \
+                    Count the photos in your output - there must be exactly \(photoCount) distinct dish images visible. \
+                    Arrange ALL \(photoCount) dish photos in a grid, collage, or menu-style layout where each dish is clearly visible and separately identifiable. \
+                    Suggested layouts: \(photoCount <= 3 ? "horizontal row or triangle" : photoCount <= 4 ? "2x2 grid" : photoCount <= 6 ? "2x3 grid or 3x2 grid" : "grid layout"). \
+                    All food images MUST maintain photorealistic quality - professional food photography style. \
+                    Apply consistent color grading across all photos to match the flyer's style (\(project.visuals.style.displayName)) \
+                    and mood (\(project.visuals.mood.displayName)). \
+                    Each dish should look delicious, fresh, and ready to eat. \
+                    Do NOT alter, morph, or change the actual content of the photos - preserve the food exactly as photographed. \
+                    FINAL CHECK: Verify all \(photoCount) photos are included before completing.
+                    """)
+            } else {
+                // Multiple people photos
+                sections.append("""
+                    CRITICAL MULTIPLE PHOTOS: \(photoCount) photos have been provided featuring different people. \
+                    Arrange ALL photos attractively within the design - use a grid, collage, or artistic arrangement \
+                    so each person is clearly visible and recognizable. \
+                    Preserve each photo's original content - no morphing or altering faces. \
+                    You may apply consistent color grading, filters, or artistic effects to match the flyer's style (\(project.visuals.style.displayName)) \
+                    and mood (\(project.visuals.mood.displayName)), but do NOT alter the actual subjects in any photo. \
+                    All \(photoCount) people must appear in the final design. \
+                    Do NOT crop out important subjects from any photo.
+                    """)
+            }
         } else if let imageryDesc = project.imageryDescription, !imageryDesc.isEmpty {
             // For food/restaurant category, enforce photorealistic food photography for ALL dishes
             if project.category == .restaurantFood {
+                // Count the dishes mentioned
+                let dishList = imageryDesc.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+                let dishCount = max(dishList.count, 1)
+                let numberedDishes = dishList.enumerated().map { "\($0.offset + 1). \($0.element)" }.joined(separator: ", ")
+
                 sections.append("""
-                    FOOD IMAGERY - CRITICAL REQUIREMENTS: \
-                    You MUST show ALL of these dishes in the flyer: \(imageryDesc). \
-                    IMPORTANT: Every single dish listed must be clearly visible and separately identifiable in the image. \
+                    FOOD IMAGERY - CRITICAL REQUIREMENTS - MUST SHOW ALL \(dishCount) DISHES: \
+                    You MUST show ALL of these dishes in the flyer: \(numberedDishes.isEmpty ? imageryDesc : numberedDishes). \
+                    MANDATORY: Every single dish listed MUST appear - count them: there should be exactly \(dishCount) distinct dishes visible. \
+                    Do NOT skip any dish. Do NOT combine dishes. Each dish must be separately identifiable. \
+                    Suggested layout: \(dishCount <= 3 ? "horizontal row or triangle arrangement" : dishCount <= 4 ? "2x2 grid" : dishCount <= 6 ? "2x3 grid" : "grid layout with all dishes visible"). \
                     All food images MUST be photorealistic - real photographs taken with a professional camera. \
                     NOT illustrations, NOT cartoons, NOT digital art, NOT vector graphics, NOT painted style. \
                     Use consistent photographic style across ALL dishes: professional food photography, \
                     natural lighting, realistic textures, shallow depth of field, appetizing presentation. \
-                    Arrange all dishes attractively within the composition - use a grid, collage, or artistic arrangement \
-                    so each dish is clearly showcased. The food should look delicious, fresh, and ready to eat.
+                    Arrange all \(dishCount) dishes attractively within the composition so each dish is clearly showcased. \
+                    The food should look delicious, fresh, and ready to eat. \
+                    FINAL CHECK: Count the dishes in your output - there must be exactly \(dishCount) dishes: \(imageryDesc).
                     """)
             } else {
                 sections.append("""

@@ -161,16 +161,25 @@ struct SmartExtrasStepView: View {
                             viewModel.project?.smartExtras.photoSuggestions[index].isEnabled = isEnabled
                             syncToLegacyFields()
                         },
-                        onPhotoSelected: { data in
-                            viewModel.project?.smartExtras.photoSuggestions[index].uploadedPhotoData = data
+                        onPhotoAdded: { data in
+                            viewModel.project?.smartExtras.photoSuggestions[index].uploadedPhotosData.append(data)
+                            syncToLegacyFields()
+                        },
+                        onPhotoRemoved: { photoIndex in
+                            if let photoIndex = photoIndex {
+                                // Remove specific photo
+                                viewModel.project?.smartExtras.photoSuggestions[index].uploadedPhotosData.remove(at: photoIndex)
+                            } else {
+                                // Clear all photos
+                                viewModel.project?.smartExtras.photoSuggestions[index].uploadedPhotosData.removeAll()
+                            }
                             syncToLegacyFields()
                         },
                         onAIPromptEntered: { prompt in
                             viewModel.project?.smartExtras.photoSuggestions[index].aiGenerationPrompt = prompt
                             syncToLegacyFields()
                         },
-                        onClearPhoto: {
-                            viewModel.project?.smartExtras.photoSuggestions[index].uploadedPhotoData = nil
+                        onClearAIPrompt: {
                             viewModel.project?.smartExtras.photoSuggestions[index].aiGenerationPrompt = nil
                             syncToLegacyFields()
                         }
@@ -311,17 +320,14 @@ struct SmartExtrasStepView: View {
         // Sync enabled elements to visuals.includeElements
         viewModel.project?.visuals.includeElements = smartExtras.enabledElements
 
-        // Sync first uploaded photo to userPhotoData
-        if let photoData = smartExtras.firstUploadedPhotoData {
-            viewModel.project?.userPhotoData = photoData
-        } else {
-            viewModel.project?.userPhotoData = nil
-        }
+        // Sync all uploaded photos to userPhotosData
+        let allPhotos = smartExtras.allUploadedPhotosData
+        viewModel.project?.userPhotosData = allPhotos
 
-        // Sync first AI prompt to imageryDescription
-        if let aiPrompt = smartExtras.firstAIGenerationPrompt {
+        // Sync first AI prompt to imageryDescription (only if no photos uploaded)
+        if allPhotos.isEmpty, let aiPrompt = smartExtras.firstAIGenerationPrompt {
             viewModel.project?.imageryDescription = aiPrompt
-        } else if viewModel.project?.userPhotoData == nil {
+        } else if allPhotos.isEmpty {
             viewModel.project?.imageryDescription = nil
         }
 
@@ -335,11 +341,20 @@ struct SmartExtrasStepView: View {
 struct PhotoSuggestionCard: View {
     let suggestion: PhotoSuggestion
     let onToggle: (Bool) -> Void
-    let onPhotoSelected: (Data) -> Void
+    let onPhotoAdded: (Data) -> Void
+    let onPhotoRemoved: (Int?) -> Void  // nil means clear all
     let onAIPromptEntered: (String) -> Void
-    let onClearPhoto: () -> Void
+    let onClearAIPrompt: () -> Void
 
     @State private var selectedPhotoItem: PhotosPickerItem?
+
+    private var uploadedCount: Int {
+        suggestion.uploadedPhotosData.count
+    }
+
+    private var hasMultipleSlots: Bool {
+        suggestion.allowsMultiplePhotos && suggestion.photoCount > 1
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: FGSpacing.sm) {
@@ -358,9 +373,22 @@ struct PhotoSuggestionCard: View {
 
                 // Text content
                 VStack(alignment: .leading, spacing: FGSpacing.xxs) {
-                    Text(suggestion.title)
-                        .font(FGTypography.labelLarge)
-                        .foregroundColor(FGColors.textPrimary)
+                    HStack(spacing: FGSpacing.xs) {
+                        Text(suggestion.title)
+                            .font(FGTypography.labelLarge)
+                            .foregroundColor(FGColors.textPrimary)
+
+                        // Show photo count badge for multi-photo suggestions
+                        if hasMultipleSlots && suggestion.isEnabled {
+                            Text("\(uploadedCount)/\(suggestion.photoCount)")
+                                .font(FGTypography.captionSmall)
+                                .foregroundColor(uploadedCount > 0 ? FGColors.statusSuccess : FGColors.textTertiary)
+                                .padding(.horizontal, FGSpacing.xs)
+                                .padding(.vertical, 2)
+                                .background(uploadedCount > 0 ? FGColors.statusSuccess.opacity(0.1) : FGColors.backgroundTertiary)
+                                .clipShape(Capsule())
+                        }
+                    }
 
                     Text(suggestion.description)
                         .font(FGTypography.caption)
@@ -399,14 +427,43 @@ struct PhotoSuggestionCard: View {
             // Expanded action area when enabled
             if suggestion.isEnabled {
                 VStack(spacing: FGSpacing.sm) {
-                    // Uploaded photo preview
-                    if let photoData = suggestion.uploadedPhotoData,
-                       let uiImage = UIImage(data: photoData) {
-                        uploadedPhotoPreview(uiImage)
+                    // Multi-photo grid for people-based categories
+                    if hasMultipleSlots {
+                        // Show AI prompt preview if set
+                        if let aiPrompt = suggestion.aiGenerationPrompt, !aiPrompt.isEmpty {
+                            aiPromptPreview(aiPrompt)
+                        } else {
+                            multiPhotoGrid
+
+                            // Show AI generation option for food categories (allows both upload and AI)
+                            if suggestion.allowsAIGeneration && suggestion.uploadedPhotosData.isEmpty {
+                                Button {
+                                    if let items = suggestion.detectedItems, !items.isEmpty {
+                                        onAIPromptEntered(items.joined(separator: ", "))
+                                    } else {
+                                        onAIPromptEntered(suggestion.title)
+                                    }
+                                } label: {
+                                    HStack {
+                                        Image(systemName: "wand.and.stars")
+                                            .font(.system(size: 14))
+                                        Text("Or generate with AI")
+                                            .font(FGTypography.caption)
+                                    }
+                                    .foregroundColor(FGColors.accentSecondary)
+                                    .padding(.vertical, FGSpacing.xs)
+                                }
+                            }
+                        }
+                    }
+                    // Single photo or AI generation
+                    else if let photoData = suggestion.uploadedPhotosData.first,
+                            let uiImage = UIImage(data: photoData) {
+                        singlePhotoPreview(uiImage)
                     } else if let aiPrompt = suggestion.aiGenerationPrompt, !aiPrompt.isEmpty {
                         aiPromptPreview(aiPrompt)
                     } else {
-                        // Action buttons
+                        // Action buttons for single photo
                         HStack(spacing: FGSpacing.sm) {
                             if suggestion.allowsUpload {
                                 PhotosPicker(
@@ -423,7 +480,6 @@ struct PhotoSuggestionCard: View {
 
                             if suggestion.allowsAIGeneration {
                                 Button {
-                                    // Automatically generate prompt from detected items
                                     if let items = suggestion.detectedItems, !items.isEmpty {
                                         onAIPromptEntered(items.joined(separator: ", "))
                                     } else {
@@ -455,13 +511,121 @@ struct PhotoSuggestionCard: View {
         .onChange(of: selectedPhotoItem) { _, newItem in
             Task {
                 if let data = try? await newItem?.loadTransferable(type: Data.self) {
-                    onPhotoSelected(data)
+                    onPhotoAdded(data)
+                    selectedPhotoItem = nil
                 }
             }
         }
     }
 
-    private func uploadedPhotoPreview(_ image: UIImage) -> some View {
+    // MARK: - Multi-Photo Grid
+
+    private var multiPhotoGrid: some View {
+        VStack(alignment: .leading, spacing: FGSpacing.sm) {
+            // Progress text
+            if uploadedCount > 0 {
+                HStack {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(FGColors.statusSuccess)
+                        .font(.system(size: 14))
+                    Text("\(uploadedCount) of \(suggestion.photoCount) photos added")
+                        .font(FGTypography.caption)
+                        .foregroundColor(FGColors.textSecondary)
+
+                    Spacer()
+
+                    if uploadedCount > 0 {
+                        Button {
+                            onPhotoRemoved(nil)  // Clear all
+                        } label: {
+                            Text("Clear all")
+                                .font(FGTypography.captionSmall)
+                                .foregroundColor(FGColors.statusError)
+                        }
+                    }
+                }
+            }
+
+            // Photo grid - adaptive columns based on count
+            let columns = gridColumns(for: suggestion.photoCount)
+            LazyVGrid(columns: columns, spacing: FGSpacing.sm) {
+                // Show uploaded photos
+                ForEach(Array(suggestion.uploadedPhotosData.enumerated()), id: \.offset) { index, photoData in
+                    if let uiImage = UIImage(data: photoData) {
+                        photoSlot(image: uiImage, index: index)
+                    }
+                }
+
+                // Show remaining empty slots (up to photoCount)
+                let remainingSlots = suggestion.photoCount - uploadedCount
+                if remainingSlots > 0 {
+                    ForEach(0..<remainingSlots, id: \.self) { _ in
+                        emptyPhotoSlot
+                    }
+                }
+            }
+        }
+    }
+
+    private func gridColumns(for count: Int) -> [GridItem] {
+        let columnCount: Int
+        switch count {
+        case 1: columnCount = 1
+        case 2: columnCount = 2
+        case 3: columnCount = 3
+        case 4: columnCount = 2
+        case 5, 6: columnCount = 3
+        default: columnCount = min(4, count)
+        }
+        return Array(repeating: GridItem(.flexible(), spacing: FGSpacing.sm), count: columnCount)
+    }
+
+    private func photoSlot(image: UIImage, index: Int) -> some View {
+        ZStack(alignment: .topTrailing) {
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFill()
+                .frame(height: 80)
+                .frame(maxWidth: .infinity)
+                .clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
+
+            Button {
+                onPhotoRemoved(index)
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 20))
+                    .foregroundColor(.white)
+                    .shadow(radius: 2)
+            }
+            .padding(4)
+        }
+    }
+
+    private var emptyPhotoSlot: some View {
+        PhotosPicker(
+            selection: $selectedPhotoItem,
+            matching: .images
+        ) {
+            ZStack {
+                RoundedRectangle(cornerRadius: FGSpacing.inputRadius)
+                    .fill(FGColors.backgroundTertiary)
+                    .frame(height: 80)
+
+                VStack(spacing: FGSpacing.xxs) {
+                    Image(systemName: "plus.circle")
+                        .font(.system(size: 24))
+                        .foregroundColor(FGColors.textTertiary)
+                    Text("Add photo")
+                        .font(FGTypography.captionSmall)
+                        .foregroundColor(FGColors.textTertiary)
+                }
+            }
+        }
+    }
+
+    // MARK: - Single Photo Preview
+
+    private func singlePhotoPreview(_ image: UIImage) -> some View {
         HStack(spacing: FGSpacing.md) {
             Image(uiImage: image)
                 .resizable()
@@ -483,7 +647,7 @@ struct PhotoSuggestionCard: View {
 
             Button {
                 selectedPhotoItem = nil
-                onClearPhoto()
+                onPhotoRemoved(0)
             } label: {
                 Image(systemName: "xmark.circle.fill")
                     .font(.system(size: 22))
@@ -491,6 +655,8 @@ struct PhotoSuggestionCard: View {
             }
         }
     }
+
+    // MARK: - AI Prompt Preview
 
     private func aiPromptPreview(_ prompt: String) -> some View {
         HStack(spacing: FGSpacing.md) {
@@ -518,7 +684,7 @@ struct PhotoSuggestionCard: View {
             Spacer()
 
             Button {
-                onClearPhoto()
+                onClearAIPrompt()
             } label: {
                 Image(systemName: "xmark.circle.fill")
                     .font(.system(size: 22))
@@ -526,6 +692,8 @@ struct PhotoSuggestionCard: View {
             }
         }
     }
+
+    // MARK: - Action Button
 
     private func actionButton(icon: String, title: String, isPrimary: Bool) -> some View {
         HStack(spacing: FGSpacing.xs) {

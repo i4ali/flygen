@@ -40,7 +40,7 @@ struct FlyerProject: Codable, Identifiable, Equatable {
     var specialInstructions: String?
     var logoImageData: Data?
     var logoPosition: LogoPosition = .topRight
-    var userPhotoData: Data?           // User's uploaded photo for AI to incorporate
+    var userPhotosData: [Data] = []    // User's uploaded photos for AI to incorporate
     var imageryDescription: String?     // Text description for AI-generated imagery
     var qrSettings: QRCodeSettings
     var smartExtras: SmartExtrasState
@@ -74,7 +74,7 @@ struct FlyerProject: Codable, Identifiable, Equatable {
         self.specialInstructions = source.specialInstructions
         self.logoImageData = source.logoImageData
         self.logoPosition = source.logoPosition
-        self.userPhotoData = source.userPhotoData
+        self.userPhotosData = source.userPhotosData
         self.imageryDescription = source.imageryDescription
         self.qrSettings = source.qrSettings
         self.smartExtras = SmartExtrasState()  // Reset to trigger fresh analysis in Step 8
