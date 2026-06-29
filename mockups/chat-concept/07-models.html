@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7 · Three Interaction Models — FlyGen Chat-First Concept</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="index.html"><span class="dot">✦</span> FlyGen · Chat-First Concept</a>
+  <span class="crumb">— <b>Journey 7:</b> Three interaction models, one task</span>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="01-onboarding.html">1 First run</a>
+    <a href="02-create.html">2 Create</a>
+    <a href="03-refine.html">3 Refine</a>
+    <a href="04-newsletter.html">4 Newsletter</a>
+    <a href="05-returning.html">5 Returning</a>
+    <a href="06-subscription.html">6 Pricing</a>
+    <a href="07-models.html" class="on">7 Models</a>
+  </nav>
+</header>
+
+<main>
+  <h1>How "chat" should we go? <span class="hl">Three models, same taco flyer</span></h1>
+  <p class="lede">"A chat interface that does everything" can be built three ways. Same task in all three — <b>a taco truck's Friday special, mid-refinement</b> — so the differences are visible. The backend, subscription and projects are identical in every model; this choice is pure interaction design, and it's reversible.</p>
+
+  <section class="journey">
+    <h2><span class="num">A</span> Side by side</h2>
+    <p class="sec-d">Model A: everything is a message. Model B: chat + pinned live canvas. Model C: the AI leads with tappable choices.</p>
+
+    <div class="flow">
+
+      <!-- MODEL A -->
+      <div class="step">
+        <div class="phone"><div class="screen">
+          <div class="island"></div>
+          <div class="sbar"><span>9:41</span><span class="bat"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="batt"><i></i></span></span></div>
+          <div class="appbar"><div class="ab-ico">‹</div><div class="ab-t">Taco Friday<small>● your designer</small></div><div class="ab-side">✦</div></div>
+          <div class="chat">
+            <div class="art" style="width:52%;opacity:.8">
+              <div class="poster" style="background:linear-gradient(160deg,#F59E0B,#DC2626 85%);color:#FFFBEB;gap:3px">
+                <div class="po-title sans" style="font-size:13px;font-weight:900">TACO<br>FRIDAY</div>
+                <div style="font-size:6px;font-weight:700">$2 TACOS ALL DAY</div>
+              </div>
+              <div class="a-foot"><b>v1</b></div>
+            </div>
+            <div class="m-user">Make the price way bigger</div>
+            <div class="art" style="width:62%">
+              <div class="poster" style="background:linear-gradient(160deg,#F59E0B,#DC2626 85%);color:#FFFBEB;gap:3px">
+                <div class="po-title sans" style="font-size:11px;font-weight:900">TACO FRIDAY</div>
+                <div style="font-size:13px;font-weight:900;background:#FFFBEB;color:#DC2626;border-radius:99px;padding:3px 10px">$2 TACOS</div>
+                <div style="font-size:5px;font-weight:700">ALL DAY · EL FUEGO TRUCK</div>
+              </div>
+              <div class="a-foot"><b>v2</b><span class="grow"></span><span>⤢</span></div>
+            </div>
+            <div class="m-ai" style="font-size:10px">Bigger! 🌮 Want it louder still?</div>
+            <div class="spacer"></div>
+          </div>
+          <div class="composer"><div class="c-plus">＋</div><div class="c-field">Reply…</div><div class="c-mic">🎙</div></div>
+          <div class="homebar"></div>
+        </div></div>
+        <div class="cap"><div class="cap-t"><span class="cap-n">A</span> Pure chat — everything is a message</div>
+        <div class="cap-d">ChatGPT-style. Dead simple mental model and the fastest to build — but versions pile up in scrollback and the design you're discussing keeps scrolling away.</div></div>
+      </div>
+      <div class="arr" style="color:#E4E0D9">|</div>
+
+      <!-- MODEL B -->
+      <div class="step">
+        <div class="phone" style="box-shadow:0 24px 48px -18px rgba(124,58,237,.45), 0 0 0 2px var(--violet)"><div class="screen">
+          <div class="island"></div>
+          <div class="sbar"><span>9:41</span><span class="bat"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="batt"><i></i></span></span></div>
+          <div class="appbar"><div class="ab-ico">‹</div><div class="ab-t">Taco Friday<small>canvas</small></div><div class="ab-side">⤓</div></div>
+          <div class="canvas">
+            <div class="cv-stage">
+              <div class="vpills"><i>v1</i><i class="on">v2</i></div>
+              <div class="cv-tools"><i>Aa</i><i>⤢</i><i>↺</i></div>
+              <div class="artwrap">
+                <div class="poster" style="background:linear-gradient(160deg,#F59E0B,#DC2626 85%);color:#FFFBEB;gap:4px">
+                  <div style="font-size:5.5px;letter-spacing:.24em;text-transform:uppercase;opacity:.9">El Fuego Truck</div>
+                  <div class="po-title sans" style="font-size:16px;font-weight:900">TACO<br>FRIDAY</div>
+                  <div style="font-size:14px;font-weight:900;background:#FFFBEB;color:#DC2626;border-radius:99px;padding:3px 11px">$2 TACOS</div>
+                  <div style="font-size:5px;font-weight:700;opacity:.9">ALL DAY · 11AM – 9PM · 5TH &amp; MAIN</div>
+                </div>
+              </div>
+            </div>
+            <div class="cv-chat">
+              <div class="m-user" style="font-size:10px">Make the price way bigger</div>
+              <div class="m-sys ok">✓ v2 — price is now the hero</div>
+            </div>
+          </div>
+          <div class="composer"><div class="c-plus">＋</div><div class="c-field">Ask for any change…</div><div class="c-mic">🎙</div></div>
+          <div class="homebar"></div>
+        </div></div>
+        <div class="cap"><div class="cap-t"><span class="cap-n">B</span> Chat + live canvas <span class="badge-rec">Recommended</span></div>
+        <div class="cap-d">The design stays pinned while you talk about it — like a designer holding the poster up across the desk. Tap-to-edit text, version pills, and side tools live on the canvas; intent lives in chat.</div></div>
+      </div>
+      <div class="arr" style="color:#E4E0D9">|</div>
+
+      <!-- MODEL C -->
+      <div class="step">
+        <div class="phone"><div class="screen">
+          <div class="island"></div>
+          <div class="sbar"><span>9:41</span><span class="bat"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="batt"><i></i></span></span></div>
+          <div class="appbar"><div class="ab-ico">‹</div><div class="ab-t">Taco Friday<small>guided</small></div><div class="ab-side">✦</div></div>
+          <div class="chat">
+            <div class="m-ai" style="font-size:10px">How should the price feel? 🌮</div>
+            <div class="chips">
+              <div class="chip sel">💥 Huge &amp; loud</div>
+              <div class="chip">✨ Classy</div>
+              <div class="chip">🔥 Neon</div>
+            </div>
+            <div class="m-ai" style="font-size:10px">And the vibe overall?</div>
+            <div class="chips">
+              <div class="chip" style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,#F59E0B,#DC2626)"></span>Fiesta</div>
+              <div class="chip sel" style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,#18181B,#DC2626)"></span>Street-food bold</div>
+              <div class="chip" style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,#FDE68A,#FB923C)"></span>Retro diner</div>
+            </div>
+            <div class="art" style="width:54%">
+              <div class="poster" style="background:linear-gradient(165deg,#18181B,#7F1D1D 90%);color:#FEF2F2;gap:3px">
+                <div class="po-title sans" style="font-size:11px;font-weight:900">TACO FRIDAY</div>
+                <div style="font-size:12px;font-weight:900;color:#FCA5A5">$2 TACOS</div>
+                <div style="font-size:4.5px;font-weight:700;opacity:.85">EL FUEGO · 5TH &amp; MAIN</div>
+              </div>
+              <div class="a-foot"><b>v2</b><span class="grow"></span><span>⤢</span></div>
+            </div>
+            <div class="spacer"></div>
+            <div class="m-sys">Every step tappable — typing never required</div>
+          </div>
+          <div class="composer"><div class="c-plus">＋</div><div class="c-field">Or just type…</div><div class="c-mic">🎙</div></div>
+          <div class="homebar"></div>
+        </div></div>
+        <div class="cap"><div class="cap-t"><span class="cap-n">C</span> Guided chat — the AI leads with options</div>
+        <div class="cap-d">Every turn offers tappable choices: visual options, swatches, presets. Zero blank-page anxiety — but push it too far and you've rebuilt the wizard in a chat costume.</div></div>
+      </div>
+
+    </div>
+
+    <div class="notes">
+      <div class="note"><span class="nt">A · Pure chat</span><b>Best for:</b> shipping fast, validating the concept.<br><b>Wins:</b> simplest build (one surface); universally familiar; degrades gracefully to notifications/share-sheet contexts.<br><b>Loses:</b> design scrolls away mid-discussion; weak precision editing; version comparison is painful.</div>
+      <div class="note good"><span class="nt">B · Chat + canvas — recommended</span><b>Best for:</b> the real product.<br><b>Wins:</b> the artifact stays visible (design tools need this); tap-to-edit text keeps the current app's best convenience; versions feel tangible.<br><b>Loses:</b> most engineering (two coordinated surfaces); slightly more to learn.</div>
+      <div class="note"><span class="nt">C · Guided chips</span><b>Best for:</b> the non-typing majority of small-biz users.<br><b>Wins:</b> zero blank-page anxiety; capabilities are discoverable; fastest taps-to-flyer.<br><b>Loses:</b> can feel like the old wizard again; railroads users who know exactly what they want.</div>
+    </div>
+
+    <div class="callout">
+      <span class="nt">Recommendation</span>
+      <b>Build B with C inside it.</b> The architecture is chat + canvas; the assistant's messages carry C's chips, swatches and concept carousels so nobody ever <i>has</i> to type; and a thread with no expanded canvas is simply model A. They're not three products — A and C are states of B. If build cost forces a sequence: ship A's thread first (it validates the whole concept), add the canvas second, layer the guided chips throughout from day one — chips are cheap and do the most for activation.
+    </div>
+  </section>
+
+  <nav class="pager">
+    <a href="06-subscription.html"><span>← Previous</span>6 · Subscription &amp; paywall</a>
+    <a class="nx" href="index.html"><span>Back to →</span>Overview &amp; verdict</a>
+  </nav>
+</main>
+
+</body>
+</html>
