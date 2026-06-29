@@ -3,6 +3,7 @@ import SwiftData
 
 struct ResultView: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
+    @EnvironmentObject var entitlementService: EntitlementService
     @EnvironmentObject var cloudKitService: CloudKitService
     @EnvironmentObject var reviewService: ReviewService
     @EnvironmentObject var notificationService: NotificationService
@@ -12,6 +13,7 @@ struct ResultView: View {
 
     @State private var showingRefinementSheet = false
     @State private var showingReformatSheet = false
+    @State private var showingPaywall = false
     @State private var showingSaveSuccess = false
     @State private var saveError: String?
     @State private var hasSavedToGallery = false
@@ -40,7 +42,12 @@ struct ResultView: View {
                                     icon: "arrow.triangle.2.circlepath",
                                     color: FGColors.warning
                                 ) {
-                                    showingRefinementSheet = true
+                                    if let profile = userProfiles.first,
+                                       entitlementService.access(for: profile) == .blocked {
+                                        showingPaywall = true
+                                    } else {
+                                        showingRefinementSheet = true
+                                    }
                                 }
 
                                 ActionButton(
@@ -48,7 +55,12 @@ struct ResultView: View {
                                     icon: "aspectratio",
                                     color: FGColors.accentPrimary
                                 ) {
-                                    showingReformatSheet = true
+                                    if let profile = userProfiles.first,
+                                       entitlementService.access(for: profile) == .blocked {
+                                        showingPaywall = true
+                                    } else {
+                                        showingReformatSheet = true
+                                    }
                                 }
 
                                 ActionButton(
@@ -125,8 +137,13 @@ struct ResultView: View {
                         }
 
                         Button {
-                            Task {
-                                await viewModel.generateFlyer()
+                            if let profile = userProfiles.first,
+                               entitlementService.access(for: profile) == .blocked {
+                                showingPaywall = true
+                            } else {
+                                Task {
+                                    await viewModel.generateFlyer()
+                                }
                             }
                         } label: {
                             Text("Try Again")
@@ -173,32 +190,19 @@ struct ResultView: View {
             .sheet(isPresented: $showingReformatSheet) {
                 ReformatSheet(viewModel: viewModel)
             }
+            .sheet(isPresented: $showingPaywall) {
+                SubscriptionPaywallView()
+            }
             .onAppear {
-                // Wire up credit deduction callback - called after each successful API call
+                // Wire up consume callback - fires after each successful generation
                 viewModel.onCreditDeduction = { [self] in
-                    deductCredit()
+                    guard let profile = userProfiles.first else { return }
+                    Task {
+                        await entitlementService.consume(for: profile, context: modelContext, cloudKit: cloudKitService)
+                    }
+                    reviewService.recordSuccessfulGeneration()
                 }
             }
-        }
-    }
-
-    private func deductCredit() {
-        if let profile = userProfiles.first, profile.credits >= 10 {
-            profile.credits -= 10
-            profile.lastSyncedAt = Date()
-            try? modelContext.save()
-            print("Credit deducted (10 credits). Remaining credits: \(profile.credits)")
-
-            // Sync credits to CloudKit
-            Task {
-                await cloudKitService.saveCredits(profile.credits)
-            }
-
-            // Record successful generation for review prompt
-            reviewService.recordSuccessfulGeneration()
-
-            // Check if credits hit zero for notification scheduling
-            notificationService.onCreditsChanged(newCredits: profile.credits)
         }
     }
 

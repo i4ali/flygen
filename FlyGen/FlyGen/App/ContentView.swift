@@ -5,23 +5,17 @@ struct ContentView: View {
     @EnvironmentObject var cloudKitService: CloudKitService
     @EnvironmentObject var notificationService: NotificationService
     @EnvironmentObject var storeKitService: StoreKitService
+    @EnvironmentObject var entitlementService: EntitlementService
     @StateObject private var viewModel = FlyerCreationViewModel()
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
-    @AppStorage("hasSeenNewUserOffer") private var hasSeenNewUserOffer: Bool = false
     @AppStorage("hasSeenBrandKitIntro") private var hasSeenBrandKitIntro: Bool = false
     @State private var showingSettings = false
-    @State private var showingCreditPurchase = false
-    @State private var showingNewUserOffer = false
     @State private var showingBrandKitIntro = false
     @Environment(\.scenePhase) private var scenePhase
 
     @Environment(\.modelContext) private var modelContext
     @Query private var userProfiles: [UserProfile]
     @Query private var brandKits: [BrandKit]
-
-    private var credits: Int {
-        userProfiles.first?.credits ?? 0
-    }
 
     var body: some View {
         Group {
@@ -75,6 +69,10 @@ struct ContentView: View {
         .task {
             await ensureUserProfileExists()
             await syncCreditsFromCloud()
+            await syncQuotaFromCloud()
+            if let profile = userProfiles.first {
+                await entitlementService.refresh(profile: profile, context: modelContext, cloudKit: cloudKitService)
+            }
             // Schedule seasonal engagement notifications
             await notificationService.scheduleSeasonalNotifications()
             // Inject brand kit into view model
@@ -91,6 +89,10 @@ struct ContentView: View {
                 Task {
                     await ensureUserProfileExists()
                     await syncCreditsFromCloud()
+                    await syncQuotaFromCloud()
+                    if let profile = userProfiles.first {
+                        await entitlementService.refresh(profile: profile, context: modelContext, cloudKit: cloudKitService)
+                    }
                 }
             }
         }
@@ -100,13 +102,11 @@ struct ContentView: View {
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
             case .active:
-                // Sync credits from CloudKit first, then check for out-of-credits alert
-                // This prevents false alerts when local credits are stale
                 Task {
                     await syncCreditsFromCloud()
-                    // Check credits AFTER sync completes to ensure CloudKit is source of truth
+                    await syncQuotaFromCloud()
                     if let profile = userProfiles.first {
-                        notificationService.onAppBecameActive(currentCredits: profile.credits)
+                        await entitlementService.refresh(profile: profile, context: modelContext, cloudKit: cloudKitService)
                     }
                 }
                 // Check for pending draft on app resume
@@ -118,55 +118,10 @@ struct ContentView: View {
                 break
             }
         }
-        .alert("Out of Credits", isPresented: $notificationService.shouldShowInAppAlert) {
-            Button("Get Credits") {
-                notificationService.dismissInAppAlert()
-                showingCreditPurchase = true
-            }
-            Button("Later", role: .cancel) {
-                notificationService.dismissInAppAlert()
-            }
-        } message: {
-            Text("You've run out of credits. Purchase more to continue creating amazing flyers!")
-        }
-        .sheet(isPresented: $showingCreditPurchase, onDismiss: {
-            // Reset promo mode when sheet is dismissed
-            storeKitService.isPromoModeActive = false
-        }) {
-            CreditPurchaseSheet()
-        }
-        .sheet(isPresented: $showingNewUserOffer) {
-            NewUserOfferSheet(
-                onClaimOffer: {
-                    hasSeenNewUserOffer = true
-                    showingNewUserOffer = false
-                    // Small delay before showing credit purchase in promo mode
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        storeKitService.isPromoModeActive = true
-                        showingCreditPurchase = true
-                    }
-                },
-                onDecline: {
-                    hasSeenNewUserOffer = true
-                    showingNewUserOffer = false
-                }
-            )
-        }
         .sheet(isPresented: $showingBrandKitIntro) {
             BrandKitIntroSheet {
                 hasSeenBrandKitIntro = true
                 showingBrandKitIntro = false
-            }
-        }
-        .onChange(of: hasCompletedOnboarding) { _, completed in
-            // Show new user offer after onboarding completes
-            if completed && !hasSeenNewUserOffer {
-                // Small delay for smoother UX
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    if !hasSeenNewUserOffer {
-                        showingNewUserOffer = true
-                    }
-                }
             }
         }
     }
@@ -195,6 +150,23 @@ struct ContentView: View {
 
         if syncedCredits != profile.credits {
             profile.credits = syncedCredits
+            profile.lastSyncedAt = Date()
+            try? modelContext.save()
+        }
+    }
+
+    private func syncQuotaFromCloud() async {
+        guard cloudKitService.isSignedIn,
+              let profile = userProfiles.first else { return }
+
+        let synced = await cloudKitService.syncQuota(
+            localUsed: profile.quotaUsedThisPeriod,
+            localPeriodStart: profile.quotaPeriodStart
+        )
+
+        if synced.used != profile.quotaUsedThisPeriod || synced.periodStart != profile.quotaPeriodStart {
+            profile.quotaUsedThisPeriod = synced.used
+            profile.quotaPeriodStart = synced.periodStart
             profile.lastSyncedAt = Date()
             try? modelContext.save()
         }

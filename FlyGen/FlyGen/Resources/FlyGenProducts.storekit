@@ -1,4 +1,14 @@
 {
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : ""
+      }
+    ]
+  },
   "identifier" : "FlyGenProducts",
   "nonRenewingSubscriptions" : [
 
@@ -7,7 +17,7 @@
     {
       "displayPrice" : "1.99",
       "familyShareable" : false,
-      "internalID" : "credits_10",
+      "internalID" : "C1A10010",
       "localizations" : [
         {
           "description" : "Get 10 credits to create flyers",
@@ -22,7 +32,7 @@
     {
       "displayPrice" : "3.99",
       "familyShareable" : false,
-      "internalID" : "credits_25",
+      "internalID" : "C1A20025",
       "localizations" : [
         {
           "description" : "Get 25 credits to create flyers - Save 20%!",
@@ -37,7 +47,7 @@
     {
       "displayPrice" : "5.99",
       "familyShareable" : false,
-      "internalID" : "credits_50",
+      "internalID" : "C1A50050",
       "localizations" : [
         {
           "description" : "Get 50 credits to create flyers - Best Value!",
@@ -51,63 +61,90 @@
     }
   ],
   "settings" : {
-    "_applicationInternalID" : "flygen",
-    "_developerTeamID" : "",
+    "_askToBuyEnabled" : false,
+    "_billingGracePeriodEnabled" : false,
+    "_billingIssuesEnabled" : false,
+    "_disableDialogs" : false,
     "_failTransactionsEnabled" : false,
-    "_lastSynchronizedDate" : null,
+    "_locale" : "en_US",
+    "_renewalBillingIssuesEnabled" : false,
+    "_storefront" : "USA",
     "_storeKitErrors" : [
-      {
-        "current" : null,
-        "enabled" : false,
-        "name" : "Load Products"
-      },
-      {
-        "current" : null,
-        "enabled" : false,
-        "name" : "Purchase"
-      },
-      {
-        "current" : null,
-        "enabled" : false,
-        "name" : "Verification"
-      },
-      {
-        "current" : null,
-        "enabled" : false,
-        "name" : "App Store Sync"
-      },
-      {
-        "current" : null,
-        "enabled" : false,
-        "name" : "Subscription Status"
-      },
-      {
-        "current" : null,
-        "enabled" : false,
-        "name" : "App Transaction"
-      },
-      {
-        "current" : null,
-        "enabled" : false,
-        "name" : "Manage Subscriptions Sheet"
-      },
-      {
-        "current" : null,
-        "enabled" : false,
-        "name" : "Refund Request Sheet"
-      },
-      {
-        "current" : null,
-        "enabled" : false,
-        "name" : "Offer Code Redeem Sheet"
-      }
-    ]
+
+    ],
+    "_timeRate" : 0
   },
   "subscriptionGroups" : [
+    {
+      "id" : "5B1A9F00",
+      "localizations" : [
 
+      ],
+      "name" : "FlyGen Premium",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "9.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "9F0A0001",
+          "introductoryOffer" : {
+            "internalID" : "9F0A0F01",
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P3D"
+          },
+          "localizations" : [
+            {
+              "description" : "50 flyers per month, with a 3-day free trial",
+              "displayName" : "FlyGen Premium Monthly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.flygen.premium.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "FlyGen Premium Monthly",
+          "subscriptionGroupID" : "5B1A9F00",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "4.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "9F0A0002",
+          "introductoryOffer" : {
+            "internalID" : "9F0A0F02",
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P3D"
+          },
+          "localizations" : [
+            {
+              "description" : "12 flyers per week, with a 3-day free trial",
+              "displayName" : "FlyGen Premium Weekly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.flygen.premium.weekly",
+          "recurringSubscriptionPeriod" : "P1W",
+          "referenceName" : "FlyGen Premium Weekly",
+          "subscriptionGroupID" : "5B1A9F00",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
   ],
   "version" : {
-    "major" : 3,
+    "major" : 4,
     "minor" : 0
   }
 }

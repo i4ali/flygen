@@ -4,7 +4,9 @@ import SwiftData
 @Model
 final class UserProfile {
     var id: UUID = UUID()
-    var credits: Int = 15
+    var credits: Int = 0
+    var quotaUsedThisPeriod: Int = 0
+    var quotaPeriodStart: Date? = nil
     var isPremium: Bool = false
     var premiumExpiresAt: Date?
     var createdAt: Date = Date()
@@ -28,7 +30,7 @@ final class UserProfile {
 
     init() {
         self.id = UUID()
-        self.credits = 15
+        self.credits = 0
         self.isPremium = false
         self.premiumExpiresAt = nil
         self.createdAt = Date()

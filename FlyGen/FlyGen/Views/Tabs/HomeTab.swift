@@ -4,13 +4,15 @@ import SwiftData
 struct HomeTab: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
     @Binding var showingSettings: Bool
+    @EnvironmentObject var entitlementService: EntitlementService
     @Query private var userProfiles: [UserProfile]
     @State private var showingTemplates = false
-    @State private var showingCreditPurchase = false
+    @State private var showingPaywall = false
     @State private var showingDiscardDraftAlert = false
+    @State private var showingChat = false
 
-    private var credits: Int {
-        userProfiles.first?.credits ?? 3
+    private var profile: UserProfile? {
+        userProfiles.first
     }
 
     var body: some View {
@@ -24,14 +26,12 @@ struct HomeTab: View {
 
                     Spacer()
 
-                    // Credits display (tappable to purchase)
-                    Button {
-                        showingCreditPurchase = true
-                    } label: {
+                    // Subscription status badge
+                    if entitlementService.isSubscribed, let profile {
                         HStack(spacing: FGSpacing.xs) {
                             Image(systemName: "sparkles")
                                 .foregroundColor(FGColors.accentSecondary)
-                            Text("\(credits)")
+                            Text("\(entitlementService.quotaRemaining(for: profile)) left")
                                 .font(FGTypography.labelLarge)
                                 .foregroundColor(FGColors.textPrimary)
                         }
@@ -43,6 +43,26 @@ struct HomeTab: View {
                             Capsule()
                                 .stroke(FGColors.borderSubtle, lineWidth: 1)
                         )
+                    } else {
+                        Button {
+                            showingPaywall = true
+                        } label: {
+                            HStack(spacing: FGSpacing.xs) {
+                                Image(systemName: "crown.fill")
+                                    .foregroundColor(FGColors.accentSecondary)
+                                Text("Subscribe")
+                                    .font(FGTypography.labelLarge)
+                                    .foregroundColor(FGColors.textPrimary)
+                            }
+                            .padding(.horizontal, FGSpacing.sm)
+                            .padding(.vertical, FGSpacing.xs)
+                            .background(FGColors.surfaceDefault)
+                            .clipShape(Capsule())
+                            .overlay(
+                                Capsule()
+                                    .stroke(FGColors.borderSubtle, lineWidth: 1)
+                            )
+                        }
                     }
 
                     Button {
@@ -79,7 +99,9 @@ struct HomeTab: View {
 
                     // Create button with gradient
                     Button {
-                        if credits > 0 {
+                        if let profile, entitlementService.access(for: profile) == .blocked {
+                            showingPaywall = true
+                        } else {
                             viewModel.showingCreationFlow = true
                         }
                     } label: {
@@ -92,28 +114,23 @@ struct HomeTab: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, FGSpacing.md)
                         .background(
-                            credits > 0
-                                ? LinearGradient(
-                                    colors: [FGColors.accentPrimary, FGColors.accentPrimary.opacity(0.8)],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                                : LinearGradient(
-                                    colors: [FGColors.textTertiary, FGColors.textTertiary],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
+                            LinearGradient(
+                                colors: [FGColors.accentPrimary, FGColors.accentPrimary.opacity(0.8)],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
                         )
                         .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
-                        .shadow(color: credits > 0 ? FGColors.accentPrimary.opacity(0.4) : .clear, radius: 12, y: 4)
+                        .shadow(color: FGColors.accentPrimary.opacity(0.4), radius: 12, y: 4)
                     }
-                    .disabled(credits <= 0)
                     .padding(.horizontal, FGSpacing.xl)
                     .padding(.top, FGSpacing.md)
 
                     // Use Template button
                     Button {
-                        if credits > 0 {
+                        if let profile, entitlementService.access(for: profile) == .blocked {
+                            showingPaywall = true
+                        } else {
                             showingTemplates = true
                         }
                     } label: {
@@ -122,21 +139,40 @@ struct HomeTab: View {
                             Text("Use Template")
                         }
                         .font(FGTypography.button)
-                        .foregroundColor(credits > 0 ? FGColors.accentPrimary : FGColors.textTertiary)
+                        .foregroundColor(FGColors.accentPrimary)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, FGSpacing.md)
                         .background(FGColors.surfaceDefault)
                         .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
                         .overlay(
                             RoundedRectangle(cornerRadius: FGSpacing.buttonRadius)
-                                .stroke(credits > 0 ? FGColors.accentPrimary : FGColors.borderSubtle, lineWidth: 1.5)
+                                .stroke(FGColors.accentPrimary, lineWidth: 1.5)
                         )
                     }
-                    .disabled(credits <= 0)
                     .padding(.horizontal, FGSpacing.xl)
 
+                    // Chat (Beta) - experimental conversational flow (not credit-gated).
+                    // Gated behind FeatureFlags.chatEnabled while we focus on the
+                    // subscription migration. Code retained; flip the flag to re-enable.
+                    if FeatureFlags.chatEnabled {
+                        Button { showingChat = true } label: {
+                            HStack(spacing: FGSpacing.sm) {
+                                Image(systemName: "bubble.left.and.text.bubble.right")
+                                Text("Chat (Beta)")
+                                Text("NEW").font(FGTypography.captionSmall).foregroundColor(FGColors.textOnAccent)
+                                    .padding(.horizontal, FGSpacing.xs).padding(.vertical, 2)
+                                    .background(FGColors.accentSecondary).clipShape(Capsule())
+                            }
+                            .font(FGTypography.button).foregroundColor(FGColors.textSecondary)
+                            .frame(maxWidth: .infinity).padding(.vertical, FGSpacing.md)
+                            .background(FGColors.surfaceDefault).clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+                            .overlay(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius).stroke(FGColors.borderDefault, lineWidth: 1))
+                        }
+                        .padding(.horizontal, FGSpacing.xl)
+                    }
+
                     // Resume Draft banner
-                    if viewModel.hasPendingDraft && credits > 0 {
+                    if viewModel.hasPendingDraft {
                         DraftBanner(
                             categoryName: viewModel.draftCategoryName ?? "Flyer",
                             onResume: {
@@ -150,15 +186,6 @@ struct HomeTab: View {
                         .padding(.top, FGSpacing.sm)
                     }
 
-                    // Credits warning
-                    if credits <= 0 {
-                        WarningBanner(
-                            icon: "exclamationmark.triangle.fill",
-                            message: "No credits remaining. Upgrade to Premium for unlimited flyers!",
-                            color: FGColors.warning
-                        )
-                        .padding(.horizontal, FGSpacing.screenHorizontal)
-                    }
                 }
 
                 Spacer()
@@ -174,8 +201,11 @@ struct HomeTab: View {
             .fullScreenCover(isPresented: $showingTemplates) {
                 TemplatePickerView(viewModel: viewModel)
             }
-            .sheet(isPresented: $showingCreditPurchase) {
-                CreditPurchaseSheet()
+            .fullScreenCover(isPresented: $showingChat) {
+                FlyerChatView()
+            }
+            .sheet(isPresented: $showingPaywall) {
+                SubscriptionPaywallView()
             }
             .alert("Discard Draft?", isPresented: $showingDiscardDraftAlert) {
                 Button("Discard", role: .destructive) {

@@ -3,13 +3,12 @@ import SwiftData
 
 struct ReviewStepView: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
+    @EnvironmentObject var entitlementService: EntitlementService
     @EnvironmentObject var cloudKitService: CloudKitService
     @Environment(\.modelContext) private var modelContext
     @Query private var userProfiles: [UserProfile]
 
-    private var credits: Int {
-        userProfiles.first?.credits ?? 0
-    }
+    @State private var showingPaywall = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -220,24 +219,16 @@ struct ReviewStepView: View {
         }
         .background(FGColors.backgroundPrimary)
         .onAppear {
-            // Wire up credit deduction callback before generation can be triggered
+            // Wire up consume callback - fires after each successful generation
             viewModel.onCreditDeduction = {
-                deductCredit()
+                guard let profile = userProfiles.first else { return }
+                Task {
+                    await entitlementService.consume(for: profile, context: modelContext, cloudKit: cloudKitService)
+                }
             }
         }
-    }
-
-    private func deductCredit() {
-        if let profile = userProfiles.first, profile.credits >= 10 {
-            profile.credits -= 10
-            profile.lastSyncedAt = Date()
-            try? modelContext.save()
-            print("Credit deducted (10 credits). Remaining credits: \(profile.credits)")
-
-            // Sync credits to CloudKit
-            Task {
-                await cloudKitService.saveCredits(profile.credits)
-            }
+        .sheet(isPresented: $showingPaywall) {
+            SubscriptionPaywallView()
         }
     }
 
@@ -246,6 +237,11 @@ struct ReviewStepView: View {
     private var generateButtonSection: some View {
         VStack(spacing: FGSpacing.sm) {
             Button {
+                guard let profile = userProfiles.first else { return }
+                guard entitlementService.access(for: profile) != .blocked else {
+                    showingPaywall = true
+                    return
+                }
                 Task {
                     await viewModel.generateFlyer()
                 }
@@ -272,25 +268,8 @@ struct ReviewStepView: View {
                     y: 4
                 )
             }
-            .disabled(viewModel.generationState == .generating || credits < 10)
-            .opacity(credits < 10 ? 0.5 : 1.0)
+            .disabled(viewModel.generationState == .generating)
             .animation(FGAnimations.spring, value: viewModel.generationState)
-
-            // Insufficient credits warning
-            if credits < 10 && viewModel.generationState != .generating {
-                HStack(spacing: FGSpacing.xs) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .font(.system(size: 14))
-                        .foregroundColor(FGColors.warning)
-
-                    Text("Insufficient credits (\(credits)/10)")
-                        .font(FGTypography.caption)
-                        .foregroundColor(FGColors.warning)
-                }
-                .padding(FGSpacing.sm)
-                .background(FGColors.warning.opacity(0.15))
-                .clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
-            }
 
             if case .error(let message) = viewModel.generationState {
                 HStack(spacing: FGSpacing.xs) {

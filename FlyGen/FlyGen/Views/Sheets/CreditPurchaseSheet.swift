@@ -15,7 +15,7 @@ struct CreditPurchaseSheet: View {
     @State private var hasAttemptedPromoLoad = false
 
     private var credits: Int {
-        userProfiles.first?.credits ?? 3
+        userProfiles.first?.credits ?? 0
     }
 
     /// Calculate the highest discount percentage across all promo packs

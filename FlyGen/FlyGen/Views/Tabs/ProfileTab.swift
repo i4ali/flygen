@@ -1,19 +1,21 @@
 import SwiftUI
 import SwiftData
+import MessageUI
+import StoreKit
 
 struct ProfileTab: View {
     @EnvironmentObject var cloudKitService: CloudKitService
+    @EnvironmentObject var entitlementService: EntitlementService
     @Environment(\.modelContext) private var modelContext
     @Query private var savedFlyers: [SavedFlyer]
     @Query private var userProfiles: [UserProfile]
     @Query private var brandKits: [BrandKit]
     @State private var showingSettings = false
-    @State private var showingCreditPurchase = false
+    @State private var showingSubscriptionPaywall = false
+    @State private var showingManageSubscriptions = false
     @State private var showingBrandKit = false
-
-    private var credits: Int {
-        userProfiles.first?.credits ?? 3
-    }
+    @State private var showingMailComposer = false
+    @State private var showingMailAlert = false
 
     var body: some View {
         NavigationStack {
@@ -24,6 +26,9 @@ struct ProfileTab: View {
 
                     // Stats section
                     statsSection
+
+                    // Subscription section
+                    subscriptionSection
 
                     // Brand Kit section
                     brandKitSection
@@ -36,9 +41,6 @@ struct ProfileTab: View {
 
                     // About section
                     aboutSection
-
-                    // Need More Credits section
-                    creditsPromoSection
                 }
                 .padding(.vertical, FGSpacing.lg)
             }
@@ -50,8 +52,22 @@ struct ProfileTab: View {
             .sheet(isPresented: $showingBrandKit) {
                 BrandKitView()
             }
-            .sheet(isPresented: $showingCreditPurchase) {
-                CreditPurchaseSheet()
+            .sheet(isPresented: $showingSubscriptionPaywall) {
+                SubscriptionPaywallView()
+                    .environmentObject(entitlementService)
+            }
+            .manageSubscriptionsSheet(isPresented: $showingManageSubscriptions)
+            .sheet(isPresented: $showingMailComposer) {
+                MailComposerView(
+                    recipient: "ali.muhammadimran@gmail.com",
+                    subject: "FlyGen Feedback",
+                    body: ""
+                )
+            }
+            .alert("Mail Not Available", isPresented: $showingMailAlert) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("Please configure a mail account in Settings to send feedback.")
             }
         }
     }
@@ -107,9 +123,6 @@ struct ProfileTab: View {
 
             VStack(spacing: 0) {
                 StatRow(icon: "doc.richtext", title: "Flyers Created", value: "\(savedFlyers.count)")
-                Divider()
-                    .background(FGColors.borderSubtle)
-                StatRow(icon: "sparkles", title: "Credits Remaining", value: "\(credits)")
             }
             .background(FGColors.backgroundElevated)
             .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
@@ -320,6 +333,33 @@ struct ProfileTab: View {
                     }
                     .padding(FGSpacing.cardPadding)
                 }
+
+                Divider()
+                    .background(FGColors.borderSubtle)
+
+                Button {
+                    if MailComposerView.canSendMail {
+                        showingMailComposer = true
+                    } else {
+                        showingMailAlert = true
+                    }
+                } label: {
+                    HStack {
+                        Label {
+                            Text("Send Feedback")
+                                .font(FGTypography.body)
+                                .foregroundColor(FGColors.textPrimary)
+                        } icon: {
+                            Image(systemName: "envelope")
+                                .foregroundColor(FGColors.accentPrimary)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .foregroundColor(FGColors.textTertiary)
+                    }
+                    .padding(FGSpacing.cardPadding)
+                }
             }
             .background(FGColors.backgroundElevated)
             .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
@@ -331,46 +371,134 @@ struct ProfileTab: View {
         }
     }
 
-    // MARK: - Credits Promo Section
+    // MARK: - Subscription Section
 
-    private var creditsPromoSection: some View {
-        Button {
-            showingCreditPurchase = true
-        } label: {
-            HStack(spacing: FGSpacing.md) {
-                ZStack {
-                    Circle()
-                        .fill(FGColors.accentSecondary.opacity(0.2))
-                        .frame(width: 50, height: 50)
+    private var subscriptionSection: some View {
+        VStack(alignment: .leading, spacing: FGSpacing.sm) {
+            Text("Subscription")
+                .font(FGTypography.h4)
+                .foregroundColor(FGColors.textSecondary)
+                .padding(.horizontal, FGSpacing.screenHorizontal)
 
-                    Image(systemName: "sparkles")
-                        .font(.title2)
-                        .foregroundColor(FGColors.accentSecondary)
+            VStack(spacing: 0) {
+                // Status row
+                HStack {
+                    Label {
+                        Text("Status")
+                            .font(FGTypography.body)
+                            .foregroundColor(FGColors.textPrimary)
+                    } icon: {
+                        Image(systemName: entitlementService.isSubscribed ? "crown.fill" : "person.circle")
+                            .foregroundColor(entitlementService.isSubscribed ? FGColors.accentPrimary : FGColors.textSecondary)
+                    }
+                    Spacer()
+                    Text(entitlementService.isSubscribed ? "Premium" : "Free")
+                        .font(FGTypography.label)
+                        .foregroundColor(entitlementService.isSubscribed ? FGColors.accentPrimary : FGColors.textSecondary)
+                }
+                .padding(FGSpacing.cardPadding)
+
+                // Renewal date (subscribed only)
+                if entitlementService.isSubscribed, let renewalDate = entitlementService.renewalDate {
+                    Divider()
+                        .background(FGColors.borderSubtle)
+
+                    HStack {
+                        Label {
+                            Text("Renews")
+                                .font(FGTypography.body)
+                                .foregroundColor(FGColors.textPrimary)
+                        } icon: {
+                            Image(systemName: "calendar")
+                                .foregroundColor(FGColors.accentPrimary)
+                        }
+                        Spacer()
+                        Text(renewalDate, style: .date)
+                            .font(FGTypography.label)
+                            .foregroundColor(FGColors.textSecondary)
+                    }
+                    .padding(FGSpacing.cardPadding)
                 }
 
-                VStack(alignment: .leading, spacing: FGSpacing.xxxs) {
-                    Text("Need More Credits?")
-                        .font(FGTypography.h4)
-                        .foregroundColor(FGColors.textPrimary)
-                    Text("Purchase credit packs to create more flyers")
-                        .font(FGTypography.caption)
-                        .foregroundColor(FGColors.textSecondary)
+                // Go Premium button (not subscribed only)
+                if !entitlementService.isSubscribed {
+                    Divider()
+                        .background(FGColors.borderSubtle)
+
+                    Button {
+                        showingSubscriptionPaywall = true
+                    } label: {
+                        HStack {
+                            Label {
+                                Text("Go Premium")
+                                    .font(FGTypography.body)
+                                    .foregroundColor(FGColors.accentPrimary)
+                            } icon: {
+                                Image(systemName: "crown")
+                                    .foregroundColor(FGColors.accentPrimary)
+                            }
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundColor(FGColors.textTertiary)
+                        }
+                        .padding(FGSpacing.cardPadding)
+                    }
                 }
 
-                Spacer()
+                Divider()
+                    .background(FGColors.borderSubtle)
 
-                Image(systemName: "chevron.right")
-                    .foregroundColor(FGColors.textTertiary)
+                // Manage Subscription
+                Button {
+                    showingManageSubscriptions = true
+                } label: {
+                    HStack {
+                        Label {
+                            Text("Manage Subscription")
+                                .font(FGTypography.body)
+                                .foregroundColor(FGColors.textPrimary)
+                        } icon: {
+                            Image(systemName: "gear")
+                                .foregroundColor(FGColors.accentPrimary)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .foregroundColor(FGColors.textTertiary)
+                    }
+                    .padding(FGSpacing.cardPadding)
+                }
+
+                Divider()
+                    .background(FGColors.borderSubtle)
+
+                // Restore Purchases
+                Button {
+                    Task { await entitlementService.restore() }
+                } label: {
+                    HStack {
+                        Label {
+                            Text("Restore Purchases")
+                                .font(FGTypography.body)
+                                .foregroundColor(FGColors.textPrimary)
+                        } icon: {
+                            Image(systemName: "arrow.clockwise")
+                                .foregroundColor(FGColors.accentPrimary)
+                        }
+                        Spacer()
+                    }
+                    .padding(FGSpacing.cardPadding)
+                }
             }
-            .padding(FGSpacing.cardPadding)
             .background(FGColors.backgroundElevated)
             .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
             .overlay(
                 RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
-                    .stroke(FGColors.accentSecondary.opacity(0.3), lineWidth: 1)
+                    .stroke(FGColors.borderSubtle, lineWidth: 1)
             )
+            .padding(.horizontal, FGSpacing.screenHorizontal)
         }
-        .padding(.horizontal, FGSpacing.screenHorizontal)
     }
 }
 
@@ -402,4 +530,5 @@ struct StatRow: View {
     ProfileTab()
         .environmentObject(CloudKitService())
         .environmentObject(StoreKitService())
+        .environmentObject(EntitlementService())
 }

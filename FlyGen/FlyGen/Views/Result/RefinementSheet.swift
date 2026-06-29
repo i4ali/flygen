@@ -1,16 +1,10 @@
 import SwiftUI
-import SwiftData
 
 struct RefinementSheet: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
     @Environment(\.dismiss) private var dismiss
-    @Query private var userProfiles: [UserProfile]
 
     @State private var feedback: String = ""
-
-    private var hasCredits: Bool {
-        (userProfiles.first?.credits ?? 0) >= 10
-    }
 
     private let quickSuggestions = [
         "Make text bigger",
@@ -79,19 +73,6 @@ struct RefinementSheet: View {
 
                 Spacer()
 
-                // No credits warning
-                if !hasCredits {
-                    HStack(spacing: FGSpacing.sm) {
-                        Image(systemName: "exclamationmark.circle.fill")
-                        Text("No credits remaining")
-                    }
-                    .font(FGTypography.caption)
-                    .foregroundColor(FGColors.warning)
-                    .padding(FGSpacing.sm)
-                    .background(FGColors.warning.opacity(0.1))
-                    .clipShape(RoundedRectangle(cornerRadius: FGSpacing.chipRadius))
-                }
-
                 // Apply button
                 Button {
                     Task {
@@ -106,17 +87,17 @@ struct RefinementSheet: View {
                         } else {
                             Image(systemName: "sparkles")
                         }
-                        Text("Apply Changes (10 credits)")
+                        Text("Apply Changes")
                     }
                     .font(FGTypography.buttonLarge)
                     .foregroundColor(FGColors.textOnAccent)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, FGSpacing.md)
-                    .background((feedback.isEmpty || !hasCredits) ? FGColors.textTertiary : FGColors.accentPrimary)
+                    .background(feedback.isEmpty ? FGColors.textTertiary : FGColors.accentPrimary)
                     .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
-                    .shadow(color: (feedback.isEmpty || !hasCredits) ? .clear : FGColors.accentPrimary.opacity(0.4), radius: 12, y: 4)
+                    .shadow(color: feedback.isEmpty ? .clear : FGColors.accentPrimary.opacity(0.4), radius: 12, y: 4)
                 }
-                .disabled(feedback.isEmpty || !hasCredits || viewModel.generationState == .generating)
+                .disabled(feedback.isEmpty || viewModel.generationState == .generating)
             }
             .padding(FGSpacing.screenHorizontal)
             .background(FGColors.backgroundPrimary)
@@ -188,13 +169,8 @@ struct FlowLayout: Layout {
 struct ReformatSheet: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
     @Environment(\.dismiss) private var dismiss
-    @Query private var userProfiles: [UserProfile]
 
     @State private var selectedRatio: AspectRatio = .portrait
-
-    private var hasCredits: Bool {
-        (userProfiles.first?.credits ?? 0) >= 10
-    }
 
     private let columns = [
         GridItem(.flexible(), spacing: FGSpacing.sm),
@@ -222,19 +198,6 @@ struct ReformatSheet: View {
 
                 Spacer()
 
-                // No credits warning
-                if !hasCredits {
-                    HStack(spacing: FGSpacing.sm) {
-                        Image(systemName: "exclamationmark.circle.fill")
-                        Text("No credits remaining")
-                    }
-                    .font(FGTypography.caption)
-                    .foregroundColor(FGColors.warning)
-                    .padding(FGSpacing.sm)
-                    .background(FGColors.warning.opacity(0.1))
-                    .clipShape(RoundedRectangle(cornerRadius: FGSpacing.chipRadius))
-                }
-
                 // Apply button
                 Button {
                     Task {
@@ -249,17 +212,17 @@ struct ReformatSheet: View {
                         } else {
                             Image(systemName: "aspectratio")
                         }
-                        Text("Regenerate in \(selectedRatio.displayName) (10 credits)")
+                        Text("Regenerate in \(selectedRatio.displayName)")
                     }
                     .font(FGTypography.buttonLarge)
                     .foregroundColor(FGColors.textOnAccent)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, FGSpacing.md)
-                    .background(hasCredits ? FGColors.accentPrimary : FGColors.textTertiary)
+                    .background(FGColors.accentPrimary)
                     .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
-                    .shadow(color: hasCredits ? FGColors.accentPrimary.opacity(0.4) : .clear, radius: 12, y: 4)
+                    .shadow(color: FGColors.accentPrimary.opacity(0.4), radius: 12, y: 4)
                 }
-                .disabled(!hasCredits || viewModel.generationState == .generating)
+                .disabled(viewModel.generationState == .generating)
             }
             .padding(FGSpacing.screenHorizontal)
             .background(FGColors.backgroundPrimary)

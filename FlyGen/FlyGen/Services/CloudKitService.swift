@@ -14,6 +14,13 @@ class CloudKitService: ObservableObject {
     private let creditsKey = "credits"
     private let creditsRecordName = "user-credits-record"  // Fixed ID for all devices
     private var creditsRecordID: CKRecord.ID?
+    private let quotaUsedKey = "quotaUsedThisPeriod"
+    private let quotaPeriodStartKey = "quotaPeriodStart"
+
+    /// Tail of the serialized write chain for the shared user-credits-record.
+    /// Every write awaits the previous one so concurrent fetch-modify-save cycles
+    /// can't clobber each other and trigger CloudKit "client oplock error".
+    private var recordWriteTask: Task<Void, Never>?
 
     // Preferences
     private let preferencesRecordType = "UserPreferences"
@@ -104,9 +111,23 @@ class CloudKitService: ObservableObject {
         }
     }
 
-    /// Saves credits to CloudKit using deterministic record ID
-    /// - Parameter credits: The credit amount to save
-    func saveCredits(_ credits: Int) async {
+    // MARK: - Serialized Record Writes
+
+    /// Performs a fetch-modify-save on the shared user-credits-record, serialized
+    /// against every other write so overlapping callers can't cause CloudKit oplock
+    /// conflicts. Falls back to a fresh fetch + retry if the record changed
+    /// underneath us (e.g. another device wrote concurrently).
+    private func updateCreditsRecord(_ label: String, _ mutate: @escaping (CKRecord) -> Void) async {
+        let previous = recordWriteTask
+        let task = Task { [weak self] in
+            await previous?.value
+            await self?.performRecordUpdate(label, mutate)
+        }
+        recordWriteTask = task
+        await task.value
+    }
+
+    private func performRecordUpdate(_ label: String, _ mutate: (CKRecord) -> Void, attempt: Int = 0) async {
         guard isSignedIn else { return }
 
         let database = container.privateCloudDatabase
@@ -114,22 +135,33 @@ class CloudKitService: ObservableObject {
 
         do {
             let record: CKRecord
-
             do {
-                // Try to fetch existing record by known ID
                 record = try await database.record(for: recordID)
             } catch {
-                // Record doesn't exist, create with this specific ID
                 record = CKRecord(recordType: recordType, recordID: recordID)
             }
 
-            record[creditsKey] = credits
+            mutate(record)
 
             let savedRecord = try await database.save(record)
             creditsRecordID = savedRecord.recordID
-            print("CloudKit: Credits saved successfully (\(credits))")
+            print("CloudKit: \(label) saved successfully")
+        } catch let error as CKError where error.code == .serverRecordChanged && attempt < 2 {
+            // Record changed between fetch and save - re-fetch and retry with fresh state.
+            await performRecordUpdate(label, mutate, attempt: attempt + 1)
         } catch {
-            print("CloudKit saveCredits error: \(error.localizedDescription)")
+            print("CloudKit save error (\(label)): \(error.localizedDescription)")
+        }
+    }
+
+    // MARK: - Credit / Quota Writes
+
+    /// Saves credits to CloudKit using the deterministic record ID.
+    /// - Parameter credits: The credit amount to save
+    func saveCredits(_ credits: Int) async {
+        let key = creditsKey
+        await updateCreditsRecord("Credits (\(credits))") { record in
+            record[key] = credits
         }
     }
 
@@ -153,6 +185,71 @@ class CloudKitService: ObservableObject {
             await saveCredits(localCredits)
             print("CloudKit: Created new credits record with \(localCredits) credits")
             return localCredits
+        }
+    }
+
+    // MARK: - Quota Sync Methods
+
+    /// Fetches quota fields from CloudKit using the same user-credits-record.
+    /// - Returns: A tuple (quotaUsed, periodStart), or nil if no record exists.
+    func fetchQuota() async -> (used: Int, periodStart: Date?)? {
+        guard isSignedIn else { return nil }
+
+        let database = container.privateCloudDatabase
+        let recordID = CKRecord.ID(recordName: creditsRecordName)
+
+        do {
+            let record = try await database.record(for: recordID)
+            let used = record[quotaUsedKey] as? Int ?? 0
+            let periodStart = record[quotaPeriodStartKey] as? Date
+            return (used, periodStart)
+        } catch {
+            print("CloudKit fetchQuota: No record found")
+            return nil
+        }
+    }
+
+    /// Saves quota fields to CloudKit using the same user-credits-record.
+    func saveQuota(used: Int, periodStart: Date?) async {
+        let usedKey = quotaUsedKey
+        let startKey = quotaPeriodStartKey
+        await updateCreditsRecord("Quota (used=\(used), periodStart=\(String(describing: periodStart)))") { record in
+            record[usedKey] = used
+            record[startKey] = periodStart as CKRecordValue?
+        }
+    }
+
+    /// Saves credits and quota together in a single record write, so the two
+    /// values that change on every generation never race each other.
+    func saveCreditsAndQuota(credits: Int, quotaUsed: Int, periodStart: Date?) async {
+        let cKey = creditsKey
+        let usedKey = quotaUsedKey
+        let startKey = quotaPeriodStartKey
+        await updateCreditsRecord("Credits+Quota (credits=\(credits), used=\(quotaUsed))") { record in
+            record[cKey] = credits
+            record[usedKey] = quotaUsed
+            record[startKey] = periodStart as CKRecordValue?
+        }
+    }
+
+    /// Syncs quota from CloudKit - cloud is the source of truth.
+    /// - Parameters:
+    ///   - localUsed: Current local quota-used count (used only if no cloud record exists).
+    ///   - localPeriodStart: Current local period start (used only if no cloud record exists).
+    /// - Returns: The cloud quota values (or local if no cloud record exists yet).
+    func syncQuota(localUsed: Int, localPeriodStart: Date?) async -> (used: Int, periodStart: Date?) {
+        guard isSignedIn else { return (localUsed, localPeriodStart) }
+
+        if let cloud = await fetchQuota() {
+            if cloud.used != localUsed || cloud.periodStart != localPeriodStart {
+                print("CloudKit: Syncing local quota from (\(localUsed), \(String(describing: localPeriodStart))) to (\(cloud.used), \(String(describing: cloud.periodStart)))")
+            }
+            return cloud
+        } else {
+            // No CloudKit record exists yet; seed it from local values.
+            await saveQuota(used: localUsed, periodStart: localPeriodStart)
+            print("CloudKit: Created new quota record with used=\(localUsed)")
+            return (localUsed, localPeriodStart)
         }
     }
 

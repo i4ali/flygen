@@ -83,7 +83,7 @@ class NotificationService: ObservableObject {
 
     // MARK: - Public Methods
 
-    /// Call this after credits are deducted to check if credits hit 0
+    /// Call this after a legacy credit purchase to cancel any pending subscription nudge.
     /// - Parameter newCredits: The current credit count after change
     func onCreditsChanged(newCredits: Int) {
         if newCredits <= 0 {
@@ -94,12 +94,7 @@ class NotificationService: ObservableObject {
     }
 
     /// Call when user returns to the app (foreground)
-    /// - Parameter currentCredits: The current credit count
     func onAppBecameActive(currentCredits: Int) {
-        if currentCredits <= 0 && !hasShownInAppAlert {
-            shouldShowInAppAlert = true
-        }
-
         // Clear badge when app becomes active
         clearBadge()
     }
@@ -177,8 +172,8 @@ class NotificationService: ObservableObject {
 
         // Create notification content
         let content = UNMutableNotificationContent()
-        content.title = "Running Low on Credits?"
-        content.body = "Your credits have run out. Get more credits to continue creating stunning AI flyers!"
+        content.title = "Your Monthly Quota is Almost Up"
+        content.body = "You're running low on flyer generations this month. Subscribe to keep creating all month long."
         content.sound = .default
         content.badge = 1
 

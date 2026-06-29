@@ -1,10 +1,20 @@
 import SwiftUI
 import SwiftData
 
+/// App-wide feature flags. Central place to toggle features that are built but
+/// intentionally not exposed to users yet, so they can be enabled in one spot.
+enum FeatureFlags {
+    /// Conversational "Chat" flyer flow. Disabled while we focus on the
+    /// credits-to-subscription migration. The Chat code is retained and still
+    /// compiled; set this to `true` to re-enable the entry point.
+    static let chatEnabled = false
+}
+
 @main
 struct FlyGenApp: App {
     @StateObject private var cloudKitService = CloudKitService()
     @StateObject private var storeKitService = StoreKitService()
+    @StateObject private var entitlementService = EntitlementService()
     @StateObject private var reviewService = ReviewService()
     @StateObject private var notificationService = NotificationService()
 
@@ -59,6 +69,7 @@ struct FlyGenApp: App {
             ContentView()
                 .environmentObject(cloudKitService)
                 .environmentObject(storeKitService)
+                .environmentObject(entitlementService)
                 .environmentObject(reviewService)
                 .environmentObject(notificationService)
         }

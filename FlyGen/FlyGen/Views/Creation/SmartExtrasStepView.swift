@@ -4,17 +4,10 @@ import PhotosUI
 
 struct SmartExtrasStepView: View {
     @ObservedObject var viewModel: FlyerCreationViewModel
-    @EnvironmentObject var cloudKitService: CloudKitService
-    @Environment(\.modelContext) private var modelContext
-    @Query private var userProfiles: [UserProfile]
     @State private var isLoading = true
     @State private var loadError: String?
 
     private let suggestionsService = SmartSuggestionsService()
-
-    private var credits: Int {
-        userProfiles.first?.credits ?? 0
-    }
 
     var body: some View {
         ScrollView {
@@ -276,13 +269,6 @@ struct SmartExtrasStepView: View {
             return
         }
 
-        // Check credits before API call
-        guard credits >= 5 else {
-            loadError = "Not enough credits (need 5)"
-            isLoading = false
-            return
-        }
-
         isLoading = true
         loadError = nil
 
@@ -291,7 +277,6 @@ struct SmartExtrasStepView: View {
                 let smartExtras = try await suggestionsService.generateSuggestions(for: project)
                 await MainActor.run {
                     viewModel.project?.smartExtras = smartExtras
-                    deductCredits(5)
                     isLoading = false
                 }
             } catch {
@@ -300,15 +285,6 @@ struct SmartExtrasStepView: View {
                     isLoading = false
                 }
             }
-        }
-    }
-
-    private func deductCredits(_ amount: Int) {
-        if let profile = userProfiles.first, profile.credits >= amount {
-            profile.credits -= amount
-            profile.lastSyncedAt = Date()
-            try? modelContext.save()
-            Task { await cloudKitService.saveCredits(profile.credits) }
         }
     }
 
