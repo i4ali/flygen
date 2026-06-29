@@ -21,6 +21,20 @@ def test_generate_concepts_builds_prompt_and_returns_base64():
     assert isinstance(kwargs["prompt"], str) and len(kwargs["prompt"]) > 0
 
 
+def test_generate_concepts_includes_user_photos_as_input_images():
+    # uploaded photos ride along as references for the image model, alongside any logo.
+    fake_result = MagicMock(success=True, image_base64="ZmFrZQ==", image_path=None, error_message=None)
+    fake_generator = MagicMock()
+    fake_generator.generate.return_value = [fake_result]
+
+    project = to_flyer_project(ExtractedBrief(category="music_concert", headline="Live Show"))
+    generate_concepts(project, generator=fake_generator, n=1,
+                      user_photo_paths=["/tmp/a.png", "/tmp/b.png"])
+
+    _, kwargs = fake_generator.generate.call_args
+    assert kwargs["input_images"] == ["/tmp/a.png", "/tmp/b.png"]
+
+
 def test_refine_concept_passes_prior_image_in_edit_mode():
     fake_result = MagicMock(success=True, image_base64="cmVmaW5lZA==", image_path=None, error_message=None)
     fake_generator = MagicMock()

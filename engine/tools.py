@@ -20,10 +20,16 @@ def _to_concept(result, version_id: str) -> Concept:
     )
 
 
-def generate_concepts(project: FlyerProject, generator, n: int = 3) -> List[Concept]:
-    """Compile the project to a prompt and generate N concepts as base64 (no disk)."""
+def generate_concepts(project: FlyerProject, generator, n: int = 3,
+                      user_photo_paths: Optional[List[str]] = None) -> List[Concept]:
+    """Compile the project to a prompt and generate N concepts as base64 (no disk).
+    Uploaded user photos (e.g. the performers) ride along as references, after the logo."""
     package = FlyerPromptBuilder(project).build()
-    input_images = [project.logo_path] if project.logo_path else None
+    input_images = []
+    if project.logo_path:
+        input_images.append(project.logo_path)
+    if user_photo_paths:
+        input_images.extend(user_photo_paths)
     results = generator.generate(
         prompt=package["main_prompt"],
         negative_prompt=package["negative_prompt"],
@@ -32,7 +38,7 @@ def generate_concepts(project: FlyerProject, generator, n: int = 3) -> List[Conc
         quality=package["quality"],
         n=n,
         save_images=False,
-        input_images=input_images,
+        input_images=input_images or None,
     )
     return [_to_concept(r, f"v{i+1}") for i, r in enumerate(results)]
 

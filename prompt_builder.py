@@ -363,14 +363,15 @@ class FlyerPromptBuilder:
             style_name = self.project.visuals.style.value.replace("_", " ").title()
             mood_name = self.project.visuals.mood.value.title()
             sections.append(
-                "CRITICAL USER PHOTO INSTRUCTIONS: A user photo has been provided and MUST be incorporated into the flyer design. "
-                "Decide the optimal placement and size for the photo based on the overall composition - it could be a hero image, "
-                "a smaller inset, or integrated into the background. "
-                f"IMPORTANT: Stylize the photo to match the flyer's visual aesthetic - apply appropriate color grading, "
+                "CRITICAL USER PHOTO INSTRUCTIONS: One or more user photos have been provided (e.g. the people, "
+                "performers, or product) and MUST be incorporated into the flyer design. "
+                "Decide the optimal placement and size for the photo(s) based on the overall composition - they "
+                "could be hero image(s), smaller insets, or integrated into the background. "
+                f"IMPORTANT: Stylize the photo(s) to match the flyer's visual aesthetic - apply appropriate color grading, "
                 f"filters, or artistic effects that harmonize with the chosen style ({style_name}) "
                 f"and mood ({mood_name}). "
-                "The photo should integrate seamlessly while the subject remains clearly recognizable. "
-                "Do NOT crop out important subjects from the photo."
+                "The photo(s) should integrate seamlessly while the subjects remain clearly recognizable. "
+                "Do NOT crop out important subjects."
             )
         elif self.project.imagery_description:
             style_name = self.project.visuals.style.value.replace("_", " ").title()

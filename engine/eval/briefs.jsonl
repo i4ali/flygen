@@ -1,0 +1,22 @@
+{"text": "Flyer for our church bake sale this Saturday 10am-2pm at Grace Hall, all proceeds go to the youth summer camp. Donate at the door.", "kind": "complete", "expect_category": "nonprofit_charity", "expect_fields": ["date", "venue_name", "cta_text"]}
+{"text": "Summer Jazz Night, Friday June 20 at 7pm, Riverside Park Amphitheater. Get tickets at riverjazz.org.", "kind": "complete", "expect_category": "event", "expect_fields": ["date", "venue_name", "website"]}
+{"text": "40% off all winter coats this weekend only at NorthPeak Outfitters. Shop in-store or online.", "kind": "complete", "expect_category": "sale_promo", "expect_fields": ["discount_text", "cta_text"]}
+{"text": "I need a flyer for an event.", "kind": "vague", "expect_category": "event", "expect_fields": []}
+{"text": "make me a flyer", "kind": "vague", "expect_category": "announcement", "expect_fields": []}
+{"text": "Grand opening of Bloom Cafe on Main Street, Saturday May 3rd at 9am. First 50 guests get free pastries.", "kind": "complete", "expect_category": "grand_opening", "expect_fields": ["date", "venue_name"]}
+{"text": "The Midnight live in concert, Aug 12, 8pm at The Echo Lounge. Tickets $25 at the door.", "kind": "complete", "expect_category": "music_concert", "expect_fields": ["date", "venue_name", "price"]}
+{"text": "Free community yoga in the park every Sunday 9am at Lincoln Park. All levels welcome.", "kind": "complete", "expect_category": "fitness_wellness", "expect_fields": ["venue_name"]}
+{"text": "Taco Tuesday at El Sol! $2 tacos all day, every Tuesday. 123 Elm St, call 555-0123.", "kind": "complete", "expect_category": "restaurant_food", "expect_fields": ["address", "phone"]}
+{"text": "Open house Sunday 1-4pm, 482 Maple Ave. 3 bed 2 bath, $450,000. Call Jane at 555-9090.", "kind": "complete", "expect_category": "real_estate", "expect_fields": ["price", "address", "phone"]}
+{"text": "Now hiring line cooks at Harbor Grill. Competitive pay, apply at harborgrill.com/jobs.", "kind": "complete", "expect_category": "job_posting", "expect_fields": ["website"]}
+{"text": "Beginner watercolor workshop, Saturday 2pm at the Art Loft. $35, register online.", "kind": "complete", "expect_category": "class_workshop", "expect_fields": ["date", "venue_name", "price"]}
+{"text": "You're invited! Mia's 5th birthday party, Sat April 6 at 3pm, 14 Oak Court. RSVP to 555-2211.", "kind": "complete", "expect_category": "party_celebration", "expect_fields": ["date", "address"]}
+{"text": "Glow Beauty Bar grand reopening — 20% off all services in June. Book at glowbar.com.", "kind": "complete", "expect_category": "beauty_salon", "expect_fields": ["discount_text", "website"]}
+{"text": "Reliable plumbing, 24/7 emergency service. Call Apex Plumbing 555-7788, free estimates.", "kind": "complete", "expect_category": "service_business", "expect_fields": ["phone"]}
+{"text": "Easter Sunday service, April 20 at 10am, Hope Community Church. Everyone welcome.", "kind": "complete", "expect_category": "church_religious", "expect_fields": ["date", "venue_name"]}
+{"text": "Necesito un volante para nuestra fiesta de quinceañera el 15 de mayo a las 6pm en el Salón Las Palmas.", "kind": "complete", "expect_category": "party_celebration", "expect_fields": ["date", "venue_name"]}
+{"text": "Gran venta de verano, 30% de descuento en toda la tienda este fin de semana. ¡Visítanos!", "kind": "complete", "expect_category": "sale_promo", "expect_fields": ["discount_text"]}
+{"text": "Annual Charity 5K Run/Walk — Saturday October 4, 8am start at City Hall Plaza. Registration $30, proceeds benefit the local food bank. Sign up at run4food.org, kids under 12 free.", "kind": "complete", "expect_category": "nonprofit_charity", "expect_fields": ["date", "venue_name", "cta_text"]}
+{"text": "something for a sale we're having", "kind": "vague", "expect_category": "sale_promo", "expect_fields": []}
+{"text": "a flyer to raise money for charity", "kind": "vague", "expect_category": "nonprofit_charity", "expect_fields": []}
+{"text": "Office will be closed Monday July 4th for the holiday. Reopening Tuesday.", "kind": "complete", "expect_category": "announcement", "expect_fields": ["date"]}
