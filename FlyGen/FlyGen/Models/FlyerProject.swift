@@ -28,6 +28,11 @@ enum LogoPosition: String, CaseIterable, Codable, Identifiable {
     }
 }
 
+/// Where a saved flyer originated. Absent (nil) means the classic step-by-step flow.
+enum FlyerOrigin: String, Codable {
+    case chat
+}
+
 struct FlyerProject: Codable, Identifiable, Equatable {
     let id: UUID
     var category: FlyerCategory
@@ -38,6 +43,7 @@ struct FlyerProject: Codable, Identifiable, Equatable {
     var output: OutputSettings
     var targetAudience: String?
     var specialInstructions: String?
+    var origin: FlyerOrigin?     // nil => classic creation flow; .chat => created in chat
     var logoImageData: Data?
     var logoPosition: LogoPosition = .topRight
     var userPhotosData: [Data] = []    // User's uploaded photos for AI to incorporate

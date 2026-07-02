@@ -4,10 +4,15 @@ import SwiftData
 /// App-wide feature flags. Central place to toggle features that are built but
 /// intentionally not exposed to users yet, so they can be enabled in one spot.
 enum FeatureFlags {
-    /// Conversational "Chat" flyer flow. Disabled while we focus on the
-    /// credits-to-subscription migration. The Chat code is retained and still
-    /// compiled; set this to `true` to re-enable the entry point.
-    static let chatEnabled = false
+    /// Conversational "Chat" flyer flow - the primary and only way to create a flyer.
+    /// The Chat code is retained and compiled; setting this to `false` would leave the
+    /// app with no creation entry point unless `classicCreationEnabled` is also on.
+    static let chatEnabled = true
+
+    /// Classic step-by-step creation wizard and its entry points (Create New Flyer,
+    /// Use Template, Resume Draft, Use as Template). Retired in favor of chat; the code
+    /// is retained and still compiled - set this to `true` to bring the entry points back.
+    static let classicCreationEnabled = false
 }
 
 @main

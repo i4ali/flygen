@@ -14,6 +14,7 @@ struct ChatRequest: Encodable {
     var field_overrides: [String: String]?
     var decision_overrides: [String: String]?
     var user_photos_b64: [String]?      // uploaded source photos, sent on the approve turn
+    var selected_elements: [String]?    // chosen creative elements (their what-text), sent on approve
 }
 
 // MARK: - parsed_fields payload (round-trips as `brief`)
@@ -33,10 +34,12 @@ struct ExtractedBriefDTO: Codable, Equatable {
     var phone: String?
     var email: String?
     var website: String?
+    var social_handle: String?
     var additional_info: [String]?     // answers with no dedicated slot — must round-trip back
     var purpose: String?
     var destination: String?
     var field_sources: [String: String]?
+    var photo_suggestion: String?      // brain's "add a photo of X" nudge; shown once per flyer
 
     /// Non-empty content fields in display order (category first), with their source.
     var displayFields: [(key: String, value: String, source: String)] {
@@ -46,6 +49,7 @@ struct ExtractedBriefDTO: Codable, Equatable {
             ("venue_name", venue_name), ("address", address), ("price", price),
             ("discount_text", discount_text), ("cta_text", cta_text),
             ("phone", phone), ("email", email), ("website", website),
+            ("social_handle", social_handle),
         ]
         var out = pairs.compactMap { key, value -> (key: String, value: String, source: String)? in
             guard let v = value, !v.isEmpty else { return nil }
@@ -83,6 +87,7 @@ struct DesignBriefDTO: Decodable {
 struct ReviewProposalDTO: Decodable {
     let fields: [FieldProposalDTO]
     let decisions: [DecisionProposalDTO]
+    var creative_elements: [CreativeProposalDTO]?
     let plan: DesignBriefDTO?
 }
 struct FieldProposalDTO: Decodable, Identifiable {
@@ -94,7 +99,15 @@ struct DecisionProposalDTO: Decodable, Identifiable {
     let key: String; let label: String; let value: String
     let options: [String]; let reason: String
     var option_labels: [String: String]?     // value -> human label (e.g. size platform hints)
+    var supported: Bool?                     // false => off-vocabulary value (not a standard option)
     var id: String { key }
+}
+struct CreativeProposalDTO: Decodable, Identifiable {
+    let what: String
+    var why: String?
+    var sensitivity: String?                 // "safe" => pre-selected; "sensitive" => opt-in
+    var selected: Bool?                      // engine default (safe on, sensitive off)
+    var id: String { what }
 }
 
 // MARK: - concepts | refined | resized payload

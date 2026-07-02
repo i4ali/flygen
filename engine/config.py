@@ -18,6 +18,8 @@ THINKING = {"type": "adaptive"}
 EFFORT = {"effort": "high"}                    # how hard to think: "low" | "medium" | "high" | "max"
 
 # Output budget per turn. The OpenRouter shim carves the thinking budget out of this, so it
-# must leave room for BOTH the reasoning pass and the JSON answer — too small truncates the
-# JSON (the failure mode that surfaces as a Pydantic "invalid JSON" error in the app).
-MAX_TOKENS = 8000
+# must leave room for BOTH the reasoning pass and the JSON answer - too small truncates the
+# JSON (the failure mode that surfaces as a Pydantic "invalid JSON" error in the app). The shim
+# also retries once with a larger budget on a truncated turn, so this is the comfortable first
+# try, not the hard ceiling; the largest briefs (long multi-day programs) need the headroom.
+MAX_TOKENS = 16000

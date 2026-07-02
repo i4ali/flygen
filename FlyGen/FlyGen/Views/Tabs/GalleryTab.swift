@@ -166,9 +166,11 @@ struct FlyerDetailSheet: View {
                         Divider()
                             .background(FGColors.borderSubtle)
                         DetailRow(label: "Created", value: flyer.createdAt.formatted(date: .long, time: .shortened))
-                        Divider()
-                            .background(FGColors.borderSubtle)
-                        DetailRow(label: "Model", value: flyer.model)
+                        if !flyer.model.isEmpty {
+                            Divider()
+                                .background(FGColors.borderSubtle)
+                            DetailRow(label: "Model", value: flyer.model)
+                        }
                     }
                     .padding(FGSpacing.cardPadding)
                     .background(FGColors.backgroundElevated)
@@ -193,8 +195,10 @@ struct FlyerDetailSheet: View {
                         .clipShape(RoundedRectangle(cornerRadius: FGSpacing.chipRadius))
                     }
 
-                    // Use as Template button (full width, prominent)
-                    if flyer.project != nil {
+                    // Use as Template button (full width, prominent) - opens the classic
+                    // wizard, so it's hidden when that flow is disabled and for chat-made
+                    // flyers (whose stored recipe is only a lightweight approximation).
+                    if FeatureFlags.classicCreationEnabled && flyer.project != nil && !flyer.isFromChat {
                         Button {
                             dismiss()
                             onUseAsTemplate?(flyer)

@@ -107,6 +107,14 @@ class _Messages:
     def __init__(self, oai):
         self._oai = oai
 
+    def _create(self, *, model, messages, max_tokens, reasoning):
+        return self._oai.chat.completions.create(
+            model=_MODEL_MAP.get(model, model),
+            messages=messages,
+            max_tokens=max_tokens,
+            extra_body={"reasoning": reasoning} if reasoning else None,
+        )
+
     def parse(self, *, model, messages, output_format, system=None,
               max_tokens=2000, thinking=None, output_config=None, **_ignored):
         # OpenRouter's response_format=json_schema is unreliable across providers (it stalls /
@@ -129,14 +137,17 @@ class _Messages:
         oai_messages.extend(_flatten_messages(messages))
 
         reasoning = _reasoning(thinking, output_config)
-        resp = self._oai.chat.completions.create(
-            model=_MODEL_MAP.get(model, model),
-            messages=oai_messages,
-            max_tokens=max_tokens,
-            extra_body={"reasoning": reasoning} if reasoning else None,
-        )
-        content = resp.choices[0].message.content
-        return _Parsed(_to_model(content, output_format))
+        resp = self._create(model=model, messages=oai_messages, max_tokens=max_tokens,
+                            reasoning=reasoning)
+        choice = resp.choices[0]
+        # finish_reason == "length" means the model hit the token ceiling and its JSON answer is
+        # cut off mid-structure (unparseable). Retry ONCE with more room and lighter reasoning, so
+        # the budget goes to the answer rather than the thinking (see engine/config.py MAX_TOKENS).
+        if getattr(choice, "finish_reason", None) == "length":
+            resp = self._create(model=model, messages=oai_messages, max_tokens=max_tokens * 2,
+                                reasoning={"effort": "low"} if reasoning else None)
+            choice = resp.choices[0]
+        return _Parsed(_to_model(choice.message.content, output_format))
 
 
 class OpenRouterClient:

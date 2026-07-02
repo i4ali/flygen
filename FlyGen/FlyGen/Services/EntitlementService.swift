@@ -121,6 +121,21 @@ final class EntitlementService: ObservableObject {
             .remaining(quota: quota)
     }
 
+    /// Number of image actions (new / refine / resize) still payable with legacy
+    /// pre-subscription credits. Each action costs `legacyCostPerImage`, so this
+    /// floor-divides to match how `consume` deducts. Returns 0 below one action's worth.
+    func legacyFlyersRemaining(for profile: UserProfile) -> Int {
+        profile.credits / SubscriptionConfig.legacyCostPerImage
+    }
+
+    /// Total image actions the user can still perform before being blocked. The gate
+    /// (`GenerationAccess.decide`) spends subscription quota first, then falls back to
+    /// legacy credits, so the count they can do is the sum. For a non-subscriber quota
+    /// is 0, so this collapses to `legacyFlyersRemaining`.
+    func totalActionsRemaining(for profile: UserProfile) -> Int {
+        quotaRemaining(for: profile) + legacyFlyersRemaining(for: profile)
+    }
+
     func access(for profile: UserProfile) -> GenerationAccess {
         GenerationAccess.decide(
             isSubscribed: isSubscribed,

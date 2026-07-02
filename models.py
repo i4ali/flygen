@@ -215,6 +215,8 @@ class ColorSettings:
     background_type: BackgroundType = BackgroundType.LIGHT
     background_color: Optional[str] = None
     gradient_colors: Optional[List[str]] = None
+    description: Optional[str] = None  # free-text palette direction (authoritative when set,
+                                       # e.g. "midnight black base, deep burgundy, antique gold")
 
 
 @dataclass

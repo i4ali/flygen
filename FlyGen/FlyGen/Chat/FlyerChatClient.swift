@@ -4,15 +4,28 @@ enum ChatClientError: LocalizedError {
     case badStatus(Int)
     var errorDescription: String? {
         switch self {
-        case .badStatus(let c): return "Engine returned HTTP \(c). Is it running on :8000?"
+        case .badStatus(let c): return "The flyer engine returned an error (HTTP \(c)). Please try again."
         }
     }
 }
 
 struct FlyerChatClient {
-    /// The Simulator reaches the host Mac's localhost directly.
-    /// Start the engine with `scripts/run-engine.sh`.
+    /// Debug builds talk to a local engine (`scripts/run-engine.sh` on :8000) so the
+    /// engine can be iterated on from the Simulator via NSAllowsLocalNetworking.
+    /// Release / TestFlight / App Store builds talk to the deployed engine on Cloud Run.
+    /// Shipping a localhost URL is what got build 44 rejected, so production must never
+    /// fall back to localhost - the two are split at compile time.
+    #if DEBUG
     static let baseURL = URL(string: "http://localhost:8000")!
+    #else
+    static let baseURL = URL(string: "https://flygen-engine-139288370007.us-central1.run.app")!
+    #endif
+
+    /// Shared secret the deployed engine checks (ENGINE_SHARED_SECRET on Cloud Run).
+    /// Sent on every request; the local dev engine ignores it when its env var is unset.
+    /// This is obfuscation-grade (it ships in the binary), not user auth - it just keeps
+    /// the endpoint from being trivially callable by anyone who finds the URL.
+    private static let engineKey = "1b9adbd0818b85d8f511aff79d9d340df1bd400524a1c144"
 
     private let session: URLSession
     init() {
@@ -32,6 +45,7 @@ struct FlyerChatClient {
                     req.httpMethod = "POST"
                     req.setValue("application/json", forHTTPHeaderField: "Content-Type")
                     req.setValue("text/event-stream", forHTTPHeaderField: "Accept")
+                    req.setValue(Self.engineKey, forHTTPHeaderField: "x-engine-key")
                     req.httpBody = try JSONEncoder().encode(body)
 
                     let (bytes, response) = try await session.bytes(for: req)

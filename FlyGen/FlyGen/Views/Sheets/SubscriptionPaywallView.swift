@@ -10,7 +10,7 @@ struct SubscriptionPaywallView: View {
     @State private var isRestoring = false
 
     private let termsURL = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
-    private let privacyURL = URL(string: "https://flygen.app/privacy")!
+    private let privacyURL = URL(string: "https://i4ali.github.io/flygen/privacy-policy.html")!
 
     // MARK: - Computed
 
@@ -18,14 +18,6 @@ struct SubscriptionPaywallView: View {
         selectedProduct
             ?? entitlementService.products.first { $0.id == SubscriptionConfig.Product.monthly }
             ?? entitlementService.products.first
-    }
-
-    private var hasIntroOffer: Bool {
-        resolvedSelected?.subscription?.introductoryOffer != nil
-    }
-
-    private var primaryButtonLabel: String {
-        hasIntroOffer ? "Start Free Trial" : "Subscribe"
     }
 
     private var isLoading: Bool {
@@ -193,7 +185,7 @@ struct SubscriptionPaywallView: View {
                     ProgressView()
                         .tint(FGColors.textOnAccent)
                 } else {
-                    Text(primaryButtonLabel)
+                    Text("Subscribe")
                         .font(FGTypography.buttonLarge)
                 }
             }
@@ -266,8 +258,7 @@ struct SubscriptionPaywallView: View {
         case .year?: unitText = "year"
         default: unitText = "period"
         }
-        let trialPrefix = hasIntroOffer ? "After a 3-day free trial, " : ""
-        return "\(trialPrefix)\(product.displayName) is \(product.displayPrice) per \(unitText)."
+        return "\(product.displayName) is \(product.displayPrice) per \(unitText)."
     }
 
     private var disclosureText: some View {
@@ -320,10 +311,6 @@ private struct PlanCard: View {
     let isSelected: Bool
     let onTap: () -> Void
 
-    private var introOffer: Product.SubscriptionOffer? {
-        product.subscription?.introductoryOffer
-    }
-
     private var isMonthly: Bool {
         product.id == SubscriptionConfig.Product.monthly
     }
@@ -367,15 +354,9 @@ private struct PlanCard: View {
                             .foregroundColor(FGColors.textSecondary)
                     }
 
-                    if introOffer != nil {
-                        Text("3-day free trial, then \(product.displayPrice)")
-                            .font(FGTypography.caption)
-                            .foregroundColor(FGColors.accentSecondary)
-                    } else {
-                        Text(product.description.isEmpty ? product.displayPrice : product.description)
-                            .font(FGTypography.caption)
-                            .foregroundColor(FGColors.textSecondary)
-                    }
+                    Text(product.description.isEmpty ? product.displayPrice : product.description)
+                        .font(FGTypography.caption)
+                        .foregroundColor(FGColors.textSecondary)
                 }
 
                 Spacer()

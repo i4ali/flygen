@@ -40,4 +40,11 @@ final class SavedFlyer {
     var headline: String {
         project?.textContent.headline ?? "Untitled Flyer"
     }
+
+    /// True when this flyer was created in the chat flow. Its stored project is a lightweight
+    /// approximation (colors/visuals were chosen server-side and not captured), so the detail
+    /// screen hides "Use as Template" for it.
+    var isFromChat: Bool {
+        project?.origin == .chat
+    }
 }

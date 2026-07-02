@@ -1,0 +1,28 @@
+# Keep the engine image small and secret-free. Never bake .env into the image -
+# the OPENROUTER_API_KEY is injected at runtime via the Worker/container env.
+.env
+.env.*
+.venv/
+**/__pycache__/
+**/*.pyc
+.git/
+.github/
+
+# iOS app + design assets are irrelevant to the Python engine image.
+FlyGen/
+mockups/
+docs/
+subscr/
+flygen-api/
+flygen-engine/
+*.png
+*.JPG
+*.jpg
+*.html
+
+# Local test/demo entrypoints that the engine service does not need.
+demo.py
+main.py
+smoke_glm.py
+test_*.py
+tests/

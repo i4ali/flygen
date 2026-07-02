@@ -31,7 +31,7 @@ struct HomeTab: View {
                         HStack(spacing: FGSpacing.xs) {
                             Image(systemName: "sparkles")
                                 .foregroundColor(FGColors.accentSecondary)
-                            Text("\(entitlementService.quotaRemaining(for: profile)) left")
+                            Text("\(entitlementService.totalActionsRemaining(for: profile)) left")
                                 .font(FGTypography.labelLarge)
                                 .foregroundColor(FGColors.textPrimary)
                         }
@@ -43,6 +43,28 @@ struct HomeTab: View {
                             Capsule()
                                 .stroke(FGColors.borderSubtle, lineWidth: 1)
                         )
+                    } else if let profile, entitlementService.legacyFlyersRemaining(for: profile) > 0 {
+                        // Legacy pre-subscription credits: surface the remaining count.
+                        // Tappable -> paywall so the upgrade path survives the subscription migration.
+                        Button {
+                            showingPaywall = true
+                        } label: {
+                            HStack(spacing: FGSpacing.xs) {
+                                Image(systemName: "sparkles")
+                                    .foregroundColor(FGColors.accentSecondary)
+                                Text("\(entitlementService.legacyFlyersRemaining(for: profile)) left")
+                                    .font(FGTypography.labelLarge)
+                                    .foregroundColor(FGColors.textPrimary)
+                            }
+                            .padding(.horizontal, FGSpacing.sm)
+                            .padding(.vertical, FGSpacing.xs)
+                            .background(FGColors.surfaceDefault)
+                            .clipShape(Capsule())
+                            .overlay(
+                                Capsule()
+                                    .stroke(FGColors.borderSubtle, lineWidth: 1)
+                            )
+                        }
                     } else {
                         Button {
                             showingPaywall = true
@@ -97,82 +119,87 @@ struct HomeTab: View {
                     }
                     .multilineTextAlignment(.center)
 
-                    // Create button with gradient
-                    Button {
-                        if let profile, entitlementService.access(for: profile) == .blocked {
-                            showingPaywall = true
-                        } else {
-                            viewModel.showingCreationFlow = true
-                        }
-                    } label: {
-                        HStack(spacing: FGSpacing.sm) {
-                            Image(systemName: "plus.circle.fill")
-                            Text("Create New Flyer")
-                        }
-                        .font(FGTypography.buttonLarge)
-                        .foregroundColor(FGColors.textOnAccent)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, FGSpacing.md)
-                        .background(
-                            LinearGradient(
-                                colors: [FGColors.accentPrimary, FGColors.accentPrimary.opacity(0.8)],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
-                        .shadow(color: FGColors.accentPrimary.opacity(0.4), radius: 12, y: 4)
-                    }
-                    .padding(.horizontal, FGSpacing.xl)
-                    .padding(.top, FGSpacing.md)
-
-                    // Use Template button
-                    Button {
-                        if let profile, entitlementService.access(for: profile) == .blocked {
-                            showingPaywall = true
-                        } else {
-                            showingTemplates = true
-                        }
-                    } label: {
-                        HStack(spacing: FGSpacing.sm) {
-                            Image(systemName: "doc.on.doc")
-                            Text("Use Template")
-                        }
-                        .font(FGTypography.button)
-                        .foregroundColor(FGColors.accentPrimary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, FGSpacing.md)
-                        .background(FGColors.surfaceDefault)
-                        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: FGSpacing.buttonRadius)
-                                .stroke(FGColors.accentPrimary, lineWidth: 1.5)
-                        )
-                    }
-                    .padding(.horizontal, FGSpacing.xl)
-
-                    // Chat (Beta) - experimental conversational flow (not credit-gated).
-                    // Gated behind FeatureFlags.chatEnabled while we focus on the
-                    // subscription migration. Code retained; flip the flag to re-enable.
+                    // Primary create action: the conversational chat flow, now the only
+                    // way to create a flyer. Not credit-gated (see note in FeatureFlags).
                     if FeatureFlags.chatEnabled {
                         Button { showingChat = true } label: {
                             HStack(spacing: FGSpacing.sm) {
                                 Image(systemName: "bubble.left.and.text.bubble.right")
-                                Text("Chat (Beta)")
-                                Text("NEW").font(FGTypography.captionSmall).foregroundColor(FGColors.textOnAccent)
-                                    .padding(.horizontal, FGSpacing.xs).padding(.vertical, 2)
-                                    .background(FGColors.accentSecondary).clipShape(Capsule())
+                                Text("Chat to Create")
                             }
-                            .font(FGTypography.button).foregroundColor(FGColors.textSecondary)
-                            .frame(maxWidth: .infinity).padding(.vertical, FGSpacing.md)
-                            .background(FGColors.surfaceDefault).clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
-                            .overlay(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius).stroke(FGColors.borderDefault, lineWidth: 1))
+                            .font(FGTypography.buttonLarge)
+                            .foregroundColor(FGColors.textOnAccent)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, FGSpacing.md)
+                            .background(
+                                LinearGradient(
+                                    colors: [FGColors.accentPrimary, FGColors.accentPrimary.opacity(0.8)],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+                            .shadow(color: FGColors.accentPrimary.opacity(0.4), radius: 12, y: 4)
+                        }
+                        .padding(.horizontal, FGSpacing.xl)
+                        .padding(.top, FGSpacing.md)
+                    }
+
+                    // Classic step-by-step creation (Create New Flyer + Use Template),
+                    // retired in favor of chat but retained behind a flag.
+                    if FeatureFlags.classicCreationEnabled {
+                        Button {
+                            if let profile, entitlementService.access(for: profile) == .blocked {
+                                showingPaywall = true
+                            } else {
+                                viewModel.showingCreationFlow = true
+                            }
+                        } label: {
+                            HStack(spacing: FGSpacing.sm) {
+                                Image(systemName: "plus.circle.fill")
+                                Text("Create New Flyer")
+                            }
+                            .font(FGTypography.button)
+                            .foregroundColor(FGColors.accentPrimary)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, FGSpacing.md)
+                            .background(FGColors.surfaceDefault)
+                            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: FGSpacing.buttonRadius)
+                                    .stroke(FGColors.accentPrimary, lineWidth: 1.5)
+                            )
+                        }
+                        .padding(.horizontal, FGSpacing.xl)
+
+                        Button {
+                            if let profile, entitlementService.access(for: profile) == .blocked {
+                                showingPaywall = true
+                            } else {
+                                showingTemplates = true
+                            }
+                        } label: {
+                            HStack(spacing: FGSpacing.sm) {
+                                Image(systemName: "doc.on.doc")
+                                Text("Use Template")
+                            }
+                            .font(FGTypography.button)
+                            .foregroundColor(FGColors.accentPrimary)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, FGSpacing.md)
+                            .background(FGColors.surfaceDefault)
+                            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: FGSpacing.buttonRadius)
+                                    .stroke(FGColors.accentPrimary, lineWidth: 1.5)
+                            )
                         }
                         .padding(.horizontal, FGSpacing.xl)
                     }
 
-                    // Resume Draft banner
-                    if viewModel.hasPendingDraft {
+                    // Resume Draft banner - drafts belong to the classic flow, so only
+                    // surface this when that flow is enabled.
+                    if FeatureFlags.classicCreationEnabled && viewModel.hasPendingDraft {
                         DraftBanner(
                             categoryName: viewModel.draftCategoryName ?? "Flyer",
                             onResume: {

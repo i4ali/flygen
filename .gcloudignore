@@ -1,0 +1,31 @@
+# Controls what `gcloud run deploy --source .` uploads to Cloud Build. Keep the
+# upload to just what the Dockerfile needs (requirements.txt, root *.py, engine/).
+# Never upload .env - the OPENROUTER_API_KEY is passed via --set-env-vars instead.
+.env
+.env.*
+.venv/
+.git/
+.github/
+**/__pycache__/
+**/*.pyc
+
+# iOS app, design assets, planning docs - irrelevant to the Python engine image.
+FlyGen/
+mockups/
+docs/
+subscr/
+flygen-api/
+flygen-engine/
+.playwright-mcp/
+node_modules/
+*.png
+*.JPG
+*.jpg
+*.html
+
+# Local-only test/demo entrypoints the engine service doesn't need.
+demo.py
+main.py
+smoke_glm.py
+test_*.py
+tests/

@@ -1,5 +1,5 @@
 from unittest.mock import MagicMock
-from engine.schema import ExtractedBrief, to_flyer_project
+from models import FlyerProject, FlyerCategory, TextContent
 from engine.tools import generate_concepts, refine_concept, resize_concept, Concept
 
 
@@ -8,7 +8,7 @@ def test_generate_concepts_builds_prompt_and_returns_base64():
     fake_generator = MagicMock()
     fake_generator.generate.return_value = [fake_result, fake_result, fake_result]
 
-    project = to_flyer_project(ExtractedBrief(category="event", headline="Bake Sale"))
+    project = FlyerProject(category=FlyerCategory.EVENT, text_content=TextContent(headline="Bake Sale"))
     concepts = generate_concepts(project, generator=fake_generator, n=3)
 
     assert len(concepts) == 3
@@ -27,7 +27,7 @@ def test_generate_concepts_includes_user_photos_as_input_images():
     fake_generator = MagicMock()
     fake_generator.generate.return_value = [fake_result]
 
-    project = to_flyer_project(ExtractedBrief(category="music_concert", headline="Live Show"))
+    project = FlyerProject(category=FlyerCategory.MUSIC_CONCERT, text_content=TextContent(headline="Live Show"))
     generate_concepts(project, generator=fake_generator, n=1,
                       user_photo_paths=["/tmp/a.png", "/tmp/b.png"])
 
@@ -40,7 +40,7 @@ def test_refine_concept_passes_prior_image_in_edit_mode():
     fake_generator = MagicMock()
     fake_generator.generate.return_value = [fake_result]
 
-    project = to_flyer_project(ExtractedBrief(category="event", headline="Bake Sale"))
+    project = FlyerProject(category=FlyerCategory.EVENT, text_content=TextContent(headline="Bake Sale"))
     concept = refine_concept(
         project,
         prior_image_path="/tmp/prev.png",

@@ -383,6 +383,15 @@ class FlyerPromptBuilder:
                 "Integrate this imagery as a key visual element within the composition."
             )
 
+        # 14.5 Arabic / Urdu script handling (mitigates garbled, doubled calligraphy)
+        if self._has_arabic_content():
+            sections.append(
+                "ARABIC/URDU SCRIPT: Render any Arabic or Urdu text as correctly-spelled, connected "
+                "right-to-left calligraphy. Keep it in its original script - do NOT transliterate it, "
+                "and do NOT translate the English text into Arabic. Each Arabic phrase must appear "
+                "EXACTLY ONCE, cleanly placed so it never overlaps, duplicates, or collides with other text."
+            )
+
         # 15. Quality reminders (conditional based on NO_TEXT mode)
         if self.project.visuals.imagery_type != ImageryType.NO_TEXT:
             sections.append(
@@ -409,49 +418,80 @@ class FlyerPromptBuilder:
     def _build_color_section(self) -> str:
         """Build color palette instructions"""
         parts = []
-        
-        # Preset palette
-        palette_desc = COLOR_PALETTE_DESCRIPTORS.get(
-            self.project.colors.preset,
-            ""
-        )
-        if palette_desc:
-            parts.append(f"Color scheme: {palette_desc}.")
-        
-        # Specific colors
+        colors = self.project.colors
+
+        # An explicit free-text palette direction (set by the engine from the design brief) is
+        # authoritative: emit it verbatim and skip the canned preset/background descriptors, which
+        # would otherwise override it with a generic "warm ... light, bright and airy" instruction.
+        description = getattr(colors, "description", None)
+        if description:
+            parts.append(
+                "Color palette (follow this exactly, including the background and text colors): "
+                f"{description}."
+            )
+        else:
+            palette_desc = COLOR_PALETTE_DESCRIPTORS.get(colors.preset, "")
+            if palette_desc:
+                parts.append(f"Color scheme: {palette_desc}.")
+
+        # Specific colors (explicit hexes reinforce the description when we have them)
         color_specs = []
-        if self.project.colors.primary_color:
-            color_specs.append(f"primary: {self.project.colors.primary_color}")
-        if self.project.colors.secondary_color:
-            color_specs.append(f"secondary: {self.project.colors.secondary_color}")
-        if self.project.colors.accent_color:
-            color_specs.append(f"accent: {self.project.colors.accent_color}")
-        
+        if colors.primary_color:
+            color_specs.append(f"primary: {colors.primary_color}")
+        if colors.secondary_color:
+            color_specs.append(f"secondary: {colors.secondary_color}")
+        if colors.accent_color:
+            color_specs.append(f"accent: {colors.accent_color}")
+
         if color_specs:
             parts.append(f"Specific colors: {', '.join(color_specs)}.")
-        
-        # Background
-        if self.project.colors.gradient_colors:
-            gradient = " to ".join(self.project.colors.gradient_colors)
+
+        # Background. Explicit gradient / background_color always win; otherwise emit the canned
+        # background descriptor ONLY when there is no free-text description (the description already
+        # dictates the background, so the default LIGHT descriptor must not contradict it).
+        if colors.gradient_colors:
+            gradient = " to ".join(colors.gradient_colors)
             parts.append(f"Background: gradient from {gradient}.")
-        elif self.project.colors.background_color:
-            bg_type_desc = BACKGROUND_DESCRIPTORS.get(
-                self.project.colors.background_type,
-                ""
-            )
-            parts.append(f"Background: {self.project.colors.background_color} {bg_type_desc}.")
-        else:
-            bg_desc = BACKGROUND_DESCRIPTORS.get(
-                self.project.colors.background_type,
-                ""
-            )
+        elif colors.background_color:
+            bg_type_desc = BACKGROUND_DESCRIPTORS.get(colors.background_type, "")
+            parts.append(f"Background: {colors.background_color} {bg_type_desc}.")
+        elif not description:
+            bg_desc = BACKGROUND_DESCRIPTORS.get(colors.background_type, "")
             if bg_desc:
                 parts.append(f"Background: {bg_desc}.")
-        
+
         return " ".join(parts)
     
+    @staticmethod
+    def _contains_arabic(text: Optional[str]) -> bool:
+        """True if the text contains Arabic-script characters (Arabic, Urdu, presentation forms)."""
+        if not text:
+            return False
+        for ch in text:
+            cp = ord(ch)
+            if (0x0600 <= cp <= 0x06FF      # Arabic
+                    or 0x0750 <= cp <= 0x077F   # Arabic Supplement
+                    or 0xFB50 <= cp <= 0xFDFF   # Arabic Presentation Forms-A
+                    or 0xFE70 <= cp <= 0xFEFF):  # Arabic Presentation Forms-B
+                return True
+        return False
+
+    def _has_arabic_content(self) -> bool:
+        """True if any rendered text/imagery contains Arabic-script content."""
+        tc = self.project.text_content
+        fields = [tc.headline, tc.subheadline, tc.body_text, tc.cta_text, tc.venue_name,
+                  tc.date, tc.time, tc.discount_text, self.project.imagery_description]
+        fields.extend(tc.additional_info or [])
+        return any(self._contains_arabic(f) for f in fields)
+
     def _spell_out(self, text: str) -> str:
-        """Return character-by-character spelling for emphasis."""
+        """Return character-by-character spelling for emphasis.
+
+        Only Latin text is spelled out. Arabic/Urdu use connected letterforms, so splitting them
+        into isolated code points corrupts the shaping (the cause of garbled calligraphy) - return
+        those runs unchanged."""
+        if self._contains_arabic(text):
+            return text
         return " ".join(list(text))
 
     def _chunk_text(self, text: str, max_words: int = 5) -> list:
@@ -579,9 +619,11 @@ class FlyerPromptBuilder:
             spelled = self._spell_out(text.social_handle)
             parts.append(f'Social handle must read EXACTLY: "{text.social_handle}" (SPELLING: {spelled}).')
 
-        # Additional info
+        # Additional info (deduped here as a backstop: the classic/non-chat path builds
+        # TextContent directly, without the interpreter's fact reconciliation).
         if text.additional_info:
-            for info_item in text.additional_info:
+            from facts import dedup_facts
+            for info_item in dedup_facts(text.additional_info) or []:
                 spelled = self._spell_out(info_item)
                 parts.append(f'Additional detail must read EXACTLY: "{info_item}" (SPELLING: {spelled}).')
 

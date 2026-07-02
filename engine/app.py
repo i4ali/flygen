@@ -1,12 +1,12 @@
 import json
+import os
 from dataclasses import is_dataclass, asdict
 from typing import Optional, List
-from fastapi import FastAPI
+from fastapi import FastAPI, Header, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from engine.llm import get_client
 from engine.orchestrator import Engine
-from engine.schema import ExtractedBrief
 
 app = FastAPI()
 
@@ -24,6 +24,7 @@ class ChatIn(BaseModel):
     field_overrides: Optional[dict] = None       # user's confirmed/edited content fields
     decision_overrides: Optional[dict] = None    # user's confirmed/overridden design decisions
     user_photos_b64: Optional[List[str]] = None  # uploaded source photos (sent on the approve turn)
+    selected_elements: Optional[List[str]] = None  # approved creative elements from the review
 
 
 def get_generator():
@@ -39,19 +40,15 @@ def run_turn(body: ChatIn):
     needs_gen = action in ("approve", "refine", "resize")
     eng = Engine(client=get_client(), generator=get_generator() if needs_gen else None)
     if body.brief:
-        eng.brief = ExtractedBrief(**body.brief)
-    if body.answers:
-        eng.answers = dict(body.answers)
-
+        eng.brief = dict(body.brief)             # ExtractedBrief-shaped wire state (plain dict)
     if action == "answers":
-        if (body.stage or "").lower() == "design":
-            return eng.handle_design_answers(body.answers or {})
         return eng.handle_answers(body.answers or {})
     if action == "approve":
         return eng.handle_approval(field_overrides=body.field_overrides,
                                    decision_overrides=body.decision_overrides,
                                    answers=body.answers or {},
-                                   user_photos_b64=body.user_photos_b64)
+                                   user_photos_b64=body.user_photos_b64,
+                                   selected_elements=body.selected_elements)
     if action == "refine":
         return eng.handle_refine(body.prior_image_path, body.instruction or "",
                                  prior_image_b64=body.prior_image_b64)
@@ -80,6 +77,14 @@ def _sse(events):
         yield f"event: {e.kind}\ndata: {json.dumps(_to_jsonable(e.payload), default=str)}\n\n"
 
 
+# Shared-secret gate. When ENGINE_SHARED_SECRET is set (Cloud Run), every /chat
+# request must carry a matching `x-engine-key` header; the app embeds the same value.
+# When it's unset (local dev), the check is skipped so run-engine.sh needs no secret.
+ENGINE_SHARED_SECRET = os.environ.get("ENGINE_SHARED_SECRET")
+
+
 @app.post("/chat")
-def chat(body: ChatIn):
+def chat(body: ChatIn, x_engine_key: Optional[str] = Header(default=None)):
+    if ENGINE_SHARED_SECRET and x_engine_key != ENGINE_SHARED_SECRET:
+        raise HTTPException(status_code=401, detail="unauthorized")
     return StreamingResponse(_sse(run_turn(body)), media_type="text/event-stream")

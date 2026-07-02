@@ -93,19 +93,14 @@
           "familyShareable" : false,
           "groupNumber" : 1,
           "internalID" : "9F0A0001",
-          "introductoryOffer" : {
-            "internalID" : "9F0A0F01",
-            "paymentMode" : "free",
-            "subscriptionPeriod" : "P3D"
-          },
           "localizations" : [
             {
-              "description" : "50 flyers per month, with a 3-day free trial",
+              "description" : "50 flyers per month",
               "displayName" : "FlyGen Premium Monthly",
               "locale" : "en_US"
             }
           ],
-          "productID" : "com.flygen.premium.monthly",
+          "productID" : "com.flygen.premium.monthly.v2",
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "FlyGen Premium Monthly",
           "subscriptionGroupID" : "5B1A9F00",
@@ -122,19 +117,14 @@
           "familyShareable" : false,
           "groupNumber" : 2,
           "internalID" : "9F0A0002",
-          "introductoryOffer" : {
-            "internalID" : "9F0A0F02",
-            "paymentMode" : "free",
-            "subscriptionPeriod" : "P3D"
-          },
           "localizations" : [
             {
-              "description" : "12 flyers per week, with a 3-day free trial",
+              "description" : "12 flyers per week",
               "displayName" : "FlyGen Premium Weekly",
               "locale" : "en_US"
             }
           ],
-          "productID" : "com.flygen.premium.weekly",
+          "productID" : "com.flygen.premium.weekly.v2",
           "recurringSubscriptionPeriod" : "P1W",
           "referenceName" : "FlyGen Premium Weekly",
           "subscriptionGroupID" : "5B1A9F00",

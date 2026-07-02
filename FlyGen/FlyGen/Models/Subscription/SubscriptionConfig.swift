@@ -6,8 +6,8 @@ enum SubscriptionConfig {
     static let legacyCostPerImage = 10
 
     enum Product {
-        static let weekly = "com.flygen.premium.weekly"
-        static let monthly = "com.flygen.premium.monthly"
+        static let weekly = "com.flygen.premium.weekly.v2"
+        static let monthly = "com.flygen.premium.monthly.v2"
         static let all: Set<String> = [weekly, monthly]
     }
 

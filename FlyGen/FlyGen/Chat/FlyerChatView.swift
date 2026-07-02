@@ -1,10 +1,12 @@
 import SwiftUI
+import SwiftData
 import UIKit
 import PhotosUI
 
 struct FlyerChatView: View {
     @StateObject private var vm = FlyerChatViewModel()
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
 
     var body: some View {
         NavigationStack {
@@ -50,29 +52,34 @@ struct FlyerChatView: View {
         case .user(let t):        UserBubble(text: t)
         case .userPhotos(let p):  UserPhotosBubble(photos: p)
         case .assistant(let t):   AssistantBubble(text: t)
+        case .photoSuggestion(let t, let resolved): PhotoSuggestionBubble(text: t, selection: $vm.photoPickerItems, disabled: vm.isStreaming, resolved: resolved, onDecline: { vm.declinePhotoSuggestion() })
         case .typing(let t):      TypingBubble(text: t)
         case .parsedFields(let b): ParsedFieldsCard(brief: b, expanded: bubble.id == latestParsedFieldsID)
         case .questions(let qs, let stage):  QuestionsCard(questions: qs, onSubmit: { vm.submitAnswers($0, order: $1, stage: stage) })
         case .designBrief(let d): DesignNotesCard(brief: d)
-        case .review(let r):      ReviewCard(review: r, onApprove: { vm.approve(fieldOverrides: $0, decisionOverrides: $1) })
+        case .review(let r):      ReviewCard(review: r, onApprove: { vm.approve(fieldOverrides: $0, decisionOverrides: $1, selectedElements: $2) })
         case .concepts(let cs):   ConceptsCard(concepts: cs,
                                       onRefine: { vm.refine(concept: $0, instruction: $1) },
-                                      onResize: { vm.resize(concept: $0, aspect: $1) })
+                                      onResize: { vm.resize(concept: $0, aspect: $1) },
+                                      onAddToMyFlyers: { addToMyFlyers($0) })
         case .error(let m):       ErrorBubble(text: m)
         }
+    }
+
+    /// Persist a chat concept into My Flyers (a SavedFlyer) so it appears in the Gallery tab
+    /// and syncs via iCloud, alongside classic flyers.
+    private func addToMyFlyers(_ concept: ConceptDTO) {
+        guard let imageData = concept.imageData, let project = vm.chatFlyerProject() else { return }
+        let generated = GeneratedFlyer(projectId: project.id, imageData: imageData,
+                                       prompt: "", negativePrompt: "", model: "")
+        modelContext.insert(SavedFlyer(project: project, generatedFlyer: generated))
+        try? modelContext.save()
     }
 
     private var composer: some View {
         VStack(spacing: FGSpacing.xs) {
             if !vm.attachedPhotos.isEmpty { photoStrip }
             HStack(spacing: FGSpacing.sm) {
-                PhotosPicker(selection: $vm.photoPickerItems, maxSelectionCount: nil, matching: .images) {
-                    Image(systemName: "photo.on.rectangle.angled").font(.system(size: 24))
-                        .foregroundColor(vm.isStreaming ? FGColors.textTertiary : FGColors.accentSecondary)
-                }
-                .disabled(vm.isStreaming)
-                .onChange(of: vm.photoPickerItems) { _, _ in Task { await vm.loadAttachedPhotos() } }
-
                 TextField("Describe a flyer (starts a new one)…", text: $vm.composerText, axis: .vertical)
                     .textFieldStyle(.plain).font(FGTypography.body).foregroundColor(FGColors.textPrimary)
                     .lineLimit(1...4)
@@ -88,6 +95,8 @@ struct FlyerChatView: View {
         }
         .padding(FGSpacing.sm)
         .background(FGColors.backgroundSecondary)
+        // Loads whatever the composer strip or the in-chat photo-suggestion picker selects.
+        .onChange(of: vm.photoPickerItems) { _, _ in Task { await vm.loadAttachedPhotos() } }
     }
 
     private var photoStrip: some View {
@@ -148,6 +157,48 @@ private struct AssistantBubble: View {
     var body: some View {
         Text(text).font(FGTypography.body).foregroundColor(FGColors.textSecondary)
             .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+/// The brain's proactive "add a photo of X" nudge, rendered as a distinct accent-tinted bubble
+/// with an inline picker - so it reads as its own message and is one tap to act on. This is the
+/// only photo entry point now that the composer's picker button is hidden.
+private struct PhotoSuggestionBubble: View {
+    let text: String
+    @Binding var selection: [PhotosPickerItem]
+    var disabled: Bool
+    var resolved: Bool                 // once the user has added a photo or declined, hide "No thanks"
+    var onDecline: () -> Void
+    var body: some View {
+        VStack(alignment: .leading, spacing: FGSpacing.sm) {
+            HStack(alignment: .top, spacing: FGSpacing.sm) {
+                Image(systemName: "camera.fill").font(.system(size: 16))
+                    .foregroundColor(FGColors.accentSecondary).padding(.top, 2)
+                Text(text).font(FGTypography.body).foregroundColor(FGColors.textPrimary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            HStack(spacing: FGSpacing.sm) {
+                PhotosPicker(selection: $selection, maxSelectionCount: nil, matching: .images) {
+                    Label("Add a photo", systemImage: "plus").font(FGTypography.button)
+                        .foregroundColor(FGColors.textOnAccent)
+                        .frame(maxWidth: .infinity).padding(.vertical, FGSpacing.sm)
+                        .background(FGColors.accentPrimary).clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+                }
+                .disabled(disabled)
+                if !resolved {
+                    Button(action: onDecline) {
+                        Text("No thanks").font(FGTypography.button)
+                            .foregroundColor(FGColors.textSecondary)
+                            .frame(maxWidth: .infinity).padding(.vertical, FGSpacing.sm)
+                            .background(FGColors.surfaceDefault).clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+                    }
+                    .disabled(disabled)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(FGSpacing.md)
+        .background(FGColors.accentSecondary.opacity(0.10)).clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+        .overlay(RoundedRectangle(cornerRadius: FGSpacing.cardRadius).stroke(FGColors.accentSecondary.opacity(0.35), lineWidth: 1))
     }
 }
 private struct TypingBubble: View {
@@ -220,9 +271,11 @@ private struct ParsedFieldsCard: View {
             }.tint(FGColors.accentSecondary)
         }
     }
-    /// Category arrives as a raw enum value ("job_posting"); show it titled ("Job Posting").
+    /// Category arrives as a raw enum value ("church_religious"); show its canonical display name
+    /// ("Church & Faith") - the same one the review card uses - so the two cards never disagree.
     private func prettyValue(_ key: String, _ value: String) -> String {
         guard key == "category" else { return value }
+        if let category = FlyerCategory(rawValue: value) { return category.displayName }
         return value.split(separator: "_").map { $0.prefix(1).uppercased() + $0.dropFirst() }.joined(separator: " ")
     }
 }
@@ -321,9 +374,10 @@ private struct DesignNotesCard: View {
 
 private struct ReviewCard: View {
     let review: ReviewProposalDTO
-    let onApprove: (_ fieldOverrides: [String: String], _ decisionOverrides: [String: String]) -> Void
+    let onApprove: (_ fieldOverrides: [String: String], _ decisionOverrides: [String: String], _ selectedElements: [String]?) -> Void
     @State private var fieldValues: [String: String] = [:]
     @State private var decisionValues: [String: String] = [:]
+    @State private var elementSelected: [String: Bool] = [:]
     @State private var approved = false
     var body: some View {
         AssistantCard {
@@ -340,14 +394,7 @@ private struct ReviewCard: View {
                         .overlay(RoundedRectangle(cornerRadius: FGSpacing.inputRadius)   // amber outline when flagged
                             .stroke(FGColors.warning, lineWidth: f.warning == nil ? 0 : 1))
                         .disabled(approved)
-                    if let w = f.warning {        // the value needs attention (e.g. a malformed URL)
-                        HStack(alignment: .top, spacing: FGSpacing.xxs) {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .font(.system(size: 10)).foregroundColor(FGColors.warning)
-                            Text(w).font(FGTypography.captionSmall).foregroundColor(FGColors.warning)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                    }
+                    if let w = f.warning { warningLine(w) }   // the value needs attention (e.g. a malformed URL)
                 }
             }
             Divider().background(FGColors.borderSubtle)
@@ -368,20 +415,97 @@ private struct ReviewCard: View {
                         .padding(.horizontal, FGSpacing.sm).padding(.vertical, FGSpacing.xs)
                         .background(FGColors.backgroundTertiary).clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
                     }.disabled(approved)
-                    Text(d.reason).font(FGTypography.captionSmall).foregroundColor(FGColors.textTertiary)
+                    if d.supported == false {       // engine flagged this value as off-vocabulary
+                        warningLine("Not a standard option - pick a suggested value above.")
+                    }
+                    if !d.reason.isEmpty {
+                        Text(d.reason).font(FGTypography.captionSmall).foregroundColor(FGColors.textTertiary)
+                    }
                 }
             }
+            creativeIdeas
+            designNotes
             Button {
                 approved = true
                 let fo = fieldValues.filter { key, val in review.fields.first(where: { $0.key == key })?.value != val }
                 var dov: [String: String] = [:]
                 for d in review.decisions { dov[d.key] = decisionValues[d.key] ?? d.value }
-                onApprove(fo, dov)
+                onApprove(fo, dov, selectedElements())
             } label: {
                 Text("Approve & generate 3 concepts").font(FGTypography.button).foregroundColor(FGColors.textOnAccent)
                     .frame(maxWidth: .infinity).padding(.vertical, FGSpacing.sm)
                     .background(FGColors.accentPrimary).clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
             }.disabled(approved)
+        }
+    }
+
+    // Proactive creative ideas: safe ones default on, sensitive ones default off; the user toggles.
+    @ViewBuilder private var creativeIdeas: some View {
+        if let elements = review.creative_elements, !elements.isEmpty {
+            Divider().background(FGColors.borderSubtle)
+            Text("Creative ideas").font(FGTypography.caption).foregroundColor(FGColors.textTertiary)
+            ForEach(elements) { e in
+                HStack(alignment: .top, spacing: FGSpacing.sm) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack(spacing: FGSpacing.xxs) {
+                            Text(e.what).font(FGTypography.bodySmall).foregroundColor(FGColors.textPrimary)
+                            if e.sensitivity == "sensitive" {
+                                Text("SENSITIVE").font(FGTypography.captionSmall).foregroundColor(FGColors.warning)
+                                    .padding(.horizontal, FGSpacing.xxs).padding(.vertical, 1)
+                                    .background(FGColors.warning.opacity(0.15)).clipShape(Capsule())
+                            }
+                        }
+                        if let why = e.why, !why.isEmpty {
+                            Text(why).font(FGTypography.captionSmall).foregroundColor(FGColors.textTertiary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                    }
+                    Spacer()
+                    Toggle("", isOn: Binding(get: { isElementOn(e) }, set: { elementSelected[e.what] = $0 }))
+                        .labelsHidden().tint(FGColors.accentPrimary).disabled(approved)
+                }
+            }
+        }
+    }
+
+    // The design brief now rides inside review.plan; surface it (older builds got a separate event).
+    @ViewBuilder private var designNotes: some View {
+        if let plan = review.plan, !(plan.notes.isEmpty && plan.checklist.isEmpty && plan.recommendations.isEmpty) {
+            Divider().background(FGColors.borderSubtle)
+            if !plan.notes.isEmpty {
+                Text(plan.notes).font(FGTypography.bodySmall).foregroundColor(FGColors.textSecondary)
+            }
+            if !plan.checklist.isEmpty || !plan.recommendations.isEmpty {
+                DisclosureGroup {
+                    ForEach(plan.checklist, id: \.self) { planBullet($0, "checkmark.circle") }
+                    ForEach(plan.recommendations, id: \.self) { planBullet($0, "lightbulb") }
+                } label: {
+                    Text("Design notes").font(FGTypography.captionBold).foregroundColor(FGColors.textTertiary)
+                }.tint(FGColors.accentSecondary)
+            }
+        }
+    }
+
+    private func isElementOn(_ e: CreativeProposalDTO) -> Bool {
+        elementSelected[e.what] ?? (e.selected ?? (e.sensitivity == "safe"))
+    }
+    /// nil when no creative ideas were offered (engine keeps its safe defaults); otherwise the chosen set.
+    private func selectedElements() -> [String]? {
+        guard let elements = review.creative_elements, !elements.isEmpty else { return nil }
+        return elements.filter { isElementOn($0) }.map { $0.what }
+    }
+    @ViewBuilder private func warningLine(_ text: String) -> some View {
+        HStack(alignment: .top, spacing: FGSpacing.xxs) {
+            Image(systemName: "exclamationmark.triangle.fill").font(.system(size: 10)).foregroundColor(FGColors.warning)
+            Text(text).font(FGTypography.captionSmall).foregroundColor(FGColors.warning)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+    @ViewBuilder private func planBullet(_ text: String, _ icon: String) -> some View {
+        HStack(alignment: .top, spacing: FGSpacing.xs) {
+            Image(systemName: icon).font(.system(size: 11)).foregroundColor(FGColors.accentSecondary).padding(.top, 2)
+            Text(text).font(FGTypography.captionSmall).foregroundColor(FGColors.textSecondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 }
@@ -390,7 +514,9 @@ private struct ConceptsCard: View {
     let concepts: [ConceptDTO]
     let onRefine: (ConceptDTO, String) -> Void
     let onResize: (ConceptDTO, AspectRatio) -> Void
+    let onAddToMyFlyers: (ConceptDTO) -> Void
     @State private var refineText: [String: String] = [:]
+    @State private var savedVersionIDs: Set<String> = []
     var body: some View {
         AssistantCard {
             Text(concepts.count > 1 ? "Three concepts" : "Updated concept").font(FGTypography.h4).foregroundColor(FGColors.textPrimary)
@@ -414,8 +540,19 @@ private struct ConceptsCard: View {
                         } label: { Image(systemName: "wand.and.stars").foregroundColor(FGColors.accentPrimary) }
                     }
                     HStack(spacing: FGSpacing.md) {
-                        Button { save(c) } label: { Label("Save", systemImage: "square.and.arrow.down").font(FGTypography.buttonSmall) }
+                        Button { save(c) } label: { Label("Photos", systemImage: "square.and.arrow.down").font(FGTypography.buttonSmall) }
                             .foregroundColor(FGColors.accentSecondary)
+                        let added = savedVersionIDs.contains(c.version_id)
+                        Button {
+                            onAddToMyFlyers(c)
+                            savedVersionIDs.insert(c.version_id)
+                        } label: {
+                            Label(added ? "Added" : "My Flyers",
+                                  systemImage: added ? "checkmark.circle.fill" : "square.grid.2x2")
+                                .font(FGTypography.buttonSmall)
+                        }
+                        .foregroundColor(added ? FGColors.success : FGColors.accentSecondary)
+                        .disabled(added)
                         Menu {
                             ForEach(AspectRatio.allCases) { ar in Button(ar.displayName) { onResize(c, ar) } }
                         } label: { Label("Resize", systemImage: "aspectratio").font(FGTypography.buttonSmall).foregroundColor(FGColors.accentSecondary) }

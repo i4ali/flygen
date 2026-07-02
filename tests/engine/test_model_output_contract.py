@@ -1,11 +1,6 @@
-"""Contract tests that exercise the REAL model-output parse path and the SSE event shapes
-the iOS app decodes.
-
-Why this file exists: an earlier smoke test mocked `extract_brief` wholesale, so it never
-saw the actual GLM output and missed that the model emits `null` inside `field_sources`
-(and for non-optional DesignBrief fields). These tests drive the real OpenRouterClient
-parse path with realistic raw JSON, and assert every streamed event matches the iOS DTOs.
-"""
+"""Contract tests: drive the REAL model-output parse path (OpenRouterClient.parse -> TurnResult)
+and assert the SSE event shapes the iOS app decodes. Guards the frozen wire DTOs and tolerance
+for model-emitted nulls that once crashed the device."""
 import json
 from unittest.mock import patch, MagicMock
 
@@ -13,16 +8,11 @@ from fastapi.testclient import TestClient
 
 from engine.app import app
 from engine.openrouter_client import OpenRouterClient
-from engine.extract import extract_brief
-from engine.plan import build_design_brief
-from engine.rubrics import rubric_for
-from engine.schema import ExtractedBrief, DesignBrief
+from engine.interpret import interpret
 from engine.tools import Concept
 
 
 def _fake_oai(content: str):
-    """An OpenAI-compatible stand-in whose chat.completions.create returns `content`
-    as the assistant message — i.e. a recorded raw model response, no network."""
     oai = MagicMock()
     msg = MagicMock(); msg.content = content
     choice = MagicMock(); choice.message = msg
@@ -31,42 +21,62 @@ def _fake_oai(content: str):
     return oai
 
 
-# --- real parse path tolerates the model's nulls (the bugs that reached the device) ---
+def _fake_oai_seq(*responses):
+    """OAI stub that returns (content, finish_reason) pairs across successive create() calls
+    and records each call's kwargs (so a test can assert it retried with a bigger budget).
+    The last pair is reused if create() is called more times than pairs given."""
+    oai = MagicMock()
+    calls = []
 
-def test_extract_brief_survives_model_nulls_in_field_sources():
-    # The model is told to "use null for any value you cannot infer" and applies that
-    # inside field_sources too. This is the exact payload class that crashed extract on
-    # the device. Drives OpenRouterClient.parse -> _to_model -> ExtractedBrief for real.
-    raw = json.dumps({
-        "category": "nonprofit_charity", "headline": "Bake Sale",
-        "subheadline": None, "cta_text": None,
-        "field_sources": {"headline": "stated", "category": "inferred",
-                          "address": None, "price": None, "destination": None},
-    })
+    def _create(**kwargs):
+        calls.append(kwargs)
+        content, finish = responses[min(len(calls) - 1, len(responses) - 1)]
+        msg = MagicMock(); msg.content = content
+        choice = MagicMock(); choice.message = msg; choice.finish_reason = finish
+        resp = MagicMock(); resp.choices = [choice]
+        return resp
+
+    oai.chat.completions.create.side_effect = _create
+    oai._calls = calls
+    return oai
+
+
+# A model answer cut off mid-array (the real device failure: an inner object closed, but the
+# enclosing `creative_elements` array and the outer object never did). Mirrors the screenshot.
+_TRUNCATED_JSON = ('{\n  "status": "ready",\n  "category": "event",\n'
+                   '  "creative_elements": [\n    {"what": "Gold accents", "sensitivity": "safe"}')
+
+
+def test_parse_retries_and_recovers_when_output_truncated():
+    """finish_reason=='length' means the JSON answer was chopped off; the shim must retry once
+    with a larger budget and return the recovered turn instead of raising."""
+    complete = json.dumps({"status": "ready", "category": "event", "headline": "Majlis Program"})
+    oai = _fake_oai_seq((_TRUNCATED_JSON, "length"), (complete, "stop"))
     client = OpenRouterClient(api_key="test")
-    client.messages._oai = _fake_oai(raw)   # parse() uses messages._oai, captured at construction
-    brief = extract_brief("bake sale flyer", client=client)
-    assert brief.headline == "Bake Sale"
-    assert brief.field_sources == {"headline": "stated", "category": "inferred"}  # nulls dropped
+    client.messages._oai = oai
+    turn = interpret(prior_brief=None, user_text="big multi-night program", answers=None, client=client)
+    assert turn.headline == "Majlis Program"                          # recovered via the retry
+    assert len(oai._calls) == 2                                       # it actually retried
+    assert oai._calls[1]["max_tokens"] > oai._calls[0]["max_tokens"]  # ...with more room
 
 
-def test_build_design_brief_survives_model_nulls():
-    # Same failure class one turn later: DesignBrief's fields are non-optional; the model
-    # may null them. The real parse path must coerce to defaults, not raise.
-    raw = json.dumps({"notes": None, "checklist": None, "recommendations": ["Add a donation QR"]})
-    client = OpenRouterClient(api_key="test")
-    client.messages._oai = _fake_oai(raw)   # parse() uses messages._oai, captured at construction
-    brief = ExtractedBrief(category="nonprofit_charity", headline="Bake Sale")
-    design = build_design_brief(brief, rubric_for(brief.category), answers={}, client=client)
-    assert design.notes == ""
-    assert design.checklist == []
-    assert design.recommendations == ["Add a donation QR"]
+def test_unparseable_model_output_surfaces_friendly_error_frame():
+    """Even when the answer is still unusable after the retry, the user must get a friendly,
+    recoverable message - never the raw Pydantic/JSON dump that reached the device."""
+    oai = _fake_oai_seq((_TRUNCATED_JSON, "length"))   # every attempt truncates
+    client_obj = OpenRouterClient(api_key="test"); client_obj.messages._oai = oai
+    with patch("engine.app.get_client", return_value=client_obj):
+        client = TestClient(app)
+        with client.stream("POST", "/chat", json={"message": "big multi-night majlis program",
+                                                   "action": "describe"}) as r:
+            fs = _frames("".join(r.iter_text()))
+    assert [k for k, _ in fs] == ["error"]
+    err = dict(fs)["error"]
+    assert "validation error" not in err.lower() and "json" not in err.lower()   # no raw internals
+    assert "again" in err.lower()                                                 # friendly + recoverable
 
-
-# --- streamed event shapes match the iOS DTO contract (guards future regressions) ---
 
 def _frames(body: str):
-    """Parse raw SSE text into [(event, json)] the way the iOS client must."""
     out = []
     for block in body.split("\n\n"):
         block = block.strip("\n")
@@ -82,10 +92,25 @@ def _frames(body: str):
     return out
 
 
+def test_interpret_survives_model_nulls():
+    raw = json.dumps({
+        "status": "ready", "category": None, "headline": "Bake Sale",
+        "field_sources": {"headline": "stated", "category": "inferred", "address": None},
+    })
+    client = OpenRouterClient(api_key="test")
+    client.messages._oai = _fake_oai(raw)
+    turn = interpret(prior_brief=None, user_text="bake sale flyer", answers=None, client=client)
+    assert turn.headline == "Bake Sale"
+    assert turn.category == "announcement"                       # null category -> default
+    assert turn.field_sources == {"headline": "stated", "category": "inferred"}  # nulls dropped
+
+
 def test_describe_event_shapes_match_ios_dtos():
-    fake = ExtractedBrief(category="nonprofit_charity", headline="Bake Sale")
+    from engine.turn import TurnResult, TurnQuestion
+    turn = TurnResult(status="need_input", category="nonprofit_charity", headline="Bake Sale",
+                      questions=[TurnQuestion(field="date", text="What day?")])
     with patch("engine.app.get_client", return_value=MagicMock()), \
-         patch("engine.extract.extract_brief", return_value=fake):
+         patch("engine.interpret.interpret", return_value=turn):
         client = TestClient(app)
         with client.stream("POST", "/chat", json={"message": "bake sale", "action": "describe"}) as r:
             fs = _frames("".join(r.iter_text()))
@@ -94,25 +119,22 @@ def test_describe_event_shapes_match_ios_dtos():
     assert questions and all(isinstance(q["field"], str) and isinstance(q["text"], str) for q in questions)
 
 
-def test_plan_and_review_event_shapes_match_ios_dtos():
-    brief_dict = {"category": "nonprofit_charity", "headline": "Bake Sale", "date": "Sat 10-2",
-                  "venue_name": "Grace Hall", "cta_text": "Come!", "field_sources": {}}
-    design = DesignBrief(notes="Keep it warm.", checklist=["Big headline"],
-                         recommendations=["Add a QR"])
+def test_review_event_shape_matches_ios_dto():
+    from engine.turn import TurnResult, TurnDecision, CreativeElement
+    turn = TurnResult(status="ready", category="event", headline="Gala",
+                      field_sources={"headline": "stated"},
+                      decisions=[TurnDecision(key="format", value="4:5", options=["4:5", "letter"], reason="feeds")],
+                      creative_elements=[CreativeElement(what="Gold accents", sensitivity="safe")])
     with patch("engine.app.get_client", return_value=MagicMock()), \
-         patch("engine.plan.build_design_brief", return_value=design):
+         patch("engine.interpret.interpret", return_value=turn):
         client = TestClient(app)
-        with client.stream("POST", "/chat", json={"action": "answers", "brief": brief_dict,
-                                                  "answers": {"cta_text": "Come!"}}) as r:
+        with client.stream("POST", "/chat", json={"message": "gala", "action": "describe"}) as r:
             fs = _frames("".join(r.iter_text()))
-    # `note` is a conversational assistant line; ignore it for the structural check.
-    assert [k for k, _ in fs if k != "note"] == ["parsed_fields", "design_brief", "review"]
-    d = dict(fs)["design_brief"]
-    assert isinstance(d["notes"], str) and isinstance(d["checklist"], list) and isinstance(d["recommendations"], list)
+    assert [k for k, _ in fs] == ["parsed_fields", "review"]
     rev = dict(fs)["review"]
     assert all({"key", "value", "source"} <= f.keys() for f in rev["fields"])
-    assert all({"key", "label", "value", "options", "reason"} <= x.keys() for x in rev["decisions"])
-    assert rev["plan"] is None or "notes" in rev["plan"]
+    assert all({"key", "label", "value", "options", "option_labels", "reason", "supported"} <= x.keys() for x in rev["decisions"])
+    assert all({"what", "why", "sensitivity", "selected"} <= e.keys() for e in rev["creative_elements"])
 
 
 def test_approve_concepts_event_shape_matches_ios_dto():
@@ -122,8 +144,7 @@ def test_approve_concepts_event_shape_matches_ios_dto():
          patch("engine.app.get_generator", return_value=MagicMock()), \
          patch("engine.tools.generate_concepts", return_value=fake_concepts):
         client = TestClient(app)
-        with client.stream("POST", "/chat", json={"action": "approve", "brief": brief_dict,
-                                                  "answers": {"destination": "instagram"}}) as r:
+        with client.stream("POST", "/chat", json={"action": "approve", "brief": brief_dict}) as r:
             fs = _frames("".join(r.iter_text()))
     assert [k for k, _ in fs] == ["concepts"]
     cs = dict(fs)["concepts"]
