@@ -52,3 +52,11 @@ DerivedData/
 /smoke_*.json
 /smoke_glm.py
 /test-prompts.txt
+
+# Loose scratch media/notes dropped in the repo root (screenshots, reference
+# images, saved guides). App assets live under FlyGen/, so these are root-anchored.
+/*.png
+/*.jpg
+/*.jpeg
+/*.JPG
+/*.html

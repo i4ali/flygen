@@ -28,6 +28,13 @@ def test_additional_info_dedups_punctuation_variants():
         ["Right after Dhuhr prayer", "Right after Dhuhr prayer.", "right after dhuhr prayer"]})
     assert t.additional_info == ["Right after Dhuhr prayer"]
 
+def test_additional_info_dedups_invisible_format_char_variants():
+    # Zero-width/format chars (ZWSP, word joiner) render as nothing, so these three all show
+    # as an identical "Ladies only" row - they must collapse to one extra, not three.
+    t = TurnResult.model_validate({"additional_info":
+        ["Ladies only", "Ladies\u200b only", "\u2060Ladies only"]})
+    assert t.additional_info == ["Ladies only"]
+
 def test_additional_info_drops_facts_already_in_a_field():
     # A fact captured both as a dedicated field AND as an extra must not double up: the extra
     # that echoes the field is dropped; genuinely-standalone extras stay.

@@ -7,14 +7,22 @@ from dataclasses import dataclass
 from typing import Any, Iterator, Optional
 from engine.turn import TurnResult
 from engine import interpret as _interpret
+from engine.gate import is_flyer_request as _is_flyer_request
 from engine.review import assemble_review, to_brief_dict, to_question_set
 from engine.compile_project import build_project
 from engine import tools as _tools
 
 
+# Shown (as a plain assistant line) when the gate decides a typed message isn't a flyer request.
+# Firm but warm, and reversible - if the gate misjudged a real-but-unusual brief, the invitation
+# to "tell me about a flyer" lets the user simply restate it.
+DEFLECTION = ("I only design flyers here, so I can't help with that one. Tell me about a flyer "
+              "you'd like - an event, a sale, an announcement - and I'll take it from there.")
+
+
 @dataclass
 class Event:
-    kind: str            # parsed_fields | questions | review
+    kind: str            # parsed_fields | questions | review | note
                          # | concepts | refined | resized | error
     payload: Any = None
 
@@ -67,8 +75,10 @@ def _materialized_images(b64_list):
 
 class Engine:
     def __init__(self, client, interpret_fn=None, assemble_fn=None, build_project_fn=None,
-                 generate_concepts=None, generator=None, refine_concept=None, resize_concept=None):
+                 generate_concepts=None, generator=None, refine_concept=None, resize_concept=None,
+                 gate_fn=None, edit_reference=None):
         self.client = client
+        self._gate = gate_fn or _is_flyer_request
         self._interpret = interpret_fn or _interpret.interpret
         self._assemble = assemble_fn or assemble_review
         self._build_project = build_project_fn or build_project
@@ -76,6 +86,7 @@ class Engine:
         self._generator = generator
         self._refine = refine_concept or _tools.refine_concept
         self._resize = resize_concept or _tools.resize_concept
+        self._edit_reference = edit_reference or _tools.edit_reference
         self.turn: Optional[TurnResult] = None
         self.brief: dict = {}        # wire state (ExtractedBrief-shaped), persisted in/out
         self.project = None
@@ -97,10 +108,34 @@ class Engine:
             yield Event("review", self._assemble(turn))
 
     def handle_user_message(self, text: str) -> Iterator[Event]:
+        # Cheap gate first: a non-flyer message (a question about the app, a greeting, small talk,
+        # off-topic) is deflected here, before the expensive design brain runs. Only the typed
+        # "describe" turn is gated - answers/approve/refine/resize are always mid-flyer, so they
+        # skip it. The gate fails open (see engine/gate.py), so a real request is never dropped.
+        if text and not self._gate(text, client=self.client):
+            yield Event("note", DEFLECTION)
+            return
         yield from self._run(user_text=text)
 
     def handle_answers(self, answers) -> Iterator[Event]:
         yield from self._run(answers=answers)
+
+    def handle_reference(self, reference_b64, instruction="") -> Iterator[Event]:
+        # The user uploaded a flyer to reuse. Hand the flyer plus their own words straight to the
+        # image model (no brain, no extraction) and return the edited flyer. Each further edit is
+        # another such turn on the latest image, so this stays stateless.
+        if not reference_b64:
+            yield Event("error", "I didn't get that flyer - want to try attaching it again?")
+            return
+        if not (instruction or "").strip():
+            yield Event("note", "Got your flyer. What would you like to change?")
+            return
+        with _materialized_images([reference_b64]) as ref_paths:
+            if not ref_paths:
+                yield Event("error", "I couldn't read that flyer - want to try attaching it again?")
+                return
+            concept = self._edit_reference(ref_paths[0], self._generator, instruction)
+        yield Event("concepts", [concept])
 
     def handle_approval(self, field_overrides=None, decision_overrides=None,
                         answers=None, user_photos_b64=None, selected_elements=None) -> Iterator[Event]:

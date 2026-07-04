@@ -6,6 +6,7 @@ from engine.tools import Concept
 
 def _engine_with(turn, generate=None):
     eng = Engine(client=MagicMock(), interpret_fn=lambda *a, **k: turn,
+                 gate_fn=lambda *a, **k: True,   # bypass the flyer-vs-not gate; these test the brain
                  generate_concepts=generate or (lambda *a, **k: [Concept("v1", "b64")]),
                  generator=MagicMock())
     return eng
@@ -16,7 +17,7 @@ def test_interpret_failure_yields_friendly_error_not_raw_exception():
     # never see that raw text (the device once showed "1 validation error for TurnResult ...").
     def boom(*a, **k):
         raise ValueError("1 validation error for TurnResult\nInvalid JSON: EOF while parsing a list")
-    eng = Engine(client=MagicMock(), interpret_fn=boom)
+    eng = Engine(client=MagicMock(), interpret_fn=boom, gate_fn=lambda *a, **k: True)
     events = list(eng.handle_user_message("big religious multi-night program"))
     assert [e.kind for e in events] == ["error"]                       # nothing leaks past the catch
     msg = events[0].payload
@@ -36,6 +37,18 @@ def test_ready_emits_review():
                       decisions=[TurnDecision(key="format", value="4:5")])
     events = list(_engine_with(turn).handle_user_message("gala sat at hall"))
     assert "review" in [e.kind for e in events]
+
+
+def test_non_flyer_message_deflects_without_running_the_brain():
+    # A question / greeting / off-topic message never reaches the expensive design brain: the gate
+    # deflects it with a single assistant `note`, and interpret is never called.
+    def brain_must_not_run(*a, **k):
+        raise AssertionError("interpret must not run for a deflected message")
+    eng = Engine(client=MagicMock(), interpret_fn=brain_must_not_run,
+                 gate_fn=lambda *a, **k: False)
+    events = list(eng.handle_user_message("do you accept photos as samples?"))
+    assert [e.kind for e in events] == ["note"]        # only the deflection, no parsed_fields/review
+    assert "flyer" in events[0].payload.lower()        # points the user back to flyers
 
 
 def test_approval_generates_concepts():

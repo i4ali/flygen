@@ -26,7 +26,7 @@ struct FlyGenApp: App {
     private static let iCloudContainerIdentifier = "iCloud.com.flygen.app"
 
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([SavedFlyer.self, UserProfile.self, BrandKit.self])
+        let schema = Schema([SavedFlyer.self, UserProfile.self, BrandKit.self, SavedPrompt.self])
         let modelConfiguration = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: false,

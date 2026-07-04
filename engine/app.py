@@ -13,13 +13,14 @@ app = FastAPI()
 
 class ChatIn(BaseModel):
     message: Optional[str] = None
-    action: Optional[str] = None       # describe | answers | approve | refine | resize
+    action: Optional[str] = None       # describe | reference | answers | approve | refine | resize
     stage: Optional[str] = None        # "design" => answers to the design brief's must-fix questions
     brief: Optional[dict] = None       # accumulated ExtractedBrief (state in/out)
     answers: Optional[dict] = None
     instruction: Optional[str] = None
     prior_image_path: Optional[str] = None
     prior_image_b64: Optional[str] = None    # concepts return base64; send it back to refine/resize
+    reference_image_b64: Optional[str] = None  # uploaded flyer to reuse; edited in place using `message`
     aspect_ratio: Optional[str] = None
     field_overrides: Optional[dict] = None       # user's confirmed/edited content fields
     decision_overrides: Optional[dict] = None    # user's confirmed/overridden design decisions
@@ -37,10 +38,13 @@ def get_generator():
 
 def run_turn(body: ChatIn):
     action = (body.action or "describe").lower()
-    needs_gen = action in ("approve", "refine", "resize")
+    needs_gen = action in ("reference", "approve", "refine", "resize")
     eng = Engine(client=get_client(), generator=get_generator() if needs_gen else None)
     if body.brief:
         eng.brief = dict(body.brief)             # ExtractedBrief-shaped wire state (plain dict)
+    if action == "reference":
+        # Reuse an uploaded flyer: the image + the user's words go straight to the image model.
+        return eng.handle_reference(body.reference_image_b64, instruction=body.message or "")
     if action == "answers":
         return eng.handle_answers(body.answers or {})
     if action == "approve":

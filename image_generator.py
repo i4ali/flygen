@@ -55,7 +55,10 @@ OPENROUTER_MODELS = {
 # Models that use chat completions API (not images API)
 CHAT_COMPLETION_IMAGE_MODELS = ["nano-banana", "nano-banana-pro"]
 
-# Nano Banana supports these aspect ratios directly
+# Nano Banana supports these aspect ratios directly. The first block is the app's
+# coarse "create" format set (4:5 intentionally snaps to 3:4). The self-mapping block
+# below adds the finer ratios Gemini accepts natively, so an uploaded reference flyer
+# can be edited at its TRUE shape instead of being squished into one of four buckets.
 NANO_BANANA_ASPECT_RATIOS = {
     "1:1": "1:1",
     "4:5": "3:4",      # Closest match
@@ -63,7 +66,27 @@ NANO_BANANA_ASPECT_RATIOS = {
     "16:9": "16:9",
     "letter": "3:4",
     "a4": "3:4",
+    # finer ratios, passed through verbatim (used by nearest_aspect_ratio for reference edits)
+    "2:3": "2:3",
+    "3:2": "3:2",
+    "3:4": "3:4",
+    "4:3": "4:3",
+    "5:4": "5:4",
 }
+
+# Ratios Gemini image models accept natively, for preserving an uploaded reference's
+# true shape (the 4-bucket create set above is too coarse and would distort the edit).
+_REFERENCE_RATIOS = {"1:1": 1.0, "2:3": 2 / 3, "3:2": 3 / 2, "3:4": 3 / 4,
+                     "4:3": 4 / 3, "5:4": 5 / 4, "9:16": 9 / 16, "16:9": 16 / 9}
+
+
+def nearest_aspect_ratio(width: int, height: int) -> str:
+    """Nearest natively-supported aspect ratio key for a given pixel size. Returned key
+    is guaranteed to be in NANO_BANANA_ASPECT_RATIOS. Falls back to portrait 4:5."""
+    if not width or not height:
+        return "4:5"
+    r = width / height
+    return min(_REFERENCE_RATIOS, key=lambda k: abs(_REFERENCE_RATIOS[k] - r))
 
 
 class FlyerImageGenerator:

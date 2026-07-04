@@ -74,6 +74,33 @@ def refine_concept(project: FlyerProject, prior_image_path: str, instruction: st
     return _to_concept(results[0], "refined")
 
 
+def _reference_aspect_ratio(path: str) -> str:
+    """Nearest natively-supported ratio to the uploaded flyer's true shape, so the edit
+    isn't squished. Falls back to portrait 4:5 if the image can't be read."""
+    from image_generator import nearest_aspect_ratio
+    try:
+        from PIL import Image
+        with Image.open(path) as im:
+            return nearest_aspect_ratio(im.width, im.height)
+    except Exception:
+        return "4:5"
+
+
+def edit_reference(reference_path: str, generator, instruction: str,
+                   aspect_ratio: Optional[str] = None) -> Concept:
+    """Edit an uploaded flyer from the user's own words: hand the flyer plus the instruction to
+    the image model and let it make the change. One image; the prompt stays light and trusts the
+    model to read the flyer and edit just what was asked."""
+    aspect_ratio = aspect_ratio or _reference_aspect_ratio(reference_path)
+    instruction = (instruction or "").strip() or "Return this flyer unchanged."
+    prompt = f"Edit this flyer to make this change, keeping the rest of the flyer the same:\n\n{instruction}"
+    results = generator.generate(
+        prompt=prompt, model="nano-banana-pro", aspect_ratio=aspect_ratio,
+        n=1, save_images=False, input_images=[reference_path],
+    )
+    return _to_concept(results[0], "reference_edit")
+
+
 def resize_concept(prior_image_path: str, aspect_ratio: str, generator,
                    model: str = "nano-banana-pro") -> Concept:
     """Reformat an existing concept to a new aspect ratio, preserving text/style

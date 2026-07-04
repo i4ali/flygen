@@ -9,8 +9,10 @@ struct ContentView: View {
     @StateObject private var viewModel = FlyerCreationViewModel()
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
     @AppStorage("hasSeenBrandKitIntro") private var hasSeenBrandKitIntro: Bool = false
+    @AppStorage("hasSeenPostOnboardingPaywall") private var hasSeenPostOnboardingPaywall: Bool = false
     @State private var showingSettings = false
     @State private var showingBrandKitIntro = false
+    @State private var showPostOnboardingPaywall = false
     @Environment(\.scenePhase) private var scenePhase
 
     @Environment(\.modelContext) private var modelContext
@@ -37,31 +39,29 @@ struct ContentView: View {
             } else if hasCompletedOnboarding {
                 MainTabView(viewModel: viewModel, showingSettings: $showingSettings)
             } else {
-                OnboardingContainerView { selectedCategories, viewModel in
-                    // Save all preferences to user profile
+                ChatOnboardingView { categories, languages in
+                    // Persist the two preferences the chat onboarding collects. Style/mood/color
+                    // and role are no longer gathered up front - the chat decides those per flyer.
                     if let profile = userProfiles.first {
-                        // Categories
-                        profile.setPreferredCategories(selectedCategories)
-
-                        // User role
-                        profile.setUserRole(viewModel.selectedUserRole)
-
-                        // Visual preferences
-                        profile.setPreferredVisualStyle(viewModel.selectedVisualStyle)
-                        profile.setPreferredMood(viewModel.selectedMood)
-                        profile.setPreferredColorScheme(viewModel.selectedColorScheme)
-
-                        // Languages
-                        profile.setPreferredLanguages(Array(viewModel.selectedLanguages))
-
+                        profile.setPreferredCategories(categories)
+                        profile.setPreferredLanguages(languages)
                         try? modelContext.save()
 
-                        // Sync to CloudKit
+                        // Sync categories to CloudKit (drives Explore "For You").
                         Task {
-                            await cloudKitService.savePreferredCategories(selectedCategories.map { $0.rawValue })
+                            await cloudKitService.savePreferredCategories(categories.map { $0.rawValue })
                         }
                     }
                     hasCompletedOnboarding = true
+                    // Show the paywall once, right after onboarding. This closure runs a single
+                    // time, so only brand-new users see it (never existing users on relaunch).
+                    // The short delay lets Home settle so the sheet slides up cleanly.
+                    if !hasSeenPostOnboardingPaywall && !entitlementService.isSubscribed {
+                        hasSeenPostOnboardingPaywall = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                            showPostOnboardingPaywall = true
+                        }
+                    }
                 }
             }
         }
@@ -123,6 +123,9 @@ struct ContentView: View {
                 hasSeenBrandKitIntro = true
                 showingBrandKitIntro = false
             }
+        }
+        .sheet(isPresented: $showPostOnboardingPaywall) {
+            SubscriptionPaywallView()
         }
     }
 
@@ -198,11 +201,17 @@ struct MainTabView: View {
                 }
                 .tag(2)
 
+            PromptsTab()
+                .tabItem {
+                    Label("Prompts", systemImage: "text.bubble.fill")
+                }
+                .tag(3)
+
             ProfileTab()
                 .tabItem {
                     Label("Profile", systemImage: "person.fill")
                 }
-                .tag(3)
+                .tag(4)
         }
     }
 }

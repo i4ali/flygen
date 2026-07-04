@@ -44,10 +44,7 @@ struct ExploreTab: View {
             .background(FGColors.backgroundPrimary)
             .navigationTitle("Explore")
             .fullScreenCover(item: $selectedSample) { sample in
-                SampleDetailSheet(sample: sample) {
-                    selectedSample = nil
-                    viewModel.loadFromSample(sample)
-                }
+                SampleDetailSheet(sample: sample)
             }
         }
     }
@@ -89,7 +86,7 @@ struct ExploreTab: View {
                         .font(FGTypography.h3)
                         .foregroundColor(FGColors.textPrimary)
 
-                    Text("Browse sample flyers created with FlyGen. Tap to use as a starting point.")
+                    Text("Browse sample flyers created with FlyGen for inspiration.")
                         .font(FGTypography.body)
                         .foregroundColor(FGColors.textSecondary)
                 }
@@ -234,7 +231,6 @@ private struct ForYouBadge: View {
 struct SampleDetailSheet: View {
     @Environment(\.dismiss) private var dismiss
     let sample: SampleFlyer
-    let onUseAsStartingPoint: () -> Void
 
     var body: some View {
         NavigationStack {
@@ -283,26 +279,8 @@ struct SampleDetailSheet: View {
                     )
                     .padding(.horizontal, FGSpacing.screenHorizontal)
 
-                    // "Use as Starting Point" button
-                    Button {
-                        onUseAsStartingPoint()
-                        dismiss()
-                    } label: {
-                        HStack(spacing: FGSpacing.sm) {
-                            Image(systemName: "wand.and.stars")
-                            Text("Use as Starting Point")
-                        }
-                        .font(FGTypography.button)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, FGSpacing.md)
-                        .background(FGColors.accentPrimary)
-                        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
-                    }
-                    .padding(.horizontal, FGSpacing.screenHorizontal)
-
                     // Info text
-                    Text("This sample was created using FlyGen's AI-powered flyer generator. Use it as a starting point to create your own!")
+                    Text("This sample was created using FlyGen's AI-powered flyer generator.")
                         .font(FGTypography.caption)
                         .foregroundColor(FGColors.textTertiary)
                         .multilineTextAlignment(.center)

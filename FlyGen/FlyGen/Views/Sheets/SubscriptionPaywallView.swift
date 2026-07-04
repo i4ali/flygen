@@ -36,8 +36,12 @@ struct SubscriptionPaywallView: View {
                 VStack(spacing: FGSpacing.xl) {
                     heroSection
                     featureList
+                    socialProof
                     planSelector
-                    subscribeButton
+                    VStack(spacing: FGSpacing.sm) {
+                        subscribeButton
+                        cancelAnytime
+                    }
                     restoreButton
                     disclosureText
                     legalLinks
@@ -45,7 +49,7 @@ struct SubscriptionPaywallView: View {
                 }
                 .padding(.horizontal, FGSpacing.screenHorizontal)
             }
-            .background(FGColors.backgroundPrimary)
+            .background(premiumBackground)
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -60,6 +64,21 @@ struct SubscriptionPaywallView: View {
                 }
             }
         }
+    }
+
+    // MARK: - Background
+
+    /// Near-black with a soft violet glow behind the hero - lifts the paywall off flat black.
+    private var premiumBackground: some View {
+        FGColors.backgroundPrimary
+            .overlay(alignment: .top) {
+                RadialGradient(colors: [FGColors.accentPrimary.opacity(0.20), .clear],
+                               center: .top, startRadius: 0, endRadius: 360)
+                    .frame(height: 520)
+                    .frame(maxWidth: .infinity, alignment: .top)
+                    .allowsHitTesting(false)
+            }
+            .ignoresSafeArea()
     }
 
     // MARK: - Hero Section
@@ -111,6 +130,26 @@ struct SubscriptionPaywallView: View {
             RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
                 .stroke(FGColors.borderSubtle, lineWidth: 1)
         )
+    }
+
+    // MARK: - Social Proof
+
+    /// Real App Store reviews build trust right before the plan/price. Reviews live in
+    /// `PaywallReview.reviews` - keep them real (App Store Review Guideline 2.3.1).
+    private var socialProof: some View {
+        VStack(spacing: FGSpacing.sm) {
+            Text("LOVED ON THE APP STORE")
+                .font(FGTypography.captionBold)
+                .tracking(1.6)
+                .foregroundStyle(
+                    LinearGradient(colors: [FGColors.accentGradientStart, FGColors.accentGradientEnd],
+                                   startPoint: .leading, endPoint: .trailing)
+                )
+
+            ForEach(PaywallReview.reviews) { review in
+                ReviewCardView(review: review)
+            }
+        }
     }
 
     // MARK: - Plan Selector
@@ -206,6 +245,22 @@ struct SubscriptionPaywallView: View {
         .disabled(entitlementService.products.isEmpty || isPurchasing || isRestoring)
     }
 
+    // MARK: - Cancel Anytime reassurance
+
+    /// Lowers purchase anxiety right at the CTA. Truthful - Apple subscriptions can be
+    /// cancelled anytime in App Store settings (see the disclosure below).
+    private var cancelAnytime: some View {
+        HStack(spacing: FGSpacing.xxs) {
+            Image(systemName: "checkmark.shield.fill")
+                .font(.system(size: 12))
+                .foregroundColor(FGColors.success)
+            Text("Cancel anytime")
+                .font(FGTypography.caption)
+                .foregroundColor(FGColors.textSecondary)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
     // MARK: - Restore Button
 
     private var restoreButton: some View {
@@ -249,16 +304,33 @@ struct SubscriptionPaywallView: View {
     // MARK: - Disclosure
 
     private var subscriptionDescription: String {
-        guard let product = resolvedSelected else { return "" }
-        let unitText: String
-        switch product.subscription?.subscriptionPeriod.unit {
-        case .day?: unitText = "day"
-        case .week?: unitText = "week"
-        case .month?: unitText = "month"
-        case .year?: unitText = "year"
-        default: unitText = "period"
+        guard let product = resolvedSelected,
+              let period = product.subscription?.subscriptionPeriod else { return "" }
+        return "\(product.displayName) is \(product.displayPrice) per \(periodNoun(period))."
+    }
+
+    /// Human-readable billing-period noun.
+    ///
+    /// Normalizes on both `unit` and `value` because StoreKit reports a weekly
+    /// subscription as `.day` / 7 (not `.week` / 1). Switching on `unit` alone
+    /// would render "per day" for a weekly plan.
+    private func periodNoun(_ period: Product.SubscriptionPeriod) -> String {
+        switch (period.unit, period.value) {
+        case (.day, 1):                return "day"
+        case (.day, 7), (.week, 1):    return "week"
+        case (.month, 1):              return "month"
+        case (.month, 12), (.year, 1): return "year"
+        default:
+            let unit: String
+            switch period.unit {
+            case .day:   unit = "day"
+            case .week:  unit = "week"
+            case .month: unit = "month"
+            case .year:  unit = "year"
+            @unknown default: unit = "period"
+            }
+            return period.value == 1 ? unit : "\(period.value) \(unit)s"
         }
-        return "\(product.displayName) is \(product.displayPrice) per \(unitText)."
     }
 
     private var disclosureText: some View {
@@ -304,6 +376,113 @@ private struct FeatureRow: View {
     }
 }
 
+// MARK: - Review Card
+
+private struct ReviewCardView: View {
+    let review: PaywallReview
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: FGSpacing.sm) {
+            // Reviewer: gradient avatar + name/date + App Store mark.
+            HStack(spacing: FGSpacing.sm) {
+                Text(String(review.author.prefix(1)).uppercased())
+                    .font(FGTypography.h4)
+                    .foregroundColor(.white)
+                    .frame(width: 42, height: 42)
+                    .background(
+                        LinearGradient(colors: [FGColors.accentGradientStart, FGColors.accentGradientEnd],
+                                       startPoint: .topLeading, endPoint: .bottomTrailing)
+                    )
+                    .clipShape(Circle())
+                    .shadow(color: FGColors.accentPrimary.opacity(0.45), radius: 8, y: 2)
+
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(review.author)
+                        .font(FGTypography.labelLarge)
+                        .foregroundColor(FGColors.textPrimary)
+                    if let date = review.date, !date.isEmpty {
+                        Text(date)
+                            .font(FGTypography.caption)
+                            .foregroundColor(FGColors.textTertiary)
+                    }
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "apple.logo")
+                    .font(.system(size: 15))
+                    .foregroundColor(FGColors.textSecondary)
+            }
+
+            // Gold stars + review title.
+            HStack(spacing: FGSpacing.xs) {
+                HStack(spacing: 2) {
+                    ForEach(0..<5, id: \.self) { i in
+                        Image(systemName: "star.fill")
+                            .font(.system(size: 13))
+                            .foregroundColor(i < review.stars ? FGColors.warning : FGColors.borderDefault)
+                    }
+                }
+                .shadow(color: FGColors.warning.opacity(0.5), radius: 5)
+                if let title = review.title, !title.isEmpty {
+                    Text(title)
+                        .font(FGTypography.captionBold)
+                        .foregroundColor(FGColors.textPrimary)
+                }
+            }
+
+            Text(review.quote)
+                .font(FGTypography.body)
+                .foregroundColor(FGColors.textPrimary)
+                .lineSpacing(3)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(FGSpacing.lg)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            ZStack(alignment: .topTrailing) {
+                LinearGradient(
+                    colors: [FGColors.accentPrimary.opacity(0.12), FGColors.backgroundElevated],
+                    startPoint: .topLeading, endPoint: .bottomTrailing
+                )
+                Text("\u{201D}")   // decorative closing-quote watermark
+                    .font(.system(size: 96, weight: .bold, design: .serif))
+                    .foregroundColor(FGColors.accentPrimary.opacity(0.13))
+                    .offset(x: -10, y: 14)
+            }
+        )
+        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+        .overlay(
+            RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
+                .stroke(
+                    LinearGradient(colors: [FGColors.accentPrimary.opacity(0.45), FGColors.accentSecondary.opacity(0.22)],
+                                   startPoint: .topLeading, endPoint: .bottomTrailing),
+                    lineWidth: 1
+                )
+        )
+        .shadow(color: FGColors.accentPrimary.opacity(0.16), radius: 18, y: 8)
+    }
+}
+
+private struct PaywallReview: Identifiable {
+    let id = UUID()
+    let stars: Int
+    let title: String?
+    let quote: String
+    let author: String
+    let date: String?
+
+    /// REAL App Store reviews. Add more real ones here as they come in - never fabricate
+    /// testimonials (App Store Review Guideline 2.3.1 prohibits fake reviews).
+    static let reviews: [PaywallReview] = [
+        PaywallReview(
+            stars: 5,
+            title: "Game-changer",
+            quote: "Just amazing, honestly a lifesaver.",
+            author: "wisementor274",
+            date: "Dec 19, 2025"
+        ),
+    ]
+}
+
 // MARK: - Plan Card
 
 private struct PlanCard: View {
@@ -343,8 +522,9 @@ private struct PlanCard: View {
                                 .foregroundColor(FGColors.textOnAccent)
                                 .padding(.horizontal, FGSpacing.sm)
                                 .padding(.vertical, FGSpacing.xxxs)
-                                .background(FGColors.accentPrimary)
+                                .background(FGGradients.accent)
                                 .clipShape(RoundedRectangle(cornerRadius: FGSpacing.chipRadius))
+                                .shadow(color: FGColors.accentPrimary.opacity(0.4), radius: 6, y: 2)
                         }
                     }
 
@@ -375,8 +555,10 @@ private struct PlanCard: View {
                         lineWidth: isSelected ? 2 : 1
                     )
             )
+            .shadow(color: isSelected ? FGColors.accentPrimary.opacity(0.35) : .clear, radius: 14, y: 6)
         }
         .buttonStyle(.plain)
+        .animation(FGAnimations.spring, value: isSelected)
     }
 }
 

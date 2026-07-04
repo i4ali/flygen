@@ -4,9 +4,26 @@ import UIKit
 import PhotosUI
 
 struct FlyerChatView: View {
+    /// When present, the chat opens seeded with this Explore flyer to refine (see `start(seed:)`).
+    let seed: SampleFlyer?
+    /// When present, the composer opens pre-filled with this text (editable, not auto-sent).
+    let prefillText: String?
+    init(seed: SampleFlyer? = nil, prefillText: String? = nil) {
+        self.seed = seed
+        self.prefillText = prefillText
+    }
+
     @StateObject private var vm = FlyerChatViewModel()
+    @EnvironmentObject private var entitlementService: EntitlementService
+    @EnvironmentObject private var cloudKitService: CloudKitService
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @Query private var userProfiles: [UserProfile]
+    @State private var didApplyPrefill = false
+    @State private var showingSavePrompt = false
+    @State private var showingPaywall = false
+    @State private var showMyFlyersPicker = false     // "reuse a flyer" -> pick from My Flyers
+    @State private var showExplorePicker = false      // "reuse a flyer" -> pick from Explore
 
     var body: some View {
         NavigationStack {
@@ -30,20 +47,64 @@ struct FlyerChatView: View {
                 composer
             }
             .background(FGColors.backgroundPrimary.ignoresSafeArea())
-            .navigationTitle("Chat (Beta)")
+            .navigationTitle("Chat")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Close") { dismiss() }.foregroundColor(FGColors.textSecondary)
                 }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button { showingSavePrompt = true } label: { Image(systemName: "bookmark") }
+                        .foregroundColor(FGColors.textSecondary)
+                        .disabled(vm.firstUserPrompt == nil)
+                }
             }
-            .onAppear { vm.start() }
+            .onAppear {
+                vm.start(seed: seed)
+                if !didApplyPrefill, let prefillText, vm.composerText.isEmpty {
+                    vm.composerText = prefillText
+                    didApplyPrefill = true
+                }
+                // Consume one quota unit after each successful generation (mirrors ResultView).
+                vm.onCreditDeduction = { consumeOneGeneration() }
+            }
+            .sheet(isPresented: $showingSavePrompt) {
+                PromptEditorSheet(initialText: vm.firstUserPrompt ?? "")
+            }
+            .sheet(isPresented: $showingPaywall) {
+                SubscriptionPaywallView()
+            }
+            .sheet(isPresented: $showMyFlyersPicker) {
+                MyFlyersReferencePicker { vm.useReference(imageData: $0) }
+            }
+            .sheet(isPresented: $showExplorePicker) {
+                ExploreReferencePicker { vm.useReference(imageData: $0) }
+            }
         }
     }
 
     /// The most recent "Here's what I got" card — only it stays expanded; older ones collapse.
     private var latestParsedFieldsID: UUID? {
         vm.transcript.last { if case .parsedFields = $0.kind { return true } else { return false } }?.id
+    }
+
+    /// True when the user has neither subscription quota nor legacy credits left, so a generation
+    /// must open the paywall instead. No profile yet -> not blocked (mirrors the wizard's `if let` gate).
+    private var isGenerationBlocked: Bool {
+        guard let profile = userProfiles.first else { return false }
+        return entitlementService.access(for: profile) == .blocked
+    }
+
+    /// Run a generation action only if the user can generate; otherwise open the paywall. Used for
+    /// refine/resize; the review card's approve button gates the same way via `isBlocked`/`onBlocked`.
+    private func gated(_ action: () -> Void) {
+        if isGenerationBlocked { showingPaywall = true } else { action() }
+    }
+
+    /// Consume one quota unit after a successful generation (mirrors ResultView.onCreditDeduction).
+    private func consumeOneGeneration() {
+        guard let profile = userProfiles.first else { return }
+        Task { await entitlementService.consume(for: profile, context: modelContext, cloudKit: cloudKitService) }
     }
 
     @ViewBuilder
@@ -53,14 +114,20 @@ struct FlyerChatView: View {
         case .userPhotos(let p):  UserPhotosBubble(photos: p)
         case .assistant(let t):   AssistantBubble(text: t)
         case .photoSuggestion(let t, let resolved): PhotoSuggestionBubble(text: t, selection: $vm.photoPickerItems, disabled: vm.isStreaming, resolved: resolved, onDecline: { vm.declinePhotoSuggestion() })
+        case .referenceNudge:     ReferenceUploadBubble(selection: $vm.referencePickerItems, disabled: vm.isStreaming,
+                                      onMyFlyers: { showMyFlyersPicker = true }, onExplore: { showExplorePicker = true },
+                                      onDismiss: { vm.dismissReferenceNudge() })
         case .typing(let t):      TypingBubble(text: t)
         case .parsedFields(let b): ParsedFieldsCard(brief: b, expanded: bubble.id == latestParsedFieldsID)
         case .questions(let qs, let stage):  QuestionsCard(questions: qs, onSubmit: { vm.submitAnswers($0, order: $1, stage: stage) })
         case .designBrief(let d): DesignNotesCard(brief: d)
-        case .review(let r):      ReviewCard(review: r, onApprove: { vm.approve(fieldOverrides: $0, decisionOverrides: $1, selectedElements: $2) })
-        case .concepts(let cs):   ConceptsCard(concepts: cs,
-                                      onRefine: { vm.refine(concept: $0, instruction: $1) },
-                                      onResize: { vm.resize(concept: $0, aspect: $1) },
+        case .review(let r):      ReviewCard(review: r, isBlocked: isGenerationBlocked,
+                                      onBlocked: { showingPaywall = true },
+                                      onApprove: { vm.approve(fieldOverrides: $0, decisionOverrides: $1, selectedElements: $2) })
+        case .referenceImage(let c):  ReferenceImageCard(concept: c)
+        case .concepts(let cs, let heading):   ConceptsCard(concepts: cs, heading: heading,
+                                      onRefine: { c, t in gated { vm.refine(concept: c, instruction: t) } },
+                                      onResize: { c, ar in gated { vm.resize(concept: c, aspect: ar) } },
                                       onAddToMyFlyers: { addToMyFlyers($0) })
         case .error(let m):       ErrorBubble(text: m)
         }
@@ -78,14 +145,28 @@ struct FlyerChatView: View {
 
     private var composer: some View {
         VStack(spacing: FGSpacing.xs) {
+            if vm.inReferenceMode {
+                HStack {
+                    Label("Editing your flyer", systemImage: "pencil")
+                        .font(FGTypography.caption).foregroundColor(FGColors.textTertiary)
+                    Spacer()
+                    Button("New flyer") { vm.startNewFlyer() }
+                        .font(FGTypography.caption).foregroundColor(FGColors.accentSecondary)
+                }
+                .padding(.horizontal, FGSpacing.xxs)
+            }
             if !vm.attachedPhotos.isEmpty { photoStrip }
-            HStack(spacing: FGSpacing.sm) {
-                TextField("Describe a flyer (starts a new one)…", text: $vm.composerText, axis: .vertical)
-                    .textFieldStyle(.plain).font(FGTypography.body).foregroundColor(FGColors.textPrimary)
-                    .lineLimit(1...4)
-                    .padding(.horizontal, FGSpacing.md).padding(.vertical, FGSpacing.sm)
-                    .background(FGColors.surfaceDefault).clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
-                    .disabled(vm.isStreaming)
+            HStack(alignment: .bottom, spacing: FGSpacing.sm) {
+                // Grows up to ~8 lines, then scrolls with an always-visible scroll thumb so the
+                // whole paste stays reachable and editable. Backed by a UITextView because a plain
+                // SwiftUI TextField/TextEditor exposes no persistent scroll indicator (see below).
+                GrowingScrollTextEditor(
+                    text: $vm.composerText,
+                    placeholder: vm.inReferenceMode ? "Tell me what to change…" : "Describe a flyer (starts a new one)…",
+                    isEnabled: !vm.isStreaming
+                )
+                .background(FGColors.surfaceDefault)
+                .clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
                 Button { vm.send() } label: {
                     Image(systemName: "arrow.up.circle.fill").font(.system(size: 32))
                         .foregroundColor(vm.canSend ? FGColors.accentPrimary : FGColors.textTertiary)
@@ -97,6 +178,8 @@ struct FlyerChatView: View {
         .background(FGColors.backgroundSecondary)
         // Loads whatever the composer strip or the in-chat photo-suggestion picker selects.
         .onChange(of: vm.photoPickerItems) { _, _ in Task { await vm.loadAttachedPhotos() } }
+        // Loads a flyer picked from the "reuse a flyer" nudge and enters reference-edit mode.
+        .onChange(of: vm.referencePickerItems) { _, _ in Task { await vm.loadReference() } }
     }
 
     private var photoStrip: some View {
@@ -125,17 +208,9 @@ struct FlyerChatView: View {
 }
 
 // MARK: - Small bubbles
+// UserBubble, AssistantBubble, and TypingBubble live in Chat/ChatBubbleViews.swift so the
+// onboarding demo can reuse the exact same styling.
 
-private struct UserBubble: View {
-    let text: String
-    var body: some View {
-        HStack { Spacer(minLength: FGSpacing.xl)
-            Text(text).font(FGTypography.body).foregroundColor(FGColors.textOnAccent)
-                .padding(.horizontal, FGSpacing.md).padding(.vertical, FGSpacing.sm)
-                .background(FGColors.accentPrimary).clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
-        }
-    }
-}
 private struct UserPhotosBubble: View {
     let photos: [Data]
     var body: some View {
@@ -150,13 +225,6 @@ private struct UserPhotosBubble: View {
                 }
             }
         }
-    }
-}
-private struct AssistantBubble: View {
-    let text: String
-    var body: some View {
-        Text(text).font(FGTypography.body).foregroundColor(FGColors.textSecondary)
-            .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 /// The brain's proactive "add a photo of X" nudge, rendered as a distinct accent-tinted bubble
@@ -186,10 +254,7 @@ private struct PhotoSuggestionBubble: View {
                 .disabled(disabled)
                 if !resolved {
                     Button(action: onDecline) {
-                        Text("No thanks").font(FGTypography.button)
-                            .foregroundColor(FGColors.textSecondary)
-                            .frame(maxWidth: .infinity).padding(.vertical, FGSpacing.sm)
-                            .background(FGColors.surfaceDefault).clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+                        Text("No thanks").fgDismissButtonStyle()
                     }
                     .disabled(disabled)
                 }
@@ -201,12 +266,131 @@ private struct PhotoSuggestionBubble: View {
         .overlay(RoundedRectangle(cornerRadius: FGSpacing.cardRadius).stroke(FGColors.accentSecondary.opacity(0.35), lineWidth: 1))
     }
 }
-private struct TypingBubble: View {
-    let text: String
+/// The "reuse a flyer you already have" nudge: pick a flyer from Photos, My Flyers, or Explore.
+/// Any choice enters reference-edit mode (the flyer becomes the current image to edit under).
+private struct ReferenceUploadBubble: View {
+    @Binding var selection: [PhotosPickerItem]
+    var disabled: Bool
+    var onMyFlyers: () -> Void
+    var onExplore: () -> Void
+    var onDismiss: () -> Void
     var body: some View {
-        HStack(spacing: FGSpacing.xs) {
-            ProgressView().tint(FGColors.accentSecondary).scaleEffect(0.8)
-            Text(text).font(FGTypography.bodySmall).foregroundColor(FGColors.textTertiary)
+        VStack(alignment: .leading, spacing: FGSpacing.sm) {
+            HStack(alignment: .top, spacing: FGSpacing.sm) {
+                Image(systemName: "doc.on.doc.fill").font(.system(size: 16))
+                    .foregroundColor(FGColors.accentSecondary).padding(.top, 2)
+                Text("Already have a flyer you like? Pick one to edit — I'll keep the design and change whatever you want.")
+                    .font(FGTypography.body).foregroundColor(FGColors.textPrimary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            HStack(spacing: FGSpacing.sm) {
+                PhotosPicker(selection: $selection, maxSelectionCount: 1, matching: .images) {
+                    sourceLabel("Photos", "photo")
+                }.disabled(disabled)
+                Button(action: onMyFlyers) { sourceLabel("My Flyers", "folder") }.disabled(disabled)
+                Button(action: onExplore) { sourceLabel("Explore", "sparkles") }.disabled(disabled)
+            }
+            Button(action: onDismiss) {
+                Text("No thanks").fgDismissButtonStyle()
+            }
+            .disabled(disabled)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(FGSpacing.md)
+        .background(FGColors.accentSecondary.opacity(0.10)).clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+        .overlay(RoundedRectangle(cornerRadius: FGSpacing.cardRadius).stroke(FGColors.accentSecondary.opacity(0.35), lineWidth: 1))
+    }
+    @ViewBuilder private func sourceLabel(_ title: String, _ icon: String) -> some View {
+        VStack(spacing: 3) {
+            Image(systemName: icon).font(.system(size: 15))
+            Text(title).font(FGTypography.captionBold).lineLimit(1).minimumScaleFactor(0.75)
+        }
+        .foregroundColor(FGColors.textOnAccent)
+        .frame(maxWidth: .infinity).padding(.vertical, FGSpacing.sm)
+        .background(FGColors.accentPrimary).clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+    }
+}
+
+extension View {
+    /// Crisp outlined style for the tertiary "No thanks" / dismiss action in chat nudge cards.
+    /// Reads as an intentional secondary button beside the solid accent choices, instead of the
+    /// dull gray-on-gray fill it replaced. Shared by both nudge cards so they stay consistent.
+    func fgDismissButtonStyle() -> some View {
+        self
+            .font(FGTypography.button)
+            .foregroundColor(FGColors.textSecondary)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, FGSpacing.sm)
+            .background(
+                RoundedRectangle(cornerRadius: FGSpacing.buttonRadius)
+                    .stroke(FGColors.borderDefault, lineWidth: 1)
+            )
+            .contentShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+    }
+}
+
+/// Pick one of the user's saved flyers as the reference to edit. Minimal grid of thumbnails;
+/// on tap, resolve the image `Data` and hand it to reference-edit mode.
+private struct MyFlyersReferencePicker: View {
+    @Query(sort: \SavedFlyer.createdAt, order: .reverse) private var savedFlyers: [SavedFlyer]
+    let onPick: (Data) -> Void
+    @Environment(\.dismiss) private var dismiss
+    private let columns = [GridItem(.adaptive(minimum: 108), spacing: FGSpacing.sm)]
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                if savedFlyers.isEmpty {
+                    Text("You haven't saved any flyers yet. Create one first, then you can reuse its design here.")
+                        .font(FGTypography.bodySmall).foregroundColor(FGColors.textSecondary)
+                        .multilineTextAlignment(.center).padding(FGSpacing.xl)
+                } else {
+                    LazyVGrid(columns: columns, spacing: FGSpacing.sm) {
+                        ForEach(savedFlyers) { flyer in
+                            if let data = flyer.imageData, let ui = UIImage(data: data) {
+                                Button { onPick(data); dismiss() } label: {
+                                    Image(uiImage: ui).resizable().scaledToFill()
+                                        .frame(height: 150).frame(maxWidth: .infinity).clipped()
+                                        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+                                }
+                            }
+                        }
+                    }
+                    .padding(FGSpacing.md)
+                }
+            }
+            .background(FGColors.backgroundPrimary.ignoresSafeArea())
+            .navigationTitle("My Flyers").navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .topBarLeading) { Button("Cancel") { dismiss() } } }
+        }
+    }
+}
+
+/// Pick an Explore sample as the reference to edit. Renders each bundled asset to JPEG on tap.
+private struct ExploreReferencePicker: View {
+    let onPick: (Data) -> Void
+    @Environment(\.dismiss) private var dismiss
+    private let columns = [GridItem(.adaptive(minimum: 108), spacing: FGSpacing.sm)]
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                LazyVGrid(columns: columns, spacing: FGSpacing.sm) {
+                    ForEach(SampleLibrary.samples) { sample in
+                        if let ui = UIImage(named: sample.imageName) {
+                            Button {
+                                if let data = ui.jpegData(compressionQuality: 0.9) { onPick(data); dismiss() }
+                            } label: {
+                                Image(uiImage: ui).resizable().scaledToFill()
+                                    .frame(height: 150).frame(maxWidth: .infinity).clipped()
+                                    .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+                            }
+                        }
+                    }
+                }
+                .padding(FGSpacing.md)
+            }
+            .background(FGColors.backgroundPrimary.ignoresSafeArea())
+            .navigationTitle("Explore").navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .topBarLeading) { Button("Cancel") { dismiss() } } }
         }
     }
 }
@@ -255,7 +439,10 @@ private struct ParsedFieldsCard: View {
         AssistantCard {
             DisclosureGroup(isExpanded: Binding(get: { userToggled ?? expanded },
                                                 set: { userToggled = $0 })) {
-                ForEach(brief.displayFields, id: \.key) { f in
+                // Identity must be positional: every additional_info row shares the key "extra",
+                // and duplicate ForEach IDs make SwiftUI render the first row's content for all
+                // of them (the "Ladies only x3" bug - the payload itself was distinct).
+                ForEach(Array(brief.displayFields.enumerated()), id: \.offset) { _, f in
                     HStack(alignment: .top, spacing: FGSpacing.xs) {
                         Text(f.key.replacingOccurrences(of: "_", with: " "))
                             .font(FGTypography.caption).foregroundColor(FGColors.textTertiary)
@@ -374,6 +561,8 @@ private struct DesignNotesCard: View {
 
 private struct ReviewCard: View {
     let review: ReviewProposalDTO
+    var isBlocked: Bool = false             // no quota/credits -> approve opens the paywall instead
+    var onBlocked: () -> Void = {}
     let onApprove: (_ fieldOverrides: [String: String], _ decisionOverrides: [String: String], _ selectedElements: [String]?) -> Void
     @State private var fieldValues: [String: String] = [:]
     @State private var decisionValues: [String: String] = [:]
@@ -387,13 +576,20 @@ private struct ReviewCard: View {
                     HStack { Text(f.key.replacingOccurrences(of: "_", with: " "))
                         .font(FGTypography.caption).foregroundColor(FGColors.textTertiary)
                         Spacer(); SourceBadge(source: f.source) }
-                    TextField("", text: Binding(get: { fieldValues[f.key] ?? f.value }, set: { fieldValues[f.key] = $0 }))
-                        .textFieldStyle(.plain).font(FGTypography.bodySmall).foregroundColor(FGColors.textPrimary)
-                        .padding(.horizontal, FGSpacing.sm).padding(.vertical, FGSpacing.xs)
-                        .background(FGColors.backgroundTertiary).clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
-                        .overlay(RoundedRectangle(cornerRadius: FGSpacing.inputRadius)   // amber outline when flagged
-                            .stroke(FGColors.warning, lineWidth: f.warning == nil ? 0 : 1))
-                        .disabled(approved)
+                    // Grows with the value and scrolls (with the always-visible thumb) once it's
+                    // long - the body field especially runs well past a single line.
+                    GrowingScrollTextEditor(
+                        text: Binding(get: { fieldValues[f.key] ?? f.value }, set: { fieldValues[f.key] = $0 }),
+                        placeholder: "",
+                        isEnabled: !approved,
+                        fontSize: 13,           // FGTypography.bodySmall
+                        insetH: FGSpacing.sm,
+                        insetV: FGSpacing.xs,
+                        maxLines: 6
+                    )
+                    .background(FGColors.backgroundTertiary).clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
+                    .overlay(RoundedRectangle(cornerRadius: FGSpacing.inputRadius)   // amber outline when flagged
+                        .stroke(FGColors.warning, lineWidth: f.warning == nil ? 0 : 1))
                     if let w = f.warning { warningLine(w) }   // the value needs attention (e.g. a malformed URL)
                 }
             }
@@ -426,6 +622,7 @@ private struct ReviewCard: View {
             creativeIdeas
             designNotes
             Button {
+                if isBlocked { onBlocked(); return }   // no quota/credits -> paywall; keep the card active to retry
                 approved = true
                 let fo = fieldValues.filter { key, val in review.fields.first(where: { $0.key == key })?.value != val }
                 var dov: [String: String] = [:]
@@ -510,8 +707,24 @@ private struct ReviewCard: View {
     }
 }
 
+/// The user's uploaded flyer, shown as the edit starting point: just the image, no Save / My Flyers /
+/// Resize (those belong on generated results) and no refine box (editing is via the composer).
+private struct ReferenceImageCard: View {
+    let concept: ConceptDTO
+    var body: some View {
+        AssistantCard {
+            Text("Your flyer").font(FGTypography.h4).foregroundColor(FGColors.textPrimary)
+            if let data = concept.imageData, let ui = UIImage(data: data) {
+                Image(uiImage: ui).resizable().scaledToFit()
+                    .frame(maxWidth: .infinity).clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
+            }
+        }
+    }
+}
+
 private struct ConceptsCard: View {
     let concepts: [ConceptDTO]
+    var heading: String? = nil                    // overrides the title (e.g. a seeded "Starting point")
     let onRefine: (ConceptDTO, String) -> Void
     let onResize: (ConceptDTO, AspectRatio) -> Void
     let onAddToMyFlyers: (ConceptDTO) -> Void
@@ -519,7 +732,7 @@ private struct ConceptsCard: View {
     @State private var savedVersionIDs: Set<String> = []
     var body: some View {
         AssistantCard {
-            Text(concepts.count > 1 ? "Three concepts" : "Updated concept").font(FGTypography.h4).foregroundColor(FGColors.textPrimary)
+            Text(heading ?? (concepts.count > 1 ? "Three concepts" : "Updated concept")).font(FGTypography.h4).foregroundColor(FGColors.textPrimary)
             ForEach(concepts) { c in
                 VStack(alignment: .leading, spacing: FGSpacing.xs) {
                     if let data = c.imageData, let ui = UIImage(data: data) {
@@ -565,5 +778,159 @@ private struct ConceptsCard: View {
     private func save(_ c: ConceptDTO) {
         guard let data = c.imageData else { return }
         Task { try? await PhotoLibraryService.saveImageData(data) }
+    }
+}
+
+// MARK: - Growing text editor with an always-visible scroll thumb
+//
+// SwiftUI's TextField and TextEditor don't give us a persistent, prominent scroll
+// indicator (TextField shows none; iOS only flashes one while dragging), so the composer
+// uses this UITextView-backed editor. It grows with its content from one line up to
+// ~8 lines, then scrolls, drawing its own always-on thumb on the right edge whenever the
+// text overflows. Styling (font, colors, insets, radius) mirrors the design tokens so it
+// looks identical to the old TextField pill.
+struct GrowingScrollTextEditor: UIViewRepresentable {
+    @Binding var text: String
+    var placeholder: String
+    var isEnabled: Bool
+    // Defaults match the chat composer; callers (e.g. the review card) override for a denser field.
+    var fontSize: CGFloat = 15         // FGTypography.body; review fields pass 13 (bodySmall)
+    var insetH: CGFloat = FGSpacing.md // horizontal text padding
+    var insetV: CGFloat = FGSpacing.sm // vertical text padding
+    var maxLines: CGFloat = 8          // grow up to this many lines, then scroll
+
+    private var uiFont: UIFont { UIFont.systemFont(ofSize: fontSize, weight: .regular) }
+    private var minHeight: CGFloat { ceil(uiFont.lineHeight) + insetV * 2 }
+    private var maxHeight: CGFloat { ceil(uiFont.lineHeight * maxLines) + insetV * 2 }
+
+    func makeCoordinator() -> Coordinator { Coordinator(self) }
+
+    func makeUIView(context: Context) -> ComposerContainerView {
+        let container = ComposerContainerView()
+        let tv = container.textView
+        tv.delegate = context.coordinator
+        tv.font = uiFont
+        tv.textColor = UIColor(FGColors.textPrimary)
+        tv.tintColor = UIColor(FGColors.accentPrimary) // caret + selection
+        tv.backgroundColor = .clear
+        tv.textContainerInset = UIEdgeInsets(top: insetV, left: insetH, bottom: insetV, right: insetH)
+        tv.textContainer.lineFragmentPadding = 0
+        tv.showsVerticalScrollIndicator = false // replaced by our always-on thumb
+        tv.alwaysBounceVertical = false
+        tv.keyboardDismissMode = .interactive
+
+        container.placeholderLabel.font = uiFont
+        container.placeholderLabel.textColor = UIColor(FGColors.textTertiary)
+        container.placeholderLabel.text = placeholder
+        container.textInset = UIEdgeInsets(top: insetV, left: insetH, bottom: insetV, right: insetH)
+        return container
+    }
+
+    func updateUIView(_ container: ComposerContainerView, context: Context) {
+        let tv = container.textView
+        // Only overwrite when the binding changed externally (prefill, clear-on-send); leave the
+        // text view alone during normal typing so we never clobber the caret or in-flight IME text.
+        if tv.text != text {
+            let sel = tv.selectedRange
+            tv.text = text
+            tv.selectedRange = NSRange(location: min(sel.location, (text as NSString).length), length: 0)
+        }
+        container.placeholderLabel.text = placeholder
+        container.placeholderLabel.isHidden = !text.isEmpty
+        tv.isEditable = isEnabled
+        container.setNeedsLayout()
+    }
+
+    // Reports the clamped height so the composer grows to fit, up to the 8-line cap.
+    func sizeThatFits(_ proposal: ProposedViewSize, uiView container: ComposerContainerView, context: Context) -> CGSize? {
+        let width = proposal.width ?? container.bounds.width
+        guard width > 0 else { return nil }
+        let fit = container.textView.sizeThatFits(CGSize(width: width, height: .greatestFiniteMagnitude)).height
+        return CGSize(width: width, height: min(maxHeight, max(minHeight, ceil(fit))))
+    }
+
+    final class Coordinator: NSObject, UITextViewDelegate {
+        let parent: GrowingScrollTextEditor
+        init(_ parent: GrowingScrollTextEditor) { self.parent = parent }
+
+        func textViewDidChange(_ textView: UITextView) {
+            parent.text = textView.text
+            guard let container = textView.superview as? ComposerContainerView else { return }
+            container.placeholderLabel.isHidden = !textView.text.isEmpty
+            container.setNeedsLayout()
+        }
+
+        // UITextViewDelegate inherits UIScrollViewDelegate: keep the thumb in sync as the user scrolls.
+        func scrollViewDidScroll(_ scrollView: UIScrollView) {
+            (scrollView.superview as? ComposerContainerView)?.updateScrollIndicator()
+        }
+    }
+}
+
+/// Hosts the text view, its placeholder, and the always-visible scroll thumb. The thumb is a
+/// sibling of the text view (not inside its scrolling content), so it stays pinned to the viewport.
+final class ComposerContainerView: UIView {
+    let textView = UITextView()
+    let placeholderLabel = UILabel()
+    private let track = UIView()
+    private let thumb = UIView()
+    var textInset: UIEdgeInsets = .zero
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        addSubview(textView)
+
+        placeholderLabel.numberOfLines = 1
+        placeholderLabel.isUserInteractionEnabled = false
+        addSubview(placeholderLabel)
+
+        track.backgroundColor = UIColor.white.withAlphaComponent(0.12)
+        track.isUserInteractionEnabled = false
+        track.isHidden = true
+        addSubview(track)
+
+        thumb.backgroundColor = UIColor.white.withAlphaComponent(0.6)
+        thumb.isUserInteractionEnabled = false
+        thumb.isHidden = true
+        addSubview(thumb)
+    }
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        textView.frame = bounds
+        let pw = max(0, bounds.width - textInset.left - textInset.right)
+        placeholderLabel.frame = CGRect(x: textInset.left, y: textInset.top,
+                                        width: pw, height: ceil(placeholderLabel.font.lineHeight))
+        updateScrollIndicator()
+    }
+
+    /// Draws (or hides) the always-visible scroll thumb based on how far the text overflows.
+    func updateScrollIndicator() {
+        let visible = textView.bounds.height
+        let content = textView.sizeThatFits(CGSize(width: textView.bounds.width,
+                                                   height: .greatestFiniteMagnitude)).height
+        let overflow = content - visible
+        guard visible > 0, overflow > 1 else {
+            track.isHidden = true
+            thumb.isHidden = true
+            return
+        }
+        track.isHidden = false
+        thumb.isHidden = false
+
+        let barWidth: CGFloat = 5
+        let rightMargin: CGFloat = 4
+        let vInset: CGFloat = 6 // keep clear of the pill's rounded corners
+        let x = bounds.width - barWidth - rightMargin
+        let trackH = max(0, visible - vInset * 2)
+        track.frame = CGRect(x: x, y: vInset, width: barWidth, height: trackH)
+        track.layer.cornerRadius = barWidth / 2
+
+        let thumbH = max(28, trackH * (visible / content))
+        let progress = max(0, min(1, textView.contentOffset.y / overflow))
+        thumb.frame = CGRect(x: x, y: vInset + (trackH - thumbH) * progress,
+                             width: barWidth, height: thumbH)
+        thumb.layer.cornerRadius = barWidth / 2
     }
 }

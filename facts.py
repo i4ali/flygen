@@ -5,8 +5,10 @@ Every place that stores or renders brief facts (the interpreter's TurnResult val
 legacy ExtractedBrief, and the flyer prompt builder) routes through here, so duplication is
 judged identically everywhere instead of via copy-pasted, drifting logic. Matching is
 deterministic and conservative: two facts collapse only when identical after ignoring case,
-all whitespace (including non-breaking spaces), and surrounding punctuation/bullets. Interior
-content is preserved, so genuinely different facts always stay distinct.
+all whitespace (including non-breaking spaces), invisible format characters (zero-width
+spaces/joiners, BOM, directional marks - they render as nothing, so they must not make
+identical-looking facts distinct), and surrounding punctuation/bullets. Interior content is
+preserved, so genuinely different facts always stay distinct.
 """
 from typing import List, Optional
 import unicodedata
@@ -23,12 +25,24 @@ def _clean(s: str) -> str:
     return " ".join(unicodedata.normalize("NFKC", s).split())
 
 
+def _without_format_chars(s: str) -> str:
+    """Drop Unicode format characters (category Cf: ZWSP, word joiner, BOM, directional marks).
+    They have no glyph, so an LLM sprinkling them yields facts that LOOK identical but compare
+    unequal - and every such "variant" would survive dedup as a duplicate row. Key-side only:
+    the display form keeps its original characters (removing e.g. a ZWJ could break emoji)."""
+    return "".join(ch for ch in s if unicodedata.category(ch) != "Cf")
+
+
 def normalize_fact(s) -> str:
-    """A canonical comparison KEY for a fact string: cleaned, edge punctuation/bullets stripped,
-    casefolded. Two facts with the same key are duplicates. Returns "" for non-strings/blank."""
+    """A canonical comparison KEY for a fact string: cleaned, invisible format chars dropped,
+    edge punctuation/bullets stripped, casefolded. Two facts with the same key are duplicates.
+    Returns "" for non-strings/blank."""
     if not isinstance(s, str):
         return ""
-    return _clean(s).strip(_EDGE).casefold()
+    # Format chars are removed BEFORE the whitespace collapse so "a <ZWSP> b" folds to
+    # "a b", not "a  b"; a format char between letters (renders as one word) keeps them joined.
+    folded = _without_format_chars(unicodedata.normalize("NFKC", s))
+    return " ".join(folded.split()).strip(_EDGE).casefold()
 
 
 def dedup_facts(items) -> Optional[List[str]]:

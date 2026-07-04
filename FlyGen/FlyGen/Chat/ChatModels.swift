@@ -10,6 +10,7 @@ struct ChatRequest: Encodable {
     var answers: [String: String]?
     var instruction: String?
     var prior_image_b64: String?
+    var reference_image_b64: String?    // uploaded flyer to reuse; edited in place using `message`
     var aspect_ratio: String?
     var field_overrides: [String: String]?
     var decision_overrides: [String: String]?

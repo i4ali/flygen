@@ -85,18 +85,7 @@ class TurnResult(BaseModel):
         # round-trips every turn ("update it"), so the model re-emits these; normalized dedup keeps
         # drifting punctuation/case variants from re-accumulating. Cross-field reconciliation -
         # dropping an extra that echoes a dedicated field - happens in the model validator below.
-        out = dedup_facts(v)
-        try:
-            import os
-            from facts import normalize_fact
-            with open("/tmp/flygen-dedup-debug.log", "a") as _f:
-                _f.write(f"RAW  additional_info in = {v!r}\n")
-                if isinstance(v, list):
-                    _f.write(f"KEYS = {[normalize_fact(x) for x in v]!r}\n")
-                _f.write(f"OUT  additional_info    = {out!r}\n---\n")
-        except Exception:
-            pass
-        return out
+        return dedup_facts(v)
 
     @model_validator(mode="after")
     def _drop_facts_already_in_fields(self):

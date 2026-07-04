@@ -11,6 +11,13 @@ MODEL_SLUG is the OpenRouter route it maps to. To switch models, change both.
 MODEL = "claude-sonnet-4-6"                   # logical id used throughout the engine
 MODEL_SLUG = "anthropic/claude-sonnet-4.6"    # the OpenRouter route MODEL maps to
 
+# --- Gate model (the cheap flyer-vs-not front door) -----------------------------------
+# A small, fast, cheap model classifies each new message BEFORE the expensive brain runs, so
+# non-flyer chatter is deflected without paying for a design turn (see engine/gate.py). This is
+# an OpenRouter slug passed straight through the shim (no MODEL/MODEL_SLUG split needed - the
+# shim's _MODEL_MAP falls through for unknown slugs). Confirm at https://openrouter.ai/models.
+GATE_MODEL = "google/gemini-2.5-flash"
+
 # --- Reasoning ------------------------------------------------------------------------
 # Adaptive thinking lets the model decide how much to reason; effort sets the ceiling.
 # Raise EFFORT to make every text turn deliberate harder.
