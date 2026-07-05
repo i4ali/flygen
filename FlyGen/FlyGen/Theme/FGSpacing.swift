@@ -41,22 +41,28 @@ struct FGSpacing {
     /// Card corner radius - 16pt
     static let cardRadius: CGFloat = 16
 
-    /// Button corner radius - 12pt
-    static let buttonRadius: CGFloat = 12
+    /// Button corner radius - 15pt (Aurora)
+    static let buttonRadius: CGFloat = 15
 
-    /// Input field corner radius - 10pt
-    static let inputRadius: CGFloat = 10
+    /// Input field corner radius - 12pt (Aurora)
+    static let inputRadius: CGFloat = 12
 
     /// Small component radius (chips, badges) - 8pt
     static let chipRadius: CGFloat = 8
+
+    /// Icon chip inside cards - 12pt (Aurora)
+    static let iconChipRadius: CGFloat = 12
 
     /// Full rounded (pills, toggles)
     static let pillRadius: CGFloat = 999
 
     // MARK: - Layout
 
-    /// Screen horizontal padding - 16pt
-    static let screenHorizontal: CGFloat = 16
+    /// Screen horizontal padding - 24pt (Aurora premium margins)
+    static let screenHorizontal: CGFloat = 24
+
+    /// Screen horizontal padding for full-width button rows - 22pt (Aurora)
+    static let screenHorizontalButtons: CGFloat = 22
 
     /// Screen vertical padding - 24pt
     static let screenVertical: CGFloat = 24
@@ -83,6 +89,20 @@ struct FGSpacing {
 
     /// Tab bar height - 83pt (including safe area)
     static let tabBarHeight: CGFloat = 83
+
+    // MARK: - Aurora tokens (new)
+
+    /// Home hero panel radius - 20pt
+    static let heroPanelRadius: CGFloat = 20
+
+    /// Result flyer card radius - 18pt
+    static let flyerCardRadius: CGFloat = 18
+
+    /// Logo mark radius - 8pt
+    static let logoMarkRadius: CGFloat = 8
+
+    /// Bottom safe padding for CTA / tab rows - 30pt
+    static let bottomSafePadding: CGFloat = 30
 }
 
 // MARK: - Padding Helpers

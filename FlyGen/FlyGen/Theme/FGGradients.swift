@@ -1,17 +1,18 @@
 import SwiftUI
 
 /// FlyGen Design System - Gradient Presets
-/// Dramatic gradients for the Midjourney-inspired aesthetic
+/// "Aurora" direction: controlled indigo→cyan. Pink is retired; mood gradients are desaturated
+/// into the indigo/cyan family. Property names are stable so call sites keep working.
 struct FGGradients {
 
     // MARK: - Background Gradients
 
-    /// Hero background gradient with subtle purple tint
+    /// Hero background - near-black with a faint indigo lift
     static let heroBackground = LinearGradient(
         colors: [
-            Color(hex: "0D0D0D"),
-            Color(hex: "1A0A2E"),  // Subtle purple tint
-            Color(hex: "0D0D0D")
+            Color(hex: "0A0B0F"),
+            Color(hex: "0D0F18"),
+            Color(hex: "0A0B0F")
         ],
         startPoint: .top,
         endPoint: .bottom
@@ -21,14 +22,14 @@ struct FGGradients {
     static let ambientBackground = LinearGradient(
         colors: [
             FGColors.backgroundPrimary,
-            Color(hex: "0F0F1A"),  // Very subtle blue
+            Color(hex: "0C0E16"),
             FGColors.backgroundPrimary
         ],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
 
-    /// Subtle radial glow for focus areas
+    /// Subtle radial glow for focus areas (indigo)
     static let radialGlow = RadialGradient(
         colors: [
             FGColors.accentPrimary.opacity(0.15),
@@ -39,29 +40,72 @@ struct FGGradients {
         endRadius: 200
     )
 
+    /// Home hero panel fill - radial 90% 120% at 30% 10%, #1C2140 → #0D0F18
+    static let heroPanelRadial = EllipticalGradient(
+        colors: [Color(hex: "1C2140"), Color(hex: "0D0F18")],
+        center: UnitPoint(x: 0.3, y: 0.1),
+        startRadiusFraction: 0,
+        endRadiusFraction: 0.95
+    )
+
+    /// Generating screen backdrop - radial 120% 55% at 50% 24%, #161A30 → #0A0B0F
+    static let generatingRadial = EllipticalGradient(
+        colors: [Color(hex: "161A30"), Color(hex: "0A0B0F")],
+        center: UnitPoint(x: 0.5, y: 0.24),
+        startRadiusFraction: 0,
+        endRadiusFraction: 0.62
+    )
+
+    /// Paywall backdrop - radial 120% 50% at 50% 0%, #1A1F3D → #0A0B0F
+    static let paywallRadial = EllipticalGradient(
+        colors: [Color(hex: "1A1F3D"), Color(hex: "0A0B0F")],
+        center: UnitPoint(x: 0.5, y: 0.0),
+        startRadiusFraction: 0,
+        endRadiusFraction: 0.55
+    )
+
+    /// Result flyer canvas - 165° #12162E → #0B0D18
+    static let flyerCanvas = LinearGradient(
+        colors: [Color(hex: "12162E"), Color(hex: "0B0D18")],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
     // MARK: - Accent Gradients
 
-    /// Primary accent gradient (violet to pink)
+    /// Primary CTA gradient - 135° indigo → deep indigo (#7C8CF8 → #8B7CF8)
     static let accent = LinearGradient(
-        colors: [FGColors.accentPrimary, FGColors.accentGradientEnd],
+        colors: [FGColors.accentPrimary, FGColors.accentIndigoDeep],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
 
-    /// Secondary accent gradient (cyan to violet)
+    /// Brand gradient - 140° indigo → cyan (#7C8CF8 → #63E6D2). Logo mark, premium badge.
+    static let brand = LinearGradient(
+        colors: [FGColors.accentPrimary, FGColors.accentSecondary],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
+    /// Secondary accent gradient - indigo → cyan (kept name; now the brand direction)
     static let accentSecondary = LinearGradient(
-        colors: [FGColors.accentSecondary, FGColors.accentPrimary],
+        colors: [FGColors.accentPrimary, FGColors.accentSecondary],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
 
-    /// Vibrant multi-color gradient
+    /// Conic sweep for the hero orb & generating spinner (indigo → cyan → indigo)
+    static let orbConic = AngularGradient(
+        colors: [FGColors.accentPrimary, FGColors.accentSecondary, FGColors.accentPrimary],
+        center: .center
+    )
+
+    /// Restrained multi-stop sweep (indigo → deep indigo → cyan) - replaces the old rainbow
     static let rainbow = LinearGradient(
         colors: [
-            Color(hex: "7C3AED"),  // Violet
-            Color(hex: "EC4899"),  // Pink
-            Color(hex: "F59E0B"),  // Amber
-            Color(hex: "06B6D4")   // Cyan
+            Color(hex: "7C8CF8"),
+            Color(hex: "8B7CF8"),
+            Color(hex: "63E6D2")
         ],
         startPoint: .leading,
         endPoint: .trailing
@@ -72,15 +116,15 @@ struct FGGradients {
     /// Shine/gloss effect for cards
     static let cardShine = LinearGradient(
         colors: [
-            Color.white.opacity(0.08),
+            Color.white.opacity(0.06),
             Color.clear,
-            Color.white.opacity(0.03)
+            Color.white.opacity(0.02)
         ],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
 
-    /// Selected card glow overlay
+    /// Selected card glow overlay (indigo)
     static let selectedGlow = LinearGradient(
         colors: [
             FGColors.accentPrimary.opacity(0.2),
@@ -90,77 +134,54 @@ struct FGGradients {
         endPoint: .bottom
     )
 
-    /// Border gradient for premium elements
+    /// Border gradient for premium elements (indigo → deep indigo → cyan)
     static let borderGlow = LinearGradient(
         colors: [
             FGColors.accentPrimary,
-            FGColors.accentGradientEnd,
+            FGColors.accentIndigoDeep,
             FGColors.accentSecondary
         ],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
 
-    // MARK: - Status Gradients
+    // MARK: - Status Gradients (keep meaning-colors)
 
-    /// Success gradient
     static let success = LinearGradient(
-        colors: [
-            Color(hex: "22C55E"),
-            Color(hex: "16A34A")
-        ],
-        startPoint: .topLeading,
-        endPoint: .bottomTrailing
+        colors: [Color(hex: "22C55E"), Color(hex: "16A34A")],
+        startPoint: .topLeading, endPoint: .bottomTrailing
     )
 
-    /// Warning gradient
     static let warning = LinearGradient(
-        colors: [
-            Color(hex: "F59E0B"),
-            Color(hex: "D97706")
-        ],
-        startPoint: .topLeading,
-        endPoint: .bottomTrailing
+        colors: [Color(hex: "F59E0B"), Color(hex: "D97706")],
+        startPoint: .topLeading, endPoint: .bottomTrailing
     )
 
-    /// Error gradient
     static let error = LinearGradient(
-        colors: [
-            Color(hex: "EF4444"),
-            Color(hex: "DC2626")
-        ],
-        startPoint: .topLeading,
-        endPoint: .bottomTrailing
+        colors: [Color(hex: "EF4444"), Color(hex: "DC2626")],
+        startPoint: .topLeading, endPoint: .bottomTrailing
     )
 
-    // MARK: - Mood Gradients (for mood selection cards)
+    // MARK: - Mood Gradients (desaturated into the indigo/cyan family)
 
+    /// All moods now read within the Aurora accent family. Subtle variation is kept for
+    /// differentiation, but pink/amber/green mood colors are retired.
     static func moodGradient(for mood: String) -> LinearGradient {
+        func lg(_ a: String, _ b: String) -> LinearGradient {
+            LinearGradient(colors: [Color(hex: a), Color(hex: b)],
+                           startPoint: .topLeading, endPoint: .bottomTrailing)
+        }
         switch mood.lowercased() {
-        case "urgent":
-            return LinearGradient(colors: [Color(hex: "EF4444"), Color(hex: "F97316")], startPoint: .topLeading, endPoint: .bottomTrailing)
-        case "exciting":
-            return LinearGradient(colors: [Color(hex: "F59E0B"), Color(hex: "EAB308")], startPoint: .topLeading, endPoint: .bottomTrailing)
-        case "calm":
-            return LinearGradient(colors: [Color(hex: "06B6D4"), Color(hex: "0EA5E9")], startPoint: .topLeading, endPoint: .bottomTrailing)
-        case "elegant":
-            return LinearGradient(colors: [Color(hex: "8B5CF6"), Color(hex: "A855F7")], startPoint: .topLeading, endPoint: .bottomTrailing)
-        case "friendly":
-            return LinearGradient(colors: [Color(hex: "22C55E"), Color(hex: "10B981")], startPoint: .topLeading, endPoint: .bottomTrailing)
-        case "professional":
-            return LinearGradient(colors: [Color(hex: "3B82F6"), Color(hex: "1D4ED8")], startPoint: .topLeading, endPoint: .bottomTrailing)
-        case "festive":
-            return LinearGradient(colors: [Color(hex: "EC4899"), Color(hex: "F43F5E")], startPoint: .topLeading, endPoint: .bottomTrailing)
-        case "serious":
-            return LinearGradient(colors: [Color(hex: "475569"), Color(hex: "334155")], startPoint: .topLeading, endPoint: .bottomTrailing)
-        case "inspirational":
-            return LinearGradient(colors: [Color(hex: "F97316"), Color(hex: "FB923C")], startPoint: .topLeading, endPoint: .bottomTrailing)
-        case "romantic":
-            return LinearGradient(colors: [Color(hex: "EC4899"), Color(hex: "DB2777")], startPoint: .topLeading, endPoint: .bottomTrailing)
-        case "somber":
-            return LinearGradient(colors: [Color(hex: "6B7280"), Color(hex: "4B5563")], startPoint: .topLeading, endPoint: .bottomTrailing)
+        case "urgent", "exciting", "festive", "inspirational":
+            return lg("7C8CF8", "8B7CF8")   // energetic - indigo → deep indigo
+        case "calm", "friendly":
+            return lg("7C8CF8", "63E6D2")   // fresh - indigo → cyan
+        case "professional", "serious", "somber":
+            return lg("3A4166", "1C2033")   // muted indigo
+        case "elegant", "romantic":
+            return lg("8B7CF8", "63E6D2")   // deep indigo → cyan
         default:
-            return accent
+            return brand
         }
     }
 }
@@ -196,37 +217,25 @@ extension View {
                 .font(FGTypography.h2)
                 .foregroundColor(FGColors.textPrimary)
 
-            // Background gradients
             VStack(alignment: .leading, spacing: FGSpacing.sm) {
-                Text("Backgrounds")
-                    .font(FGTypography.label)
-                    .foregroundColor(FGColors.textSecondary)
-
+                Text("Backgrounds").font(FGTypography.label).foregroundColor(FGColors.textSecondary)
                 HStack(spacing: FGSpacing.md) {
                     gradientSwatch("Hero", FGGradients.heroBackground)
                     gradientSwatch("Ambient", FGGradients.ambientBackground)
                 }
             }
 
-            // Accent gradients
             VStack(alignment: .leading, spacing: FGSpacing.sm) {
-                Text("Accents")
-                    .font(FGTypography.label)
-                    .foregroundColor(FGColors.textSecondary)
-
+                Text("Accents").font(FGTypography.label).foregroundColor(FGColors.textSecondary)
                 HStack(spacing: FGSpacing.md) {
-                    gradientSwatch("Primary", FGGradients.accent)
-                    gradientSwatch("Secondary", FGGradients.accentSecondary)
-                    gradientSwatch("Rainbow", FGGradients.rainbow)
+                    gradientSwatch("CTA", FGGradients.accent)
+                    gradientSwatch("Brand", FGGradients.brand)
+                    gradientSwatch("Sweep", FGGradients.rainbow)
                 }
             }
 
-            // Card effects
             VStack(alignment: .leading, spacing: FGSpacing.sm) {
-                Text("Card Effects")
-                    .font(FGTypography.label)
-                    .foregroundColor(FGColors.textSecondary)
-
+                Text("Card Effects").font(FGTypography.label).foregroundColor(FGColors.textSecondary)
                 HStack(spacing: FGSpacing.md) {
                     gradientSwatch("Shine", FGGradients.cardShine)
                     gradientSwatch("Selected", FGGradients.selectedGlow)
@@ -234,12 +243,8 @@ extension View {
                 }
             }
 
-            // Status gradients
             VStack(alignment: .leading, spacing: FGSpacing.sm) {
-                Text("Status")
-                    .font(FGTypography.label)
-                    .foregroundColor(FGColors.textSecondary)
-
+                Text("Status").font(FGTypography.label).foregroundColor(FGColors.textSecondary)
                 HStack(spacing: FGSpacing.md) {
                     gradientSwatch("Success", FGGradients.success)
                     gradientSwatch("Warning", FGGradients.warning)

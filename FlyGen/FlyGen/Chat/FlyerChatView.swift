@@ -80,6 +80,15 @@ struct FlyerChatView: View {
             .sheet(isPresented: $showExplorePicker) {
                 ExploreReferencePicker { vm.useReference(imageData: $0) }
             }
+            .fullScreenCover(item: $vm.annotationEditor) { req in
+                FlyerAnnotationView(
+                    request: req,
+                    onApply: { marked, instruction, annotated, draft in
+                        vm.applyAnnotatedEdit(marked: marked, instruction: instruction, annotated: annotated, draft: draft)
+                    },
+                    onCancel: { vm.annotationEditor = nil }
+                )
+            }
         }
     }
 
@@ -124,11 +133,13 @@ struct FlyerChatView: View {
         case .review(let r):      ReviewCard(review: r, isBlocked: isGenerationBlocked,
                                       onBlocked: { showingPaywall = true },
                                       onApprove: { vm.approve(fieldOverrides: $0, decisionOverrides: $1, selectedElements: $2) })
-        case .referenceImage(let c):  ReferenceImageCard(concept: c)
+        case .referenceImage(let c):  ReferenceImageCard(concept: c,
+                                      onMarkUp: { d in gated { vm.beginAnnotation(on: d) } })
         case .concepts(let cs, let heading):   ConceptsCard(concepts: cs, heading: heading,
                                       onRefine: { c, t in gated { vm.refine(concept: c, instruction: t) } },
                                       onResize: { c, ar in gated { vm.resize(concept: c, aspect: ar) } },
-                                      onAddToMyFlyers: { addToMyFlyers($0) })
+                                      onAddToMyFlyers: { addToMyFlyers($0) },
+                                      onMarkUp: { c in gated { if let d = c.imageData { vm.beginAnnotation(on: d) } } })
         case .error(let m):       ErrorBubble(text: m)
         }
     }
@@ -175,7 +186,10 @@ struct FlyerChatView: View {
             }
         }
         .padding(FGSpacing.sm)
-        .background(FGColors.backgroundSecondary)
+        .background(
+            FGColors.backgroundSecondary
+                .overlay(alignment: .top) { Rectangle().fill(FGColors.borderHairline).frame(height: 1) }
+        )
         // Loads whatever the composer strip or the in-chat photo-suggestion picker selects.
         .onChange(of: vm.photoPickerItems) { _, _ in Task { await vm.loadAttachedPhotos() } }
         // Loads a flyer picked from the "reuse a flyer" nudge and enters reference-edit mode.
@@ -711,13 +725,27 @@ private struct ReviewCard: View {
 /// Resize (those belong on generated results) and no refine box (editing is via the composer).
 private struct ReferenceImageCard: View {
     let concept: ConceptDTO
+    var onMarkUp: (Data) -> Void = { _ in }
     var body: some View {
         AssistantCard {
             Text("Your flyer").font(FGTypography.h4).foregroundColor(FGColors.textPrimary)
             if let data = concept.imageData, let ui = UIImage(data: data) {
                 Image(uiImage: ui).resizable().scaledToFit()
-                    .frame(maxWidth: .infinity).clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
+                    .frame(maxWidth: .infinity).auroraFlyerCard()
+                MarkUpButton { onMarkUp(data) }
             }
+        }
+    }
+}
+
+/// "Mark up to edit" - opens the full-screen annotation editor on a flyer image. Shared by the
+/// uploaded-reference card and generated concept cards so they read the same.
+private struct MarkUpButton: View {
+    let action: () -> Void
+    var body: some View {
+        Button(action: action) {
+            Label("Mark up to edit", systemImage: "pencil.and.outline")
+                .font(FGTypography.buttonSmall).foregroundColor(FGColors.accentSecondary)
         }
     }
 }
@@ -728,6 +756,7 @@ private struct ConceptsCard: View {
     let onRefine: (ConceptDTO, String) -> Void
     let onResize: (ConceptDTO, AspectRatio) -> Void
     let onAddToMyFlyers: (ConceptDTO) -> Void
+    var onMarkUp: (ConceptDTO) -> Void = { _ in }
     @State private var refineText: [String: String] = [:]
     @State private var savedVersionIDs: Set<String> = []
     var body: some View {
@@ -737,7 +766,8 @@ private struct ConceptsCard: View {
                 VStack(alignment: .leading, spacing: FGSpacing.xs) {
                     if let data = c.imageData, let ui = UIImage(data: data) {
                         Image(uiImage: ui).resizable().scaledToFit()
-                            .frame(maxWidth: .infinity).clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
+                            .frame(maxWidth: .infinity).auroraFlyerCard()
+                        MarkUpButton { onMarkUp(c) }
                     } else if let err = c.error {
                         Text(err).font(FGTypography.captionSmall).foregroundColor(FGColors.error)
                     }

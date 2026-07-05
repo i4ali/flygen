@@ -85,26 +85,26 @@ struct SubscriptionPaywallView: View {
 
     private var heroSection: some View {
         VStack(spacing: FGSpacing.md) {
-            ZStack {
-                Circle()
-                    .fill(FGColors.accentPrimary.opacity(0.15))
-                    .frame(width: 100, height: 100)
-                    .blur(radius: 15)
+            // Aurora badge tile: 64pt brand-gradient square with a dark crown glyph.
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(FGGradients.brand)
+                .frame(width: 64, height: 64)
+                .overlay(
+                    Image(systemName: "crown.fill")
+                        .font(.system(size: 30))
+                        .foregroundColor(FGColors.backgroundPrimary)
+                )
+                .shadow(color: FGColors.accentPrimary.opacity(0.6), radius: 20, y: 10)
+                .padding(.bottom, FGSpacing.xs)
 
-                Image(systemName: "crown.fill")
-                    .font(.system(size: 46))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [FGColors.accentPrimary, FGColors.accentSecondary],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+            HStack(spacing: 0) {
+                Text("FlyGen ")
+                    .foregroundColor(FGColors.textPrimary)
+                Text("Premium")
+                    .foregroundStyle(FGGradients.brand)
             }
-
-            Text("FlyGen Premium")
-                .font(FGTypography.displaySmall)
-                .foregroundColor(FGColors.textPrimary)
+            .font(FGTypography.heroTitle)
+            .tracking(FGTypography.Tracking.heroTitle)
 
             Text("Create flyers all month long")
                 .font(FGTypography.body)
@@ -229,18 +229,15 @@ struct SubscriptionPaywallView: View {
                 }
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, FGSpacing.md)
+            .frame(height: 56)
             .foregroundColor(FGColors.textOnAccent)
             .background(
                 entitlementService.products.isEmpty
                     ? AnyShapeStyle(FGColors.textTertiary)
-                    : AnyShapeStyle(LinearGradient(
-                        colors: [FGColors.accentPrimary, FGColors.accentSecondary],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    ))
+                    : AnyShapeStyle(FGGradients.accent)
             )
-            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius, style: .continuous))
+            .auroraCTAGlow(!entitlementService.products.isEmpty)
         }
         .disabled(entitlementService.products.isEmpty || isPurchasing || isRestoring)
     }
@@ -546,15 +543,9 @@ private struct PlanCard: View {
                     .foregroundColor(FGColors.textPrimary)
             }
             .padding(FGSpacing.cardPadding)
-            .background(FGColors.backgroundElevated)
-            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
-            .overlay(
-                RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
-                    .stroke(
-                        isSelected ? FGColors.accentPrimary : FGColors.borderSubtle,
-                        lineWidth: isSelected ? 2 : 1
-                    )
-            )
+            .background(FGColors.surfaceDefault)
+            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius, style: .continuous))
+            .auroraSelectionRing(isSelected, cornerRadius: FGSpacing.cardRadius)
             .shadow(color: isSelected ? FGColors.accentPrimary.opacity(0.35) : .clear, radius: 14, y: 6)
         }
         .buttonStyle(.plain)

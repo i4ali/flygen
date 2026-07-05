@@ -184,34 +184,27 @@ struct MainTabView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             HomeTab(viewModel: viewModel, showingSettings: $showingSettings)
-                .tabItem {
-                    Label("Home", systemImage: "house.fill")
-                }
                 .tag(0)
+                .toolbar(.hidden, for: .tabBar)
 
             GalleryTab(viewModel: viewModel, selectedTab: $selectedTab)
-                .tabItem {
-                    Label("My Flyers", systemImage: "square.grid.2x2.fill")
-                }
                 .tag(1)
+                .toolbar(.hidden, for: .tabBar)
 
             ExploreTab(viewModel: viewModel)
-                .tabItem {
-                    Label("Explore", systemImage: "sparkles")
-                }
                 .tag(2)
+                .toolbar(.hidden, for: .tabBar)
 
             PromptsTab()
-                .tabItem {
-                    Label("Prompts", systemImage: "text.bubble.fill")
-                }
                 .tag(3)
+                .toolbar(.hidden, for: .tabBar)
 
             ProfileTab()
-                .tabItem {
-                    Label("Profile", systemImage: "person.fill")
-                }
                 .tag(4)
+                .toolbar(.hidden, for: .tabBar)
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            AuroraTabBar(selection: $selectedTab)
         }
     }
 }

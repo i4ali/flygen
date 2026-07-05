@@ -101,6 +101,35 @@ def edit_reference(reference_path: str, generator, instruction: str,
     return _to_concept(results[0], "reference_edit")
 
 
+def _annotated_edit_prompt(instruction: str) -> str:
+    """Framing for a marked-up flyer: map each numbered circle to its instruction and require the
+    circles/numbers be removed from the output. Validated in the annotate-to-edit Phase 0 spike
+    (2026-07-04); see docs/plans/2026-07-04-annotate-to-edit-design.md."""
+    return (
+        "This flyer has numbered circles marking areas to change. Apply the numbered "
+        "instructions below to the matching circled areas, then remove every circle and "
+        "number so none remain in the final flyer:\n\n"
+        f"{instruction}"
+    )
+
+
+def annotated_edit(image_path: str, generator, instruction: str,
+                   aspect_ratio: Optional[str] = None) -> Concept:
+    """Edit a flyer the user marked up with numbered circles (the marked image + a numbered
+    instruction list). Same trust-the-model light wrapper as edit_reference, but the prompt tells
+    the model the circles are pointers to act on and remove, not content. Used by both the
+    reference and refine paths when a request is annotated. Signature matches edit_reference so the
+    two are interchangeable at the call site."""
+    aspect_ratio = aspect_ratio or _reference_aspect_ratio(image_path)
+    instruction = (instruction or "").strip() or "Return this flyer unchanged."
+    prompt = _annotated_edit_prompt(instruction)
+    results = generator.generate(
+        prompt=prompt, model="nano-banana-pro", aspect_ratio=aspect_ratio,
+        n=1, save_images=False, input_images=[image_path],
+    )
+    return _to_concept(results[0], "annotated_edit")
+
+
 def resize_concept(prior_image_path: str, aspect_ratio: str, generator,
                    model: str = "nano-banana-pro") -> Concept:
     """Reformat an existing concept to a new aspect ratio, preserving text/style

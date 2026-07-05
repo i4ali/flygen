@@ -76,7 +76,7 @@ def _materialized_images(b64_list):
 class Engine:
     def __init__(self, client, interpret_fn=None, assemble_fn=None, build_project_fn=None,
                  generate_concepts=None, generator=None, refine_concept=None, resize_concept=None,
-                 gate_fn=None, edit_reference=None):
+                 gate_fn=None, edit_reference=None, annotated_edit=None):
         self.client = client
         self._gate = gate_fn or _is_flyer_request
         self._interpret = interpret_fn or _interpret.interpret
@@ -87,6 +87,7 @@ class Engine:
         self._refine = refine_concept or _tools.refine_concept
         self._resize = resize_concept or _tools.resize_concept
         self._edit_reference = edit_reference or _tools.edit_reference
+        self._annotated_edit = annotated_edit or _tools.annotated_edit
         self.turn: Optional[TurnResult] = None
         self.brief: dict = {}        # wire state (ExtractedBrief-shaped), persisted in/out
         self.project = None
@@ -120,10 +121,12 @@ class Engine:
     def handle_answers(self, answers) -> Iterator[Event]:
         yield from self._run(answers=answers)
 
-    def handle_reference(self, reference_b64, instruction="") -> Iterator[Event]:
+    def handle_reference(self, reference_b64, instruction="", annotated=False) -> Iterator[Event]:
         # The user uploaded a flyer to reuse. Hand the flyer plus their own words straight to the
         # image model (no brain, no extraction) and return the edited flyer. Each further edit is
-        # another such turn on the latest image, so this stays stateless.
+        # another such turn on the latest image, so this stays stateless. When `annotated`, the
+        # flyer carries numbered circles and the annotated-edit prompt is used instead (both edit
+        # functions share a signature, so the call site is identical).
         if not reference_b64:
             yield Event("error", "I didn't get that flyer - want to try attaching it again?")
             return
@@ -134,7 +137,8 @@ class Engine:
             if not ref_paths:
                 yield Event("error", "I couldn't read that flyer - want to try attaching it again?")
                 return
-            concept = self._edit_reference(ref_paths[0], self._generator, instruction)
+            edit = self._annotated_edit if annotated else self._edit_reference
+            concept = edit(ref_paths[0], self._generator, instruction)
         yield Event("concepts", [concept])
 
     def handle_approval(self, field_overrides=None, decision_overrides=None,
@@ -159,7 +163,17 @@ class Engine:
         yield Event("concepts", concepts)
 
     def handle_refine(self, prior_image_path=None, instruction="", mode="edit",
-                      prior_image_b64=None) -> Iterator[Event]:
+                      prior_image_b64=None, annotated=False) -> Iterator[Event]:
+        # Annotated edits are self-contained (marked image + numbered instructions), like a
+        # reference edit - no project/brief needed, and the light annotated-edit prompt replaces
+        # the full design prompt. See docs/plans/2026-07-04-annotate-to-edit-design.md.
+        if annotated:
+            with _resolved_image(prior_image_path, prior_image_b64) as path:
+                if path is None:
+                    yield Event("error", "no prior image to refine"); return
+                concept = self._annotated_edit(path, self._generator, instruction)
+            yield Event("refined", concept)
+            return
         # Each HTTP request builds a fresh Engine, so self.project is usually None on a refine
         # turn; rebuild it from the brief the client posts back (mirrors the old engine's
         # self.project-or-rebuild-from-brief behavior, now via TurnResult + build_project).

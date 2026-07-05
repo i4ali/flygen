@@ -46,27 +46,38 @@ struct FlyGenApp: App {
     }
 
     private func configureAppearance() {
-        // Tab bar appearance
+        // Aurora palette (UIKit): base #0A0B0F, indigo #7C8CF8, tertiary #565C6B, near-white #EDEFF4
+        let base = UIColor(red: 0.039, green: 0.043, blue: 0.059, alpha: 1.0)   // #0A0B0F
+        let indigo = UIColor(red: 0.486, green: 0.549, blue: 0.973, alpha: 1.0) // #7C8CF8
+        let tertiary = UIColor(red: 0.337, green: 0.361, blue: 0.420, alpha: 1.0) // #565C6B
+        let nearWhite = UIColor(red: 0.929, green: 0.937, blue: 0.957, alpha: 1.0) // #EDEFF4
+
+        // Tab bar appearance (the app renders a custom AuroraTabBar; this keeps any native
+        // bar on-brand as a fallback).
         let tabBarAppearance = UITabBarAppearance()
         tabBarAppearance.configureWithOpaqueBackground()
-        tabBarAppearance.backgroundColor = UIColor(red: 0.05, green: 0.05, blue: 0.05, alpha: 1.0) // #0D0D0D
-        tabBarAppearance.stackedLayoutAppearance.normal.iconColor = UIColor(white: 0.45, alpha: 1.0)
-        tabBarAppearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor(white: 0.45, alpha: 1.0)]
-        tabBarAppearance.stackedLayoutAppearance.selected.iconColor = UIColor(red: 0.486, green: 0.227, blue: 0.929, alpha: 1.0) // #7C3AED
-        tabBarAppearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor(red: 0.486, green: 0.227, blue: 0.929, alpha: 1.0)]
+        tabBarAppearance.backgroundColor = base
+        tabBarAppearance.stackedLayoutAppearance.normal.iconColor = tertiary
+        tabBarAppearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: tertiary]
+        tabBarAppearance.stackedLayoutAppearance.selected.iconColor = indigo
+        tabBarAppearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: indigo]
         UITabBar.appearance().standardAppearance = tabBarAppearance
         UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
 
-        // Navigation bar appearance
+        // Navigation bar appearance (Space Grotesk titles)
         let navBarAppearance = UINavigationBarAppearance()
         navBarAppearance.configureWithOpaqueBackground()
-        navBarAppearance.backgroundColor = UIColor(red: 0.05, green: 0.05, blue: 0.05, alpha: 1.0)
-        navBarAppearance.titleTextAttributes = [.foregroundColor: UIColor.white]
-        navBarAppearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+        navBarAppearance.backgroundColor = base
+        var titleAttrs: [NSAttributedString.Key: Any] = [.foregroundColor: nearWhite]
+        if let titleFont = UIFont(name: "SpaceGrotesk-Bold", size: 17) { titleAttrs[.font] = titleFont }
+        navBarAppearance.titleTextAttributes = titleAttrs
+        var largeAttrs: [NSAttributedString.Key: Any] = [.foregroundColor: nearWhite]
+        if let largeFont = UIFont(name: "SpaceGrotesk-Bold", size: 32) { largeAttrs[.font] = largeFont }
+        navBarAppearance.largeTitleTextAttributes = largeAttrs
         UINavigationBar.appearance().standardAppearance = navBarAppearance
         UINavigationBar.appearance().compactAppearance = navBarAppearance
         UINavigationBar.appearance().scrollEdgeAppearance = navBarAppearance
-        UINavigationBar.appearance().tintColor = UIColor(red: 0.486, green: 0.227, blue: 0.929, alpha: 1.0)
+        UINavigationBar.appearance().tintColor = indigo
     }
 
     var body: some Scene {

@@ -1,85 +1,99 @@
 import SwiftUI
 
 /// FlyGen Design System - Typography Scale
-/// Bold, modern typography for AI-forward aesthetic
+/// "Aurora" direction: a single precise typeface, Space Grotesk (weights 400/500/600/700).
+/// Roles keep their names/sizes so the ~429 call sites inherit the new family automatically;
+/// `.custom(_:fixedSize:)` preserves the current fixed-size (pixel-spec) behavior.
 struct FGTypography {
+
+    /// The four bundled Space Grotesk faces.
+    private enum SGFace: String {
+        case regular = "SpaceGrotesk-Regular"
+        case medium = "SpaceGrotesk-Medium"
+        case semibold = "SpaceGrotesk-SemiBold"
+        case bold = "SpaceGrotesk-Bold"
+    }
+
+    /// Space Grotesk at a fixed point size (preserves the current fixed-size, pixel-spec behavior).
+    private static func sg(_ size: CGFloat, _ face: SGFace = .regular) -> Font {
+        .custom(face.rawValue, fixedSize: size)
+    }
 
     // MARK: - Display (Hero text)
 
-    /// Large display text - 48pt bold rounded
-    static let displayLarge = Font.system(size: 48, weight: .bold, design: .rounded)
-
-    /// Medium display text - 36pt bold rounded
-    static let displayMedium = Font.system(size: 36, weight: .bold, design: .rounded)
-
-    /// Small display text - 28pt bold rounded
-    static let displaySmall = Font.system(size: 28, weight: .bold, design: .rounded)
+    static let displayLarge = sg(48, .bold)
+    static let displayMedium = sg(36, .bold)
+    static let displaySmall = sg(28, .bold)
 
     // MARK: - Headings
 
-    /// Heading 1 - 28pt bold rounded
-    static let h1 = Font.system(size: 28, weight: .bold, design: .rounded)
-
-    /// Heading 2 - 24pt semibold rounded
-    static let h2 = Font.system(size: 24, weight: .semibold, design: .rounded)
-
-    /// Heading 3 - 20pt semibold
-    static let h3 = Font.system(size: 20, weight: .semibold, design: .default)
-
-    /// Heading 4 - 17pt semibold
-    static let h4 = Font.system(size: 17, weight: .semibold, design: .default)
+    static let h1 = sg(28, .bold)
+    static let h2 = sg(24, .semibold)
+    static let h3 = sg(20, .semibold)
+    static let h4 = sg(17, .semibold)
 
     // MARK: - Body Text
 
-    /// Large body text - 17pt regular
-    static let bodyLarge = Font.system(size: 17, weight: .regular, design: .default)
-
-    /// Standard body text - 15pt regular
-    static let body = Font.system(size: 15, weight: .regular, design: .default)
-
-    /// Small body text - 13pt regular
-    static let bodySmall = Font.system(size: 13, weight: .regular, design: .default)
+    static let bodyLarge = sg(17, .regular)
+    static let body = sg(15, .regular)
+    static let bodySmall = sg(13, .regular)
 
     // MARK: - Labels
 
-    /// Large label - 15pt medium
-    static let labelLarge = Font.system(size: 15, weight: .medium, design: .default)
-
-    /// Standard label - 13pt medium
-    static let label = Font.system(size: 13, weight: .medium, design: .default)
-
-    /// Small label - 11pt medium
-    static let labelSmall = Font.system(size: 11, weight: .medium, design: .default)
+    static let labelLarge = sg(15, .medium)
+    static let label = sg(13, .medium)
+    static let labelSmall = sg(11, .medium)
 
     // MARK: - Captions
 
-    /// Caption text - 12pt regular
-    static let caption = Font.system(size: 12, weight: .regular, design: .default)
-
-    /// Bold caption text - 12pt semibold
-    static let captionBold = Font.system(size: 12, weight: .semibold, design: .default)
-
-    /// Extra small caption - 10pt regular
-    static let captionSmall = Font.system(size: 10, weight: .regular, design: .default)
+    static let caption = sg(12, .regular)
+    static let captionBold = sg(12, .semibold)
+    static let captionSmall = sg(10, .regular)
 
     // MARK: - Buttons
 
-    /// Large button text - 17pt semibold
-    static let buttonLarge = Font.system(size: 17, weight: .semibold, design: .default)
+    static let buttonLarge = sg(17, .semibold)
+    static let button = sg(15, .semibold)
+    static let buttonSmall = sg(13, .semibold)
 
-    /// Standard button text - 15pt semibold
-    static let button = Font.system(size: 15, weight: .semibold, design: .default)
+    // MARK: - Monospace (technical content - Space Grotesk isn't mono, keep system)
 
-    /// Small button text - 13pt semibold
-    static let buttonSmall = Font.system(size: 13, weight: .semibold, design: .default)
-
-    // MARK: - Monospace (for technical content)
-
-    /// Monospace body - 14pt
     static let mono = Font.system(size: 14, weight: .regular, design: .monospaced)
-
-    /// Small monospace - 12pt
     static let monoSmall = Font.system(size: 12, weight: .regular, design: .monospaced)
+
+    // MARK: - Aurora-exact roles (hero screens)
+
+    /// Screen title - 29/700 (pair with Tracking.screenTitle)
+    static let screenTitle = sg(29, .bold)
+    /// Home hero title - 30/700 (pair with Tracking.heroTitle)
+    static let heroTitle = sg(30, .bold)
+    /// Section / result title - 16/600 (pair with Tracking.sectionTitle)
+    static let sectionTitle = sg(16, .semibold)
+    /// Wordmark "FlyGen" - 19/700 (pair with Tracking.wordmark)
+    static let wordmark = sg(19, .bold)
+    /// Filled input value - 16/600
+    static let fieldValue = sg(16, .semibold)
+    /// Field label - 13/400
+    static let fieldLabel = sg(13, .regular)
+    /// Review row label - 11.5/500 UPPERCASE (pair with Tracking.reviewLabel + .textCase(.uppercase))
+    static let reviewLabel = sg(11.5, .medium)
+    /// Button label - 16/600
+    static let buttonLabel = sg(16, .semibold)
+    /// Step count / meta - 12.5/500
+    static let stepMeta = sg(12.5, .medium)
+    /// Tab label - 11/600 active, use `tabLabelInactive` for inactive
+    static let tabLabel = sg(11, .semibold)
+    static let tabLabelInactive = sg(11, .regular)
+
+    /// Aurora tracking values (points). `Font` can't carry tracking, so apply via `.tracking(_:)`
+    /// on the matching role. Values = em × size.
+    enum Tracking {
+        static let screenTitle: CGFloat = -1.0    // -0.035em @ 29
+        static let heroTitle: CGFloat = -1.05     // -0.035em @ 30
+        static let sectionTitle: CGFloat = -0.32  // -0.02em  @ 16
+        static let wordmark: CGFloat = -0.57      // -0.03em  @ 19
+        static let reviewLabel: CGFloat = 0.92    // +0.08em  @ 11.5
+    }
 }
 
 // MARK: - Text Style Modifiers
@@ -160,97 +174,19 @@ enum FGLabelStyle {
 
 #Preview("FGTypography Scale") {
     ScrollView {
-        VStack(alignment: .leading, spacing: 24) {
-            // Display
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Display")
-                    .font(FGTypography.labelSmall)
-                    .foregroundColor(FGColors.textTertiary)
-
-                Text("Display Large")
-                    .font(FGTypography.displayLarge)
-                    .foregroundColor(FGColors.textPrimary)
-
-                Text("Display Medium")
-                    .font(FGTypography.displayMedium)
-                    .foregroundColor(FGColors.textPrimary)
-
-                Text("Display Small")
-                    .font(FGTypography.displaySmall)
-                    .foregroundColor(FGColors.textPrimary)
-            }
-
-            Divider().background(FGColors.borderSubtle)
-
-            // Headings
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Headings")
-                    .font(FGTypography.labelSmall)
-                    .foregroundColor(FGColors.textTertiary)
-
-                Text("Heading 1")
-                    .font(FGTypography.h1)
-                    .foregroundColor(FGColors.textPrimary)
-
-                Text("Heading 2")
-                    .font(FGTypography.h2)
-                    .foregroundColor(FGColors.textPrimary)
-
-                Text("Heading 3")
-                    .font(FGTypography.h3)
-                    .foregroundColor(FGColors.textPrimary)
-
-                Text("Heading 4")
-                    .font(FGTypography.h4)
-                    .foregroundColor(FGColors.textPrimary)
-            }
-
-            Divider().background(FGColors.borderSubtle)
-
-            // Body
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Body")
-                    .font(FGTypography.labelSmall)
-                    .foregroundColor(FGColors.textTertiary)
-
-                Text("Body Large - Primary text for important content")
-                    .font(FGTypography.bodyLarge)
-                    .foregroundColor(FGColors.textPrimary)
-
-                Text("Body Regular - Standard content text throughout the app")
-                    .font(FGTypography.body)
-                    .foregroundColor(FGColors.textSecondary)
-
-                Text("Body Small - Secondary or supplementary information")
-                    .font(FGTypography.bodySmall)
-                    .foregroundColor(FGColors.textTertiary)
-            }
-
-            Divider().background(FGColors.borderSubtle)
-
-            // Labels & Captions
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Labels & Captions")
-                    .font(FGTypography.labelSmall)
-                    .foregroundColor(FGColors.textTertiary)
-
-                Text("Label Large")
-                    .font(FGTypography.labelLarge)
-                    .foregroundColor(FGColors.textSecondary)
-
-                Text("Label Regular")
-                    .font(FGTypography.label)
-                    .foregroundColor(FGColors.textSecondary)
-
-                Text("Caption Bold")
-                    .font(FGTypography.captionBold)
-                    .foregroundColor(FGColors.textSecondary)
-
-                Text("Caption Regular")
-                    .font(FGTypography.caption)
-                    .foregroundColor(FGColors.textTertiary)
+        VStack(alignment: .leading, spacing: 20) {
+            Group {
+                Text("Space Grotesk").font(FGTypography.labelSmall).foregroundColor(FGColors.textTertiary)
+                Text("Screen title 29").font(FGTypography.screenTitle).tracking(FGTypography.Tracking.screenTitle).foregroundColor(FGColors.textPrimary)
+                Text("Hero title 30").font(FGTypography.heroTitle).tracking(FGTypography.Tracking.heroTitle).foregroundColor(FGColors.textPrimary)
+                Text("Heading 2").font(FGTypography.h2).foregroundColor(FGColors.textPrimary)
+                Text("Section title 16").font(FGTypography.sectionTitle).foregroundColor(FGColors.textPrimary)
+                Text("Body regular 15 - a guided brief in, a polished layout out.").font(FGTypography.body).foregroundColor(FGColors.textSecondary)
+                Text("Field label 13").font(FGTypography.fieldLabel).foregroundColor(FGColors.textTertiary)
+                Text("REVIEW LABEL").font(FGTypography.reviewLabel).tracking(FGTypography.Tracking.reviewLabel).textCase(.uppercase).foregroundColor(FGColors.textTertiary)
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
     }
     .background(FGColors.backgroundPrimary)

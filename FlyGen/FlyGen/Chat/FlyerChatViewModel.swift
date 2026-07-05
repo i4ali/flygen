@@ -33,6 +33,7 @@ final class FlyerChatViewModel: ObservableObject {
     @Published var photoPickerItems: [PhotosPickerItem] = []
     @Published var attachedPhotos: [Data] = []
     @Published var referencePickerItems: [PhotosPickerItem] = []   // the "reuse a flyer" upload
+    @Published var annotationEditor: AnnotationEditorRequest?      // drives the full-screen annotation editor
 
     private let client = FlyerChatClient()
     private var brief: ExtractedBriefDTO?
@@ -43,6 +44,7 @@ final class FlyerChatViewModel: ObservableObject {
     // instead of starting a new flyer. Published so the composer can reflect the mode.
     @Published private(set) var inReferenceMode = false
     private var currentReferenceB64: String?    // the latest edited flyer image; the composer edits this
+    private var pendingAnnotationDraft: AnnotationDraft?   // in-flight marked-up edit; kept so a failed turn can reopen the editor intact
     private var generationPhotos: [Data] = []   // photos committed to this flyer; sent at generation
     // Photo-suggestion gating: hold the review card until the user adds a photo or declines, so the
     // turn reads as a conversation instead of the LLM dumping everything (fields + review) at once.
@@ -337,6 +339,44 @@ final class FlyerChatViewModel: ObservableObject {
         run(ChatRequest(action: "resize", brief: brief, prior_image_b64: b64, aspect_ratio: aspect.rawValue), thinking: "Reformatting…")
     }
 
+    // MARK: Annotate to edit
+
+    /// Open the full-screen annotation editor on a card's image. The caller gates on quota first
+    /// (opening leads to a paid generation on Apply).
+    func beginAnnotation(on imageData: Data) {
+        guard !isStreaming else { return }
+        annotationEditor = AnnotationEditorRequest(imageData: imageData)
+    }
+
+    /// Dispatch a marked-up edit from the annotation editor. `marked` carries the numbered circles
+    /// (it's what we SEND); `instruction` is the numbered list. Reuse mode edits via the `reference`
+    /// action, a generated result via `refine`; `annotated` is set only when circles were drawn (a
+    /// whole-flyer-note-only edit is an ordinary edit). The draft is retained so a failed turn can
+    /// reopen the editor with everything intact.
+    func applyAnnotatedEdit(marked: Data, instruction: String, annotated: Bool, draft: AnnotationDraft) {
+        guard !isStreaming else { return }
+        annotationEditor = nil
+        pendingAnnotationDraft = draft
+        let b64 = marked.base64EncodedString()
+        transcript.append(ChatBubble(.userPhotos([marked])))          // thumbnail of what we sent
+        if !instruction.isEmpty { transcript.append(ChatBubble(.user(instruction))) }
+        if inReferenceMode {
+            run(ChatRequest(message: instruction, action: "reference", reference_image_b64: b64, annotated: annotated),
+                thinking: "Editing your flyer…")
+        } else {
+            run(ChatRequest(action: "refine", brief: brief, instruction: instruction, prior_image_b64: b64, annotated: annotated),
+                thinking: "Applying your edits…")
+        }
+    }
+
+    /// On a failed marked-up edit, reopen the editor seeded with the same circles + notes so the
+    /// user can reword and resend without redrawing.
+    private func reopenAnnotationIfPending() {
+        guard let draft = pendingAnnotationDraft else { return }
+        pendingAnnotationDraft = nil
+        annotationEditor = AnnotationEditorRequest(imageData: draft.sourceImageData, seed: draft)
+    }
+
     /// Maps the current brief into a FlyerProject so a chat concept can be saved into My Flyers.
     /// Colors/visuals/output keep defaults (the engine chose the real look server-side and we
     /// didn't capture it); `origin = .chat` lets the gallery hide "Use as Template". Returns nil
@@ -387,6 +427,7 @@ final class FlyerChatViewModel: ObservableObject {
                 for try await event in client.stream(request) { apply(event, typingID: typing.id) }
             } catch {
                 insertBeforeTyping(ChatBubble(.error(error.localizedDescription)), typingID: typing.id)
+                reopenAnnotationIfPending()
             }
             removeTyping(typing.id)
             isStreaming = false
@@ -408,19 +449,25 @@ final class FlyerChatViewModel: ObservableObject {
             if let img = cs.first(where: { $0.image_base64 != nil })?.image_base64 {
                 insertBeforeTyping(ChatBubble(.concepts(cs, heading: nil)), typingID: typingID)
                 if inReferenceMode { currentReferenceB64 = img }   // the next composer edit builds on this result
+                pendingAnnotationDraft = nil                       // a marked-up edit (if any) succeeded
                 onCreditDeduction?()                               // 1 unit per successful create (3 concepts = 1)
             } else {
                 insertBeforeTyping(ChatBubble(.error(Self.generationFailedMessage)), typingID: typingID)
+                reopenAnnotationIfPending()                        // bring the circles back to reword & retry
             }
         case .refined(let c), .resized(let c):
             if c.image_base64 != nil {
                 insertBeforeTyping(ChatBubble(.concepts([c], heading: nil)), typingID: typingID)
+                pendingAnnotationDraft = nil                       // a marked-up edit (if any) succeeded
                 onCreditDeduction?()                               // 1 unit per successful refine/resize
             } else {
                 insertBeforeTyping(ChatBubble(.error(Self.generationFailedMessage)), typingID: typingID)
+                reopenAnnotationIfPending()                        // bring the circles back to reword & retry
             }
         case .note(let t):         insertBeforeTyping(ChatBubble(.assistant(t)), typingID: typingID)
-        case .error(let msg):      insertBeforeTyping(ChatBubble(.error(msg)), typingID: typingID)
+        case .error(let msg):
+            insertBeforeTyping(ChatBubble(.error(msg)), typingID: typingID)
+            reopenAnnotationIfPending()
         case .unknown: break
         }
     }

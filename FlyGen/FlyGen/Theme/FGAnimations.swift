@@ -9,8 +9,8 @@ struct FGAnimations {
     /// Standard spring for selections and interactions
     static let spring = Animation.spring(response: 0.35, dampingFraction: 0.7)
 
-    /// Bouncy spring for playful interactions
-    static let springBouncy = Animation.spring(response: 0.4, dampingFraction: 0.6)
+    /// Bouncy spring, softened toward Aurora's "subtle, no bounce"
+    static let springBouncy = Animation.spring(response: 0.4, dampingFraction: 0.78)
 
     /// Snappy spring for quick feedback
     static let springSnappy = Animation.spring(response: 0.25, dampingFraction: 0.8)
@@ -42,6 +42,12 @@ struct FGAnimations {
 
     /// Rotation animation for spinners
     static let spin = Animation.linear(duration: 1.0).repeatForever(autoreverses: false)
+
+    /// Aurora generating spinner - 1.6s linear rotate
+    static let spinAurora = Animation.linear(duration: 1.6).repeatForever(autoreverses: false)
+
+    /// Aurora active-step pulse - opacity 0.4↔1, 1.5s ease-in-out
+    static let pulseAurora = Animation.easeInOut(duration: 1.5).repeatForever(autoreverses: true)
 
     // MARK: - Durations
 

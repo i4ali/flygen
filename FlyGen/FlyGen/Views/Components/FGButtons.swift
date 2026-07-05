@@ -23,23 +23,19 @@ struct FGPrimaryButton: View {
                 }
 
                 Text(title)
-                    .font(FGTypography.labelLarge)
+                    .font(FGTypography.buttonLabel)
             }
             .foregroundColor(FGColors.textOnAccent)
             .frame(maxWidth: .infinity)
-            .frame(height: FGSpacing.buttonHeight)
+            .frame(height: 56)
             .background(
-                RoundedRectangle(cornerRadius: FGSpacing.buttonRadius)
+                RoundedRectangle(cornerRadius: FGSpacing.buttonRadius, style: .continuous)
                     .fill(isEnabled ? FGGradients.accent : LinearGradient(colors: [FGColors.textTertiary], startPoint: .leading, endPoint: .trailing))
             )
-            .overlay(
-                RoundedRectangle(cornerRadius: FGSpacing.buttonRadius)
-                    .fill(FGGradients.cardShine)
-            )
             .shadow(
-                color: isEnabled ? FGColors.accentPrimary.opacity(0.3) : .clear,
-                radius: 8,
-                y: 4
+                color: isEnabled ? FGColors.accentPrimary.opacity(0.5) : .clear,
+                radius: 18,
+                y: 10
             )
         }
         .buttonStyle(FGPrimaryButtonStyle(isEnabled: isEnabled))
@@ -69,14 +65,14 @@ struct FGSecondaryButton: View {
             }
             .foregroundColor(isEnabled ? FGColors.textPrimary : FGColors.textTertiary)
             .frame(maxWidth: .infinity)
-            .frame(height: FGSpacing.buttonHeight)
+            .frame(height: 54)
             .background(
-                RoundedRectangle(cornerRadius: FGSpacing.buttonRadius)
+                RoundedRectangle(cornerRadius: FGSpacing.buttonRadius, style: .continuous)
                     .fill(FGColors.surfaceDefault)
             )
             .overlay(
-                RoundedRectangle(cornerRadius: FGSpacing.buttonRadius)
-                    .stroke(FGColors.borderDefault, lineWidth: 1)
+                RoundedRectangle(cornerRadius: FGSpacing.buttonRadius, style: .continuous)
+                    .strokeBorder(FGColors.borderCard, lineWidth: 1)
             )
         }
         .buttonStyle(FGCardButtonStyle())

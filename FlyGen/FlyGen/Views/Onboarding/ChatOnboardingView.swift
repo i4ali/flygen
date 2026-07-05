@@ -119,7 +119,7 @@ private struct OnboardingBrandMark: View {
                     colors: [FGColors.accentPrimary, FGColors.accentGradientEnd, FGColors.accentSecondary, FGColors.accentPrimary],
                     center: .center, angle: .degrees(rot)))
                 .frame(width: 24, height: 24)
-                .overlay(RoundedRectangle(cornerRadius: 4).fill(Color(hex: "0A0710")).frame(width: 14, height: 14))
+                .overlay(RoundedRectangle(cornerRadius: 4).fill(FGColors.backgroundPrimary).frame(width: 14, height: 14))
                 .overlay(RoundedRectangle(cornerRadius: 2)
                     .fill(LinearGradient(colors: [FGColors.accentGradientStart, FGColors.accentSecondary],
                                          startPoint: .top, endPoint: .bottom))

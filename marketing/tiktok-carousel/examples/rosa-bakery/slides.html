@@ -1,0 +1,436 @@
+<title>FlyGen TikTok Carousel - Concept A</title>
+<style>
+  :root{
+    --bg:#0C0B12; --panel:#16141F; --panel-2:#1E1B29;
+    --ink:#ECEAF2; --muted:#9A94AD; --faint:#6E6880;
+    --accent:#8B6CFF; --cyan:#22D3EE;
+    --border:rgba(255,255,255,.09); --border-2:rgba(255,255,255,.14);
+    --ui:-apple-system,system-ui,"Segoe UI",Roboto,sans-serif;
+    --tk:"SF Pro Rounded",ui-rounded,-apple-system,system-ui,"Segoe UI",sans-serif;
+    --s:0.335; /* preview scale for the 1080x1920 slides */
+  }
+  @media (prefers-color-scheme: light){
+    :root{
+      --bg:#F3F1F8; --panel:#FFFFFF; --panel-2:#F7F5FC;
+      --ink:#1A1726; --muted:#655D78; --faint:#8E88A0;
+      --border:rgba(24,18,48,.10); --border-2:rgba(24,18,48,.16);
+      --accent:#6D45E6;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0C0B12; --panel:#16141F; --panel-2:#1E1B29;
+    --ink:#ECEAF2; --muted:#9A94AD; --faint:#6E6880;
+    --border:rgba(255,255,255,.09); --border-2:rgba(255,255,255,.14); --accent:#8B6CFF;
+  }
+  :root[data-theme="light"]{
+    --bg:#F3F1F8; --panel:#FFFFFF; --panel-2:#F7F5FC;
+    --ink:#1A1726; --muted:#655D78; --faint:#8E88A0;
+    --border:rgba(24,18,48,.10); --border-2:rgba(24,18,48,.16); --accent:#6D45E6;
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui);
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:1200px;margin:0 auto;padding:40px 24px 96px}
+
+  /* ---------- header ---------- */
+  header.top{display:flex;flex-direction:column;gap:14px;margin-bottom:8px}
+  .eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  h1{font-family:var(--tk);font-weight:800;font-size:clamp(28px,4.5vw,44px);margin:0;letter-spacing:-.01em;text-wrap:balance}
+  .sub{color:var(--muted);max-width:64ch;font-size:16px;margin:0}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+  .chip{font-size:12.5px;color:var(--muted);border:1px solid var(--border);background:var(--panel);
+    padding:5px 11px;border-radius:999px;font-variant-numeric:tabular-nums}
+  .chip b{color:var(--ink);font-weight:600}
+
+  /* ---------- toolbar ---------- */
+  .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:26px 0 8px;
+    padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-radius:16px}
+  .toolbar .hint{color:var(--muted);font-size:13.5px;flex:1;min-width:220px}
+  .toolbar .hint b{color:var(--ink)}
+  .btn{font-family:var(--ui);font-size:13.5px;font-weight:600;color:var(--ink);cursor:pointer;
+    background:var(--panel-2);border:1px solid var(--border-2);padding:9px 15px;border-radius:10px;
+    display:inline-flex;align-items:center;gap:8px;transition:border-color .15s,background .15s}
+  .btn:hover{border-color:var(--accent)}
+  .btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .btn[aria-pressed="true"]{background:color-mix(in srgb,var(--accent) 22%,transparent);border-color:var(--accent)}
+  .dot{width:9px;height:9px;border-radius:3px;background:#3ddc84;box-shadow:0 0 0 3px rgba(61,220,132,.18)}
+
+  /* ---------- deck ---------- */
+  .deck{display:flex;flex-wrap:wrap;gap:34px 26px;margin-top:26px;justify-content:center}
+  .card{display:flex;flex-direction:column;gap:12px;width:calc(1080px * var(--s))}
+  .frame{position:relative;width:calc(1080px * var(--s));height:calc(1920px * var(--s));
+    border-radius:18px;overflow:hidden;background:#000;
+    box-shadow:0 18px 44px rgba(0,0,0,.45),0 2px 0 rgba(255,255,255,.05) inset;
+    border:1px solid rgba(255,255,255,.10)}
+  .cap-under{display:flex;flex-direction:column;gap:3px;padding:0 2px}
+  .cap-under .n{font-size:13px;font-weight:700;color:var(--ink);font-family:var(--tk);letter-spacing:.005em}
+  .cap-under .n span{color:var(--accent)}
+  .cap-under .swap{font-size:12.5px;color:var(--muted);line-height:1.45}
+  .cap-under .swap b{color:var(--ink);font-weight:600}
+
+  /* ---------- the 1080x1920 slide stage ---------- */
+  .slide{position:absolute;top:0;left:0;width:1080px;height:1920px;
+    transform:scale(var(--s));transform-origin:top left;overflow:hidden;background:#0a0a0d}
+  .slide .bg{position:absolute;inset:0}
+  .slide .shot{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
+  .slide .bg-fill{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .scrim{position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(180deg,rgba(0,0,0,.30) 0%,rgba(0,0,0,0) 20%,rgba(0,0,0,0) 60%,rgba(0,0,0,.42) 100%)}
+
+  /* placeholder art - reads clearly as an empty "drop your photo here" slot */
+  .ph{position:absolute;inset:0;background:#131019}
+  .ph::before{content:"";position:absolute;inset:0;
+    background:radial-gradient(140% 100% at 50% 0%,rgba(139,108,255,.12),transparent 55%)}
+  .ph::after{content:"";position:absolute;inset:24px;border:4px dashed rgba(255,255,255,.18);border-radius:22px}
+  /* small hint chip pinned to the top so it never collides with the caption */
+  .ph-hint{position:absolute;top:96px;left:50%;transform:translateX(-50%);z-index:2;
+    display:inline-flex;align-items:center;gap:11px;white-space:nowrap;max-width:940px;
+    font-family:var(--ui);font-weight:700;font-size:29px;letter-spacing:.01em;color:rgba(255,255,255,.9);
+    background:rgba(9,8,14,.74);border:2px dashed rgba(255,255,255,.30);border-radius:999px;padding:12px 24px}
+  .ph-hint svg{width:33px;height:33px;opacity:.85;flex:none}
+  .ph-hint b{color:#C9BBFF;font-weight:800;letter-spacing:.03em}
+
+  /* ---------- TikTok-native caption text ---------- */
+  .content{position:absolute;top:250px;left:80px;right:150px;bottom:500px;
+    display:flex;flex-direction:column;z-index:3}
+  .content.v-center{justify-content:center}
+  .content.v-top{justify-content:flex-start}
+  .content.v-bottom{justify-content:flex-end}
+  .content.v-split{justify-content:space-between}
+  .content.a-left{align-items:flex-start;text-align:left}
+  .content.a-center{align-items:center;text-align:center}
+  .stack{display:flex;flex-direction:column;gap:20px;width:100%}
+  .stack.a-center{align-items:center}
+  .stack.a-left{align-items:flex-start}
+
+  .cap{font-family:var(--tk);color:#fff;font-weight:800;letter-spacing:-.005em;line-height:1.34;
+    background:rgba(12,10,18,.58);-webkit-box-decoration-break:clone;box-decoration-break:clone;
+    padding:.10em .30em;border-radius:16px;text-shadow:0 2px 10px rgba(0,0,0,.35);
+    display:inline;width:fit-content}
+  .cap--primary{font-size:74px}
+  .cap--support{font-size:56px;font-weight:700}
+  .cap--small{font-size:45px;font-weight:700;background:rgba(12,10,18,.50)}
+  .cap--micro{font-size:39px;font-weight:600;color:#EDEAF6;background:rgba(12,10,18,.42)}
+  .cap.accent{color:#C9BBFF}
+
+  /* ---------- slide 6 flyer trio ---------- */
+  .trio{display:flex;gap:24px;width:100%;justify-content:center;margin-top:8px}
+  .trio .mini{flex:1;aspect-ratio:1080/1350;border-radius:16px;position:relative;overflow:hidden;
+    background:#0f0d16;border:2px solid rgba(255,255,255,.16);box-shadow:0 12px 28px rgba(0,0,0,.45)}
+  .trio .mini img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+
+  /* ---------- safe-zone guides ---------- */
+  .safe{position:absolute;inset:0;z-index:5;pointer-events:none;display:none}
+  body.show-safe .safe{display:block}
+  .safe .danger{position:absolute;background:rgba(255,64,90,.16)}
+  .safe .d-top{top:0;left:0;right:0;height:250px}
+  .safe .d-bottom{left:0;right:0;bottom:0;height:500px}
+  .safe .d-right{top:250px;bottom:500px;right:0;width:150px;background:rgba(255,64,90,.20)}
+  .safe .ok{position:absolute;top:250px;left:80px;right:150px;bottom:500px;
+    border:3px dashed rgba(61,220,132,.9);border-radius:8px}
+  .safe .lbl{position:absolute;font-family:var(--ui);font-weight:700;font-size:26px;color:#fff;
+    background:rgba(0,0,0,.55);padding:6px 12px;border-radius:8px}
+  .safe .l-top{top:14px;left:18px}
+  .safe .l-bottom{bottom:14px;left:18px}
+  .safe .l-right{top:52%;right:8px;transform:rotate(90deg) translateX(50%);transform-origin:right}
+
+  /* ---------- assets panel ---------- */
+  .panels{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:60px}
+  .pnl{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:22px 22px 24px;
+    display:flex;flex-direction:column;gap:14px;min-width:0}
+  .pnl h2{font-family:var(--tk);font-size:19px;margin:0;font-weight:800;display:flex;align-items:center;gap:10px}
+  .pnl h2 .k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);
+    border:1px solid var(--border-2);padding:3px 8px;border-radius:6px;font-weight:700}
+  .copybox{position:relative;background:var(--panel-2);border:1px solid var(--border);border-radius:12px;
+    padding:15px 16px;font-size:14px;color:var(--ink);line-height:1.6;white-space:pre-wrap;word-break:break-word}
+  .copybox.mono{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:13px}
+  .tags{color:var(--cyan);font-weight:600}
+  .copybtn{position:absolute;top:10px;right:10px;font-size:11.5px;font-weight:700;letter-spacing:.02em;
+    color:var(--ink);background:var(--panel);border:1px solid var(--border-2);border-radius:8px;
+    padding:5px 10px;cursor:pointer;opacity:.9}
+  .copybtn:hover{border-color:var(--accent)}
+  .copybtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .variants{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;list-style:none}
+  .variants li{background:var(--panel-2);border:1px solid var(--border);border-left:3px solid var(--accent);
+    border-radius:0 10px 10px 0;padding:11px 14px;font-size:14px;color:var(--ink)}
+  .note{font-size:13px;color:var(--muted);line-height:1.55}
+  .note b{color:var(--ink)}
+
+  @media (max-width:760px){
+    :root{--s:0.30}
+    .panels{grid-template-columns:1fr}
+    .deck{gap:30px 18px}
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .btn,.copybtn{transition:border-color .15s ease,background .15s ease}
+  }
+
+  /* ===== export mode: #export=N renders slide N alone at true 1080x1920 for PNG capture ===== */
+  body.exporting{margin:0;background:#000;overflow:hidden}
+  body.exporting .wrap{padding:0;max-width:none;margin:0}
+  body.exporting .wrap>*:not(.deck){display:none}
+  body.exporting .deck{display:block;margin:0;gap:0}
+  body.exporting .card{display:none;width:1080px;margin:0}
+  body.exporting .card.export-on{display:block}
+  body.exporting .card .cap-under{display:none}
+  body.exporting .frame{width:1080px;height:1920px;border-radius:0;box-shadow:none;border:0}
+  body.exporting .slide{transform:none}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">FlyGen · TikTok carousel · Concept A</div>
+    <h1>"My work: 10/10. My flyer: 3/10."</h1>
+    <p class="sub">A first-person small-biz storytime that dramatizes the flyer struggle and lets the app slip in almost by accident on the turn. Indirect by design - the app is named only in your bio.</p>
+    <div class="meta">
+      <span class="chip"><b>7</b> slides</span>
+      <span class="chip"><b>1080 × 1920</b> px each (9:16)</span>
+      <span class="chip">Niche: <b>home baker</b> (swappable)</span>
+      <span class="chip">App reveal: <b>slide 5</b></span>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <span class="dot" aria-hidden="true"></span>
+    <span class="hint"><b>Dashed frames = drop your own photo/screenshot here.</b> They're sized and positioned exactly; just replace the fill. Slide 5 already uses your real app screenshot.</span>
+    <button class="btn" id="safeBtn" aria-pressed="false">Show safe zones</button>
+  </div>
+
+  <div class="deck" id="deck">
+
+    <!-- SLIDE 1 -->
+    <div class="card">
+      <div class="frame">
+        <div class="slide">
+          <img class="bg-fill" src="__SCENE1__" alt="beautifully frosted gourmet cupcakes on a wooden board">
+          <div class="scrim"></div>
+          <div class="content v-center a-center">
+            <div class="stack a-center">
+              <p style="margin:0"><span class="cap cap--primary">my cupcakes: 10/10 🧁</span></p>
+              <p style="margin:0"><span class="cap cap--support">the flyer I posted to sell them 👉</span></p>
+            </div>
+          </div>
+          <div class="safe" aria-hidden="true">
+            <div class="danger d-top"></div><div class="danger d-bottom"></div><div class="danger d-right"></div>
+            <div class="ok"></div>
+            <div class="lbl l-top">top UI</div><div class="lbl l-bottom">caption · handle · dots</div><div class="lbl l-right">rail</div>
+          </div>
+        </div>
+      </div>
+      <div class="cap-under"><div class="n"><span>01</span> · The hook</div>
+        <div class="swap"><b>Filled</b> with a generated cupcake hero. Swap for your real photo. Text centered to survive the grid-thumbnail crop.</div></div>
+    </div>
+
+    <!-- SLIDE 2 -->
+    <div class="card">
+      <div class="frame">
+        <div class="slide">
+          <img class="bg-fill" src="__BADFLYER__" alt="deliberately amateur DIY cupcake-sale flyer pinned to a corkboard">
+          <div class="scrim"></div>
+          <div class="content v-top a-center" style="top:280px">
+            <div class="stack a-center">
+              <p style="margin:0"><span class="cap cap--primary">...yeah.</span></p>
+              <p style="margin:0"><span class="cap cap--support">I posted this. to actual<br>paying customers 💀</span></p>
+            </div>
+          </div>
+          <div class="safe" aria-hidden="true">
+            <div class="danger d-top"></div><div class="danger d-bottom"></div><div class="danger d-right"></div>
+            <div class="ok"></div>
+            <div class="lbl l-top">top UI</div><div class="lbl l-bottom">caption · handle · dots</div><div class="lbl l-right">rail</div>
+          </div>
+        </div>
+      </div>
+      <div class="cap-under"><div class="n"><span>02</span> · The sting <span style="color:var(--cyan)">· AI sample filled</span></div>
+        <div class="swap"><b>Filled</b> with a Nano-Banana-generated amateur flyer. Swap for your own real bad flyer anytime - self-roast = instant trust.</div></div>
+    </div>
+
+    <!-- SLIDE 3 -->
+    <div class="card">
+      <div class="frame">
+        <div class="slide">
+          <img class="bg-fill" src="__SCENE3__" alt="frustrated home baker at a laptop with cupcakes nearby">
+          <div class="scrim"></div>
+          <div class="content v-bottom a-left">
+            <div class="stack a-left">
+              <p style="margin:0"><span class="cap cap--support">I'm a baker,<br>not a graphic designer.</span></p>
+              <p style="margin:0"><span class="cap cap--small">Canva has 4,000 templates &amp;<br>somehow I hated all of them.</span></p>
+            </div>
+          </div>
+          <div class="safe" aria-hidden="true">
+            <div class="danger d-top"></div><div class="danger d-bottom"></div><div class="danger d-right"></div>
+            <div class="ok"></div>
+            <div class="lbl l-top">top UI</div><div class="lbl l-bottom">caption · handle · dots</div><div class="lbl l-right">rail</div>
+          </div>
+        </div>
+      </div>
+      <div class="cap-under"><div class="n"><span>03</span> · The spiral I</div>
+        <div class="swap"><b>Filled</b> with a generated stand-in. Swap for a Canva screen-record or a real photo of you at the laptop.</div></div>
+    </div>
+
+    <!-- SLIDE 4 -->
+    <div class="card">
+      <div class="frame">
+        <div class="slide">
+          <img class="bg-fill" src="__SCENE4__" alt="tired woman working late at night by laptop glow with a clock">
+          <div class="scrim"></div>
+          <div class="content v-bottom a-left">
+            <div class="stack a-left">
+              <p style="margin:0"><span class="cap cap--support">spent my whole day off<br>on THAT ☝️</span></p>
+              <p style="margin:0"><span class="cap cap--small">a designer quoted me $80.<br>for ONE flyer 😵</span></p>
+              <p style="margin:0"><span class="cap cap--micro">(I need a new one every week)</span></p>
+            </div>
+          </div>
+          <div class="safe" aria-hidden="true">
+            <div class="danger d-top"></div><div class="danger d-bottom"></div><div class="danger d-right"></div>
+            <div class="ok"></div>
+            <div class="lbl l-top">top UI</div><div class="lbl l-bottom">caption · handle · dots</div><div class="lbl l-right">rail</div>
+          </div>
+        </div>
+      </div>
+      <div class="cap-under"><div class="n"><span>04</span> · The spiral II</div>
+        <div class="swap"><b>Filled</b> with a late-night stand-in. Swap for anything that says "time + money."</div></div>
+    </div>
+
+    <!-- SLIDE 5 - real app screenshot -->
+    <div class="card">
+      <div class="frame">
+        <div class="slide">
+          <img class="shot" src="__SCREENSHOT__" alt="FlyGen app home screen - Chat to Create">
+          <div class="scrim"></div>
+          <div class="content v-split a-left">
+            <div class="stack a-left">
+              <p style="margin:0"><span class="cap cap--small">then a girl in my<br>small-biz group goes:</span></p>
+              <p style="margin:0"><span class="cap cap--support accent">"just describe it.<br>one sentence."</span></p>
+            </div>
+            <div class="stack a-left">
+              <p style="margin:0"><span class="cap cap--support">...describe it to WHAT 😭</span></p>
+            </div>
+          </div>
+          <div class="safe" aria-hidden="true">
+            <div class="danger d-top"></div><div class="danger d-bottom"></div><div class="danger d-right"></div>
+            <div class="ok"></div>
+            <div class="lbl l-top">top UI</div><div class="lbl l-bottom">caption · handle · dots</div><div class="lbl l-right">rail</div>
+          </div>
+        </div>
+      </div>
+      <div class="cap-under"><div class="n"><span>05</span> · The turn <span style="color:var(--cyan)">· your screenshot</span></div>
+        <div class="swap"><b>Live asset.</b> The skeptical open-the-app beat. App shown, never pitched.</div></div>
+    </div>
+
+    <!-- SLIDE 6 -->
+    <div class="card">
+      <div class="frame">
+        <div class="slide">
+          <div class="bg" style="background:radial-gradient(130% 80% at 50% 30%,#1a1530,#0b0a11 70%)"></div>
+          <div class="scrim"></div>
+          <div class="content v-center a-center">
+            <div class="stack a-center" style="gap:34px">
+              <div class="stack a-center">
+                <p style="margin:0"><span class="cap cap--support">so I described my<br>Saturday sale. one sentence.</span></p>
+              </div>
+              <div class="trio">
+                <div class="mini"><img src="__GOOD0__" alt="professional cupcake sale flyer - minimal style"></div>
+                <div class="mini"><img src="__GOOD1__" alt="professional cupcake sale flyer - elegant style"></div>
+                <div class="mini"><img src="__GOOD2__" alt="professional cupcake sale flyer - playful style"></div>
+              </div>
+              <p style="margin:0"><span class="cap cap--support">it gave me THESE.<br>in 20 seconds 😳</span></p>
+            </div>
+          </div>
+          <div class="safe" aria-hidden="true">
+            <div class="danger d-top"></div><div class="danger d-bottom"></div><div class="danger d-right"></div>
+            <div class="ok"></div>
+            <div class="lbl l-top">top UI</div><div class="lbl l-bottom">caption · handle · dots</div><div class="lbl l-right">rail</div>
+          </div>
+        </div>
+      </div>
+      <div class="cap-under"><div class="n"><span>06</span> · The reveal <span style="color:var(--cyan)">· AI samples filled</span></div>
+        <div class="swap"><b>Filled</b> with 3 Nano-Banana outputs (Minimal / Elegant / Playful) from the one-sentence prompt. Swap for your own FlyGen runs anytime.</div></div>
+    </div>
+
+    <!-- SLIDE 7 -->
+    <div class="card">
+      <div class="frame">
+        <div class="slide">
+          <img class="bg-fill" src="__SCENE7__" alt="near-empty cupcake crate with a hand-written Sold Out card on a bakery counter">
+          <div class="scrim"></div>
+          <div class="content v-bottom a-center">
+            <div class="stack a-center">
+              <p style="margin:0"><span class="cap cap--primary">posted it. sold out<br>by noon.</span></p>
+              <p style="margin:0"><span class="cap cap--support">never opening Canva again 🫶</span></p>
+              <p style="margin:0"><span class="cap cap--micro">(what I used is in my bio -<br>for my fellow Not-A-Designers)</span></p>
+            </div>
+          </div>
+          <div class="safe" aria-hidden="true">
+            <div class="danger d-top"></div><div class="danger d-bottom"></div><div class="danger d-right"></div>
+            <div class="ok"></div>
+            <div class="lbl l-top">top UI</div><div class="lbl l-bottom">caption · handle · dots</div><div class="lbl l-right">rail</div>
+          </div>
+        </div>
+      </div>
+      <div class="cap-under"><div class="n"><span>07</span> · The payoff + whisper CTA</div>
+        <div class="swap"><b>Filled</b> with a sold-out stand-in. CTA stays small in size, safe in position - never "download."</div></div>
+    </div>
+
+  </div>
+
+  <!-- ---------- assets ---------- -->
+  <div class="panels">
+    <div class="pnl">
+      <h2><span class="k">Post</span> Caption + hashtags</h2>
+      <div class="copybox" id="capText">not me spending 6 hours on a flyer that looked like a ransom note when I could've just... typed a sentence 😭 small biz besties why did nobody tell me. link in bio, that's all I'm saying 🤝
+
+<span class="tags">#smallbusiness #smallbusinesscheck #baker #homebakery #canvastruggles #smallbiztips #bakersoftiktok #foryou</span><button class="copybtn" data-copy="capText">Copy</button></div>
+      <p class="note"><b>Cover frame = slide 1.</b> If the 10/10-vs-👉 tension doesn't read in the grid thumbnail at a glance, it won't stop the scroll.</p>
+    </div>
+
+    <div class="pnl">
+      <h2><span class="k">Prompt</span> Feed FlyGen for slide 6</h2>
+      <div class="copybox mono" id="promptText">Weekend cupcake sale this Saturday from 10am at Rosa's Home Bakery, a dozen for $18, pre-order by Friday, DM to reserve.<button class="copybtn" data-copy="promptText">Copy</button></div>
+      <p class="note">One sentence in - FlyGen returns 3 concepts, which <b>is</b> your slide-6 trio. Keep it concrete (real name, time, offer) so the reveal earns that 😳.</p>
+      <h2 style="margin-top:6px"><span class="k">A/B</span> Alt slide-1 hooks</h2>
+      <ul class="variants">
+        <li>POV: your product is a 10 but your marketing is a 3</li>
+        <li>things nobody tells you about a small biz: you're also the (bad) graphic designer</li>
+        <li>I almost paid $80 for a flyer I ended up making in 20 seconds</li>
+      </ul>
+      <p class="note">Post 2-3 hook variants as separate posts; let the algorithm pick the winner.</p>
+    </div>
+  </div>
+
+  <p class="note" style="margin-top:34px;text-align:center;max-width:70ch;margin-left:auto;margin-right:auto">
+    <b>To export:</b> each slide renders at true 1080×1920. Say the word and I'll screenshot every slide to ready-to-upload PNGs - or you drop your photos into the dashed frames first, then I export the finished set.
+  </p>
+</div>
+
+<script>
+  (function(){
+    var b=document.getElementById('safeBtn');
+    b.addEventListener('click',function(){
+      var on=document.body.classList.toggle('show-safe');
+      b.setAttribute('aria-pressed',on?'true':'false');
+      b.textContent=on?'Hide safe zones':'Show safe zones';
+    });
+    document.querySelectorAll('.copybtn').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        var el=document.getElementById(btn.getAttribute('data-copy'));
+        var t=el.cloneNode(true); var rm=t.querySelector('.copybtn'); if(rm)rm.remove();
+        var text=t.textContent.trim();
+        navigator.clipboard.writeText(text).then(function(){
+          var o=btn.textContent; btn.textContent='Copied ✓';
+          setTimeout(function(){btn.textContent=o;},1400);
+        });
+      });
+    });
+
+    // export mode: #export=N shows only slide N at true 1080x1920 for headless PNG capture
+    var m=(location.hash||'').match(/export=(\d+)/);
+    if(m){
+      document.body.classList.add('exporting');
+      var cards=document.querySelectorAll('.deck .card');
+      var card=cards[parseInt(m[1],10)-1];
+      if(card) card.classList.add('export-on');
+      window.scrollTo(0,0);
+    }
+  })();
+</script>

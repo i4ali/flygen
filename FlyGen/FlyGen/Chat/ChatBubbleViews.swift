@@ -17,11 +17,8 @@ struct UserBubble: View {
                 if caret { TypingCaret() }
             }
             .padding(.horizontal, FGSpacing.md).padding(.vertical, FGSpacing.sm)
-            .background(
-                LinearGradient(colors: [Color(hex: "8B5CF6"), FGColors.accentPrimary, Color(hex: "6D28D9")],
-                               startPoint: .topLeading, endPoint: .bottomTrailing)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+            .background(FGGradients.accent)
+            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius, style: .continuous))
             .shadow(color: FGColors.accentPrimary.opacity(0.35), radius: 10, y: 4)
         }
     }

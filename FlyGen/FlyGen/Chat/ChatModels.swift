@@ -16,6 +16,7 @@ struct ChatRequest: Encodable {
     var decision_overrides: [String: String]?
     var user_photos_b64: [String]?      // uploaded source photos, sent on the approve turn
     var selected_elements: [String]?    // chosen creative elements (their what-text), sent on approve
+    var annotated: Bool?                // marked-up flyer (numbered circles) => engine uses the annotated-edit prompt
 }
 
 // MARK: - parsed_fields payload (round-trips as `brief`)

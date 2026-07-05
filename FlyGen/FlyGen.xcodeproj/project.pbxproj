@@ -18,11 +18,13 @@
 		23489EA620ACBFB14235A1C4 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB709BFEED3D9A7E60798343 /* UserProfile.swift */; };
 		277B13203FA5FBD8FC6CA8CB /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 730206EB978BE7E39383D4E7 /* Color+Hex.swift */; };
 		3B94A4B396C8D3435B1B7036 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B77BF34CD3B703956CC91DE /* SettingsView.swift */; };
+		3EE8F26D91AC96BF67320A69 /* FlyerAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A626C239CF4CCCD0E0F382 /* FlyerAnnotationView.swift */; };
 		3F254031FAE485695BCECEFB /* WorklogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1ECA3028BF7D793454CE80C /* WorklogView.swift */; };
 		41536973C193B227050DE9A3 /* HomeTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28384D20DBD9AA54F572AFFC /* HomeTab.swift */; };
 		4451B033948E9138B7F24C48 /* SavedPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 150B576A437000196A562740 /* SavedPrompt.swift */; };
 		449D883F219ADF7D2890DD16 /* PromptBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9579E2430EA7DEC2FA8D87BF /* PromptBuilder.swift */; };
 		51A412CAA71CCC99E9905560 /* BackgroundType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CE5F8A345997A42000089FD /* BackgroundType.swift */; };
+		523749073694C209490B6669 /* FGModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0125D0C65BCA7D001A0EE3C6 /* FGModifiers.swift */; };
 		55BC12E203F28484A23A0271 /* ChatModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39B24F45CF2E79E2EB956607 /* ChatModels.swift */; };
 		580462DCC3C131BE42F89718 /* PromptsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79529A0F2276152A81665116 /* PromptsTab.swift */; };
 		583C195202B2E418A93257F1 /* GalleryTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 406E392633E0FE2FA6DCA496 /* GalleryTab.swift */; };
@@ -60,6 +62,7 @@
 		90AFF4D51F9F7F113B7909E6 /* FlyerChatClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3FCD5B436511EA4CC3ACFB4 /* FlyerChatClient.swift */; };
 		9288B11FBCD6606AF08CDECC /* ColorsStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802D02689D38132C24042AFA /* ColorsStepView.swift */; };
 		95D0F8F627BD2D5768EFA97F /* StoreKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A127BBD1A88D83A876C6249C /* StoreKitService.swift */; };
+		98A9AE6C48084B2A24CE0E99 /* SpaceGrotesk-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DAB10B9A50AB09E7D83C2772 /* SpaceGrotesk-Bold.ttf */; };
 		99A104086420FCC441766ECB /* FlyGenProducts.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 0D3E46940C3FF0B96D5406A0 /* FlyGenProducts.storekit */; };
 		99D720E6840CE49CB75168A3 /* FlyGenApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F969BABBE5624EFD6A441E /* FlyGenApp.swift */; };
 		9AF92378203559B840D6DC15 /* OnboardingScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 038F3D1486CC6993C2922585 /* OnboardingScript.swift */; };
@@ -116,6 +119,7 @@
 		D958E07702A0C8EE2FE7C9F1 /* CloudKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77094514BDAD21090480D3A /* CloudKitService.swift */; };
 		D9C9D5796C668A7410E36E2D /* SavedFlyer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CD1653EE523C3DC3B07690 /* SavedFlyer.swift */; };
 		DFE68A36258F14EC52666634 /* Mood.swift in Sources */ = {isa = PBXBuildFile; fileRef = 340B5206B7FAD148FFC4FA90 /* Mood.swift */; };
+		E1B5ACB136DF9F51E260F489 /* AuroraTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70A79E23A9AFC6EBF5E7EBAE /* AuroraTabBar.swift */; };
 		E447D3471E42E86CC0D53039 /* StepProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 456744D560C03FD857118347 /* StepProgressBar.swift */; };
 		E60540EDAE2B1C02FE942967 /* TemplateLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B4EB3FF702C55572A1A3DA0 /* TemplateLibrary.swift */; };
 		E8CA330BA5E4268BC3E03BA4 /* AspectRatio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C085DEEA61D0B6B26BA0AEF /* AspectRatio.swift */; };
@@ -124,14 +128,18 @@
 		EF40B132AE59C78A2B0279D9 /* DemoFlyerReveal.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A307A0155A5D0FB32F67E0 /* DemoFlyerReveal.swift */; };
 		F0B7A6CC4ABD2C702068AE49 /* TemplatePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10FCE45EBD805D38DC2CB792 /* TemplatePreviewView.swift */; };
 		F0EFFA9DAEAE066B03059A00 /* OutputSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7753024C905464D110F059D5 /* OutputSettings.swift */; };
+		F1198B51558971607D934743 /* SpaceGrotesk-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 908DB9BD9245948B69F3AB94 /* SpaceGrotesk-Medium.ttf */; };
 		F315B5B3E510D452B864EFA8 /* MoodStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A5464C24F5B8B13D097698 /* MoodStepView.swift */; };
 		F513C5AF7CBFC768AE108E74 /* PromptLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78E95F587FA38E162879147D /* PromptLibrary.swift */; };
 		F698469DE0F1EF731F03ACB7 /* QRCodeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BF8F3456115A7D92EB1F149 /* QRCodeService.swift */; };
 		F927960154E78DFB295870BA /* QRCodeStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD932742A9E1DC6131CEFEE /* QRCodeStepView.swift */; };
+		FAD40968B8730834B70FCDF4 /* SpaceGrotesk-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90C3830B5F9816D3E8D79D19 /* SpaceGrotesk-Regular.ttf */; };
+		FCEBDEC1E4473CC9050A899E /* SpaceGrotesk-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 48C68C3CAE706867E1BFB331 /* SpaceGrotesk-SemiBold.ttf */; };
 		FE856E43BD714DCE814824D0 /* OnboardingChipQuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0A16D10E4B1927A2E2B94EE /* OnboardingChipQuestionView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0125D0C65BCA7D001A0EE3C6 /* FGModifiers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FGModifiers.swift; sourceTree = "<group>"; };
 		02FE6F65315FE96A35C34223 /* FlyerCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyerCategory.swift; sourceTree = "<group>"; };
 		038F3D1486CC6993C2922585 /* OnboardingScript.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingScript.swift; sourceTree = "<group>"; };
 		06A2021DD0B02DD6E91E8438 /* FormatStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormatStepView.swift; sourceTree = "<group>"; };
@@ -155,6 +163,7 @@
 		406E392633E0FE2FA6DCA496 /* GalleryTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryTab.swift; sourceTree = "<group>"; };
 		456744D560C03FD857118347 /* StepProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepProgressBar.swift; sourceTree = "<group>"; };
 		48A766390A874ED2612B3679 /* CreationFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreationFlowView.swift; sourceTree = "<group>"; };
+		48C68C3CAE706867E1BFB331 /* SpaceGrotesk-SemiBold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; path = "SpaceGrotesk-SemiBold.ttf"; sourceTree = "<group>"; };
 		4C085DEEA61D0B6B26BA0AEF /* AspectRatio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AspectRatio.swift; sourceTree = "<group>"; };
 		4D8B2C9407BFD5954190C83A /* ChatBubbleViews.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChatBubbleViews.swift; path = ../../Chat/ChatBubbleViews.swift; sourceTree = "<group>"; };
 		4F62F08E46FF0DE6F50F5350 /* TextProminence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextProminence.swift; sourceTree = "<group>"; };
@@ -166,6 +175,7 @@
 		6C0526DA2A47D62F2F4C4AD2 /* ChatOnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ChatOnboardingView.swift; sourceTree = "<group>"; };
 		6C0B42D66AE1AED299093D64 /* CategoryStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryStepView.swift; sourceTree = "<group>"; };
 		6ED36D876F1394273F82CF87 /* ChatOnboardingViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ChatOnboardingViewModel.swift; sourceTree = "<group>"; };
+		70A79E23A9AFC6EBF5E7EBAE /* AuroraTabBar.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AuroraTabBar.swift; sourceTree = "<group>"; };
 		730206EB978BE7E39383D4E7 /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Hex.swift"; sourceTree = "<group>"; };
 		7753024C905464D110F059D5 /* OutputSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputSettings.swift; sourceTree = "<group>"; };
 		78E95F587FA38E162879147D /* PromptLibrary.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PromptLibrary.swift; sourceTree = "<group>"; };
@@ -174,6 +184,7 @@
 		7C61A47D28D08C6960017130 /* PhotoLibraryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLibraryService.swift; sourceTree = "<group>"; };
 		802D02689D38132C24042AFA /* ColorsStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorsStepView.swift; sourceTree = "<group>"; };
 		827EC63DDC6A4957895A8B11 /* QRCodeSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeSettings.swift; sourceTree = "<group>"; };
+		86A626C239CF4CCCD0E0F382 /* FlyerAnnotationView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FlyerAnnotationView.swift; path = ../../Chat/FlyerAnnotationView.swift; sourceTree = "<group>"; };
 		898F624DFE2689054E2A708A /* FlyerCreationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyerCreationViewModel.swift; sourceTree = "<group>"; };
 		8B634CC343D768DCA67B127B /* TemplatePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplatePickerView.swift; sourceTree = "<group>"; };
 		8BD5EFEA2EE8CF7C00D38B1B /* ScheduleEntriesField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleEntriesField.swift; sourceTree = "<group>"; };
@@ -191,6 +202,8 @@
 		8BF224C02EE5FE9700E8776A /* BrandKitScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandKitScreen.swift; sourceTree = "<group>"; };
 		8CE5F8A345997A42000089FD /* BackgroundType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundType.swift; sourceTree = "<group>"; };
 		8D909C2791FE2A8700E30AA4 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		908DB9BD9245948B69F3AB94 /* SpaceGrotesk-Medium.ttf */ = {isa = PBXFileReference; includeInIndex = 1; path = "SpaceGrotesk-Medium.ttf"; sourceTree = "<group>"; };
+		90C3830B5F9816D3E8D79D19 /* SpaceGrotesk-Regular.ttf */ = {isa = PBXFileReference; includeInIndex = 1; path = "SpaceGrotesk-Regular.ttf"; sourceTree = "<group>"; };
 		91F81AFF070A145CF531597E /* ColorSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorSettings.swift; sourceTree = "<group>"; };
 		92EF130D6F0181711C3C8D15 /* ProfileTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileTab.swift; sourceTree = "<group>"; };
 		9579E2430EA7DEC2FA8D87BF /* PromptBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptBuilder.swift; sourceTree = "<group>"; };
@@ -242,6 +255,7 @@
 		CEB654DCA88FF679FBEFB358 /* RefinementSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefinementSheet.swift; sourceTree = "<group>"; };
 		D0A16D10E4B1927A2E2B94EE /* OnboardingChipQuestionView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingChipQuestionView.swift; sourceTree = "<group>"; };
 		D77094514BDAD21090480D3A /* CloudKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitService.swift; sourceTree = "<group>"; };
+		DAB10B9A50AB09E7D83C2772 /* SpaceGrotesk-Bold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; path = "SpaceGrotesk-Bold.ttf"; sourceTree = "<group>"; };
 		DE68BC1381C77E543EAE2C81 /* SuggestionService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SuggestionService.swift; sourceTree = "<group>"; };
 		E1031905BEC715F64F5957DC /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		E8B8C8492F364170AB2291CB /* NotificationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
@@ -365,6 +379,7 @@
 				8BE98D1D2EE5FA3A005A4DC3 /* Animations */,
 				A94669CCDA2F09E03E777709 /* Assets.xcassets */,
 				0D3E46940C3FF0B96D5406A0 /* FlyGenProducts.storekit */,
+				5E8B6BE6DE83EA6C9C3A8B68 /* Fonts */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -376,6 +391,18 @@
 				F2F620B4FCB372C92181B0CF /* Products */,
 				CACC7257E1ED876830AC4761 /* Chat */,
 			);
+			sourceTree = "<group>";
+		};
+		5E8B6BE6DE83EA6C9C3A8B68 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				90C3830B5F9816D3E8D79D19 /* SpaceGrotesk-Regular.ttf */,
+				908DB9BD9245948B69F3AB94 /* SpaceGrotesk-Medium.ttf */,
+				48C68C3CAE706867E1BFB331 /* SpaceGrotesk-SemiBold.ttf */,
+				DAB10B9A50AB09E7D83C2772 /* SpaceGrotesk-Bold.ttf */,
+			);
+			name = Fonts;
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 		71E5C35B572C53DB9D271188 /* Views */ = {
@@ -454,6 +481,7 @@
 				BBMAILCOMPOSER01 /* MailComposerView.swift */,
 				F6E4BF8C2207C43A1E6C895F /* SelectionCard.swift */,
 				456744D560C03FD857118347 /* StepProgressBar.swift */,
+				70A79E23A9AFC6EBF5E7EBAE /* AuroraTabBar.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -493,6 +521,7 @@
 				B0EB877522770E516371B37D /* FlyerChatViewModel.swift */,
 				A2EEACFB2F2BBDEC9670AA26 /* FlyerChatView.swift */,
 				4D8B2C9407BFD5954190C83A /* ChatBubbleViews.swift */,
+				86A626C239CF4CCCD0E0F382 /* FlyerAnnotationView.swift */,
 			);
 			name = Chat;
 			path = FlyGen/FlyGen/Chat;
@@ -506,6 +535,7 @@
 				BB00000000000003 /* FGSpacing.swift */,
 				BB00000000000004 /* FGGradients.swift */,
 				BB00000000000005 /* FGAnimations.swift */,
+				0125D0C65BCA7D001A0EE3C6 /* FGModifiers.swift */,
 			);
 			path = Theme;
 			sourceTree = "<group>";
@@ -705,6 +735,10 @@
 				8BE98D2C2EE5FA3A005A4DC3 /* onboarding-ready.json in Resources */,
 				AAONBAIANALYS01 /* onboarding-ai-analysis.json in Resources */,
 				99A104086420FCC441766ECB /* FlyGenProducts.storekit in Resources */,
+				FAD40968B8730834B70FCDF4 /* SpaceGrotesk-Regular.ttf in Resources */,
+				F1198B51558971607D934743 /* SpaceGrotesk-Medium.ttf in Resources */,
+				FCEBDEC1E4473CC9050A899E /* SpaceGrotesk-SemiBold.ttf in Resources */,
+				98A9AE6C48084B2A24CE0E99 /* SpaceGrotesk-Bold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -823,6 +857,9 @@
 				22669209B86AEA1D9CD4BDF3 /* ChatOnboardingView.swift in Sources */,
 				817E68D40D0F79C38B0B9469 /* AuroraBackground.swift in Sources */,
 				3F254031FAE485695BCECEFB /* WorklogView.swift in Sources */,
+				523749073694C209490B6669 /* FGModifiers.swift in Sources */,
+				E1B5ACB136DF9F51E260F489 /* AuroraTabBar.swift in Sources */,
+				3EE8F26D91AC96BF67320A69 /* FlyerAnnotationView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

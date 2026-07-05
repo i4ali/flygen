@@ -1,7 +1,7 @@
 import SwiftUI
 import UIKit
 
-/// Living atmospheric background for the onboarding: drifting violet / cyan / pink light over
+/// Living atmospheric background for the onboarding: drifting indigo / cyan light over
 /// near-black, with a fine grain and a vignette. This is the "premium stage" - it replaces the
 /// flat static gradient the onboarding used to sit on. Pure SwiftUI; renders on Metal on-device.
 struct AuroraBackground: View {
@@ -10,7 +10,7 @@ struct AuroraBackground: View {
 
     var body: some View {
         ZStack {
-            Color(hex: "08080C")
+            Color(hex: "0A0B0F")
 
             blob(FGColors.accentPrimary,     size: 460)
                 .offset(x: drift ? -120 : -70, y: drift ? -240 : -180)

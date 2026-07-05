@@ -26,6 +26,7 @@ class ChatIn(BaseModel):
     decision_overrides: Optional[dict] = None    # user's confirmed/overridden design decisions
     user_photos_b64: Optional[List[str]] = None  # uploaded source photos (sent on the approve turn)
     selected_elements: Optional[List[str]] = None  # approved creative elements from the review
+    annotated: Optional[bool] = None   # marked-up flyer (numbered circles) => use the annotated-edit prompt
 
 
 def get_generator():
@@ -44,7 +45,8 @@ def run_turn(body: ChatIn):
         eng.brief = dict(body.brief)             # ExtractedBrief-shaped wire state (plain dict)
     if action == "reference":
         # Reuse an uploaded flyer: the image + the user's words go straight to the image model.
-        return eng.handle_reference(body.reference_image_b64, instruction=body.message or "")
+        return eng.handle_reference(body.reference_image_b64, instruction=body.message or "",
+                                    annotated=bool(body.annotated))
     if action == "answers":
         return eng.handle_answers(body.answers or {})
     if action == "approve":
@@ -55,7 +57,8 @@ def run_turn(body: ChatIn):
                                    selected_elements=body.selected_elements)
     if action == "refine":
         return eng.handle_refine(body.prior_image_path, body.instruction or "",
-                                 prior_image_b64=body.prior_image_b64)
+                                 prior_image_b64=body.prior_image_b64,
+                                 annotated=bool(body.annotated))
     if action == "resize":
         return eng.handle_resize(body.prior_image_path, body.aspect_ratio or "",
                                  prior_image_b64=body.prior_image_b64)

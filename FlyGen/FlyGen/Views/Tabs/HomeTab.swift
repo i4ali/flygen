@@ -20,70 +20,40 @@ struct HomeTab: View {
             VStack(spacing: 0) {
                 // Header
                 HStack {
-                    Text("FlyGen")
-                        .font(FGTypography.displayMedium)
-                        .foregroundColor(FGColors.textPrimary)
+                    HStack(spacing: 9) {
+                        RoundedRectangle(cornerRadius: FGSpacing.logoMarkRadius, style: .continuous)
+                            .fill(FGGradients.brand)
+                            .frame(width: 26, height: 26)
+                        Text("FlyGen")
+                            .font(FGTypography.wordmark)
+                            .tracking(FGTypography.Tracking.wordmark)
+                            .foregroundColor(FGColors.textPrimary)
+                    }
 
                     Spacer()
 
                     // Subscription status badge
                     if entitlementService.isSubscribed, let profile {
-                        HStack(spacing: FGSpacing.xs) {
-                            Image(systemName: "sparkles")
-                                .foregroundColor(FGColors.accentSecondary)
+                        StatusPill(dot: true) {
                             Text("\(entitlementService.totalActionsRemaining(for: profile)) left")
-                                .font(FGTypography.labelLarge)
-                                .foregroundColor(FGColors.textPrimary)
                         }
-                        .padding(.horizontal, FGSpacing.sm)
-                        .padding(.vertical, FGSpacing.xs)
-                        .background(FGColors.surfaceDefault)
-                        .clipShape(Capsule())
-                        .overlay(
-                            Capsule()
-                                .stroke(FGColors.borderSubtle, lineWidth: 1)
-                        )
                     } else if let profile, entitlementService.legacyFlyersRemaining(for: profile) > 0 {
                         // Legacy pre-subscription credits: surface the remaining count.
                         // Tappable -> paywall so the upgrade path survives the subscription migration.
                         Button {
                             showingPaywall = true
                         } label: {
-                            HStack(spacing: FGSpacing.xs) {
-                                Image(systemName: "sparkles")
-                                    .foregroundColor(FGColors.accentSecondary)
+                            StatusPill(dot: true) {
                                 Text("\(entitlementService.legacyFlyersRemaining(for: profile)) left")
-                                    .font(FGTypography.labelLarge)
-                                    .foregroundColor(FGColors.textPrimary)
                             }
-                            .padding(.horizontal, FGSpacing.sm)
-                            .padding(.vertical, FGSpacing.xs)
-                            .background(FGColors.surfaceDefault)
-                            .clipShape(Capsule())
-                            .overlay(
-                                Capsule()
-                                    .stroke(FGColors.borderSubtle, lineWidth: 1)
-                            )
                         }
                     } else {
                         Button {
                             showingPaywall = true
                         } label: {
-                            HStack(spacing: FGSpacing.xs) {
-                                Image(systemName: "crown.fill")
-                                    .foregroundColor(FGColors.accentSecondary)
+                            StatusPill(icon: "crown.fill") {
                                 Text("Subscribe")
-                                    .font(FGTypography.labelLarge)
-                                    .foregroundColor(FGColors.textPrimary)
                             }
-                            .padding(.horizontal, FGSpacing.sm)
-                            .padding(.vertical, FGSpacing.xs)
-                            .background(FGColors.surfaceDefault)
-                            .clipShape(Capsule())
-                            .overlay(
-                                Capsule()
-                                    .stroke(FGColors.borderSubtle, lineWidth: 1)
-                            )
                         }
                     }
 
@@ -91,30 +61,31 @@ struct HomeTab: View {
                         showingSettings = true
                     } label: {
                         Image(systemName: "gearshape")
-                            .font(.title2)
+                            .font(.system(size: 21))
                             .foregroundColor(FGColors.textSecondary)
                     }
                     .padding(.leading, FGSpacing.sm)
                 }
-                .padding(FGSpacing.screenHorizontal)
+                .padding(.horizontal, FGSpacing.screenHorizontal)
                 .padding(.top, FGSpacing.md)
 
                 Spacer()
 
                 // Main content
                 VStack(spacing: FGSpacing.xl) {
-                    // Animated flyer stack
-                    FlyerStackAnimation()
-                        .frame(width: 150, height: 150)
-                        .padding(.bottom, FGSpacing.sm)
+                    // Aurora hero panel: dotted-grid glass card + indigo/cyan orb
+                    AuroraHeroPanel()
+                        .padding(.horizontal, FGSpacing.screenHorizontal)
 
                     VStack(spacing: FGSpacing.xs) {
                         Text("Create stunning flyers")
-                            .font(FGTypography.h2)
+                            .font(FGTypography.heroTitle)
+                            .tracking(FGTypography.Tracking.heroTitle)
                             .foregroundColor(FGColors.textPrimary)
 
                         Text("with AI")
-                            .font(FGTypography.h2)
+                            .font(FGTypography.heroTitle)
+                            .tracking(FGTypography.Tracking.heroTitle)
                             .foregroundColor(FGColors.accentPrimary)
                     }
                     .multilineTextAlignment(.center)
@@ -127,21 +98,18 @@ struct HomeTab: View {
                                 Image(systemName: "bubble.left.and.text.bubble.right")
                                 Text("Chat to Create")
                             }
-                            .font(FGTypography.buttonLarge)
+                            .font(FGTypography.buttonLabel)
                             .foregroundColor(FGColors.textOnAccent)
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, FGSpacing.md)
+                            .frame(height: 56)
                             .background(
-                                LinearGradient(
-                                    colors: [FGColors.accentPrimary, FGColors.accentPrimary.opacity(0.8)],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
+                                RoundedRectangle(cornerRadius: FGSpacing.buttonRadius, style: .continuous)
+                                    .fill(FGGradients.accent)
                             )
-                            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
-                            .shadow(color: FGColors.accentPrimary.opacity(0.4), radius: 12, y: 4)
+                            .auroraCTAGlow()
                         }
-                        .padding(.horizontal, FGSpacing.xl)
+                        .buttonStyle(FGPrimaryButtonStyle())
+                        .padding(.horizontal, FGSpacing.screenHorizontalButtons)
                         .padding(.top, FGSpacing.md)
                     }
 
@@ -246,6 +214,38 @@ struct HomeTab: View {
     }
 }
 
+// MARK: - Status Pill
+
+/// Aurora status pill: surface + hairline capsule with either a cyan live-dot or a leading icon.
+private struct StatusPill<Label: View>: View {
+    var dot: Bool = false
+    var icon: String? = nil
+    @ViewBuilder var label: () -> Label
+
+    var body: some View {
+        HStack(spacing: FGSpacing.xs) {
+            if dot {
+                Circle()
+                    .fill(FGColors.accentSecondary)
+                    .frame(width: 7, height: 7)
+                    .shadow(color: FGColors.accentSecondary, radius: 4)
+            } else if let icon {
+                Image(systemName: icon)
+                    .font(.system(size: 13))
+                    .foregroundColor(FGColors.accentSecondary)
+            }
+            label()
+                .font(FGTypography.labelLarge)
+                .foregroundColor(FGColors.textPrimary)
+        }
+        .padding(.horizontal, FGSpacing.sm)
+        .padding(.vertical, FGSpacing.xs)
+        .background(FGColors.surfaceDefault)
+        .clipShape(Capsule())
+        .overlay(Capsule().strokeBorder(FGColors.borderCard, lineWidth: 1))
+    }
+}
+
 // MARK: - Draft Banner
 
 /// Banner showing there's an unfinished draft that can be resumed
@@ -307,138 +307,62 @@ private struct DraftBanner: View {
     }
 }
 
-// MARK: - Flyer Stack Animation
+// MARK: - Aurora Hero Panel
 
-/// Animated stack of flyer shapes for the home screen
-private struct FlyerStackAnimation: View {
-    @State private var isAnimating = false
-    @State private var glowPulse = false
-
-    // Gradient colors using FGColors
-    private var gradient1: LinearGradient {
-        LinearGradient(
-            colors: [FGColors.accentPrimary, FGColors.accentSecondary],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
-
-    private var gradient2: LinearGradient {
-        LinearGradient(
-            colors: [FGColors.accentSecondary, Color.pink],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
-
-    private var gradient3: LinearGradient {
-        LinearGradient(
-            colors: [FGColors.accentPrimary, FGColors.accentPrimary.opacity(0.7)],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-    }
-
+/// The Home hero: a dotted/line-grid glass panel with a glowing indigo→cyan conic orb and a
+/// sparkle glyph. Replaces the old animated flyer-card stack.
+private struct AuroraHeroPanel: View {
     var body: some View {
         ZStack {
-            // Background glow - more pronounced pulse
-            Circle()
-                .fill(FGColors.accentPrimary.opacity(glowPulse ? 0.35 : 0.15))
-                .frame(width: glowPulse ? 160 : 140, height: glowPulse ? 160 : 140)
-                .blur(radius: 30)
+            RoundedRectangle(cornerRadius: FGSpacing.heroPanelRadius, style: .continuous)
+                .fill(FGGradients.heroPanelRadial)
 
-            // Back flyer - more dramatic rotation
-            FlyerShape()
-                .fill(gradient1)
-                .frame(width: 70, height: 90)
-                .rotationEffect(.degrees(-20 + (isAnimating ? 12 : 0)))
-                .offset(x: isAnimating ? -20 : -12, y: isAnimating ? 8 : 2)
-                .opacity(0.75)
-                .shadow(color: FGColors.accentSecondary.opacity(0.3), radius: 8)
+            // Faint indigo grid.
+            GridLines(spacing: 26)
+                .stroke(FGColors.accentPrimary.opacity(0.09), lineWidth: 1)
 
-            // Middle flyer - more dramatic rotation
-            FlyerShape()
-                .fill(gradient2)
-                .frame(width: 75, height: 95)
-                .rotationEffect(.degrees(12 + (isAnimating ? -10 : 0)))
-                .offset(x: isAnimating ? 15 : 8, y: isAnimating ? -8 : -2)
-                .opacity(0.85)
-                .shadow(color: Color.pink.opacity(0.3), radius: 8)
-
-            // Front flyer - more noticeable scale pulse
-            FlyerShape()
-                .fill(gradient3)
-                .frame(width: 80, height: 100)
-                .scaleEffect(isAnimating ? 1.12 : 0.95)
-                .rotationEffect(.degrees(isAnimating ? 2 : -2))
-                .shadow(color: FGColors.accentPrimary.opacity(0.5), radius: isAnimating ? 15 : 8)
-
-            // Sparkle accent - bouncing effect
-            Image(systemName: "sparkles")
-                .font(.system(size: 22, weight: .medium))
-                .foregroundColor(.white)
-                .offset(x: 35, y: isAnimating ? -45 : -38)
-                .opacity(isAnimating ? 1.0 : 0.5)
-                .scaleEffect(isAnimating ? 1.2 : 0.9)
-        }
-        .onAppear {
-            withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
-                isAnimating = true
-            }
-            withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
-                glowPulse = true
+            // Orb: conic ring (dark disc masks the center) + sparkle.
+            ZStack {
+                Circle()
+                    .fill(FGGradients.orbConic)
+                    .frame(width: 92, height: 92)
+                    .blur(radius: 1)
+                    .opacity(0.9)
+                Circle()
+                    .fill(Color(hex: "0D0F18"))
+                    .frame(width: 60, height: 60)
+                Image(systemName: "sparkle")
+                    .font(.system(size: 24, weight: .medium))
+                    .foregroundColor(FGColors.textPrimary)
             }
         }
+        .frame(height: 158)
+        .clipShape(RoundedRectangle(cornerRadius: FGSpacing.heroPanelRadius, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: FGSpacing.heroPanelRadius, style: .continuous)
+                .strokeBorder(FGColors.borderHairline, lineWidth: 1)
+        )
     }
 }
 
-/// Custom flyer shape - rounded rectangle with folded corner
-private struct FlyerShape: Shape {
+/// A light line grid used behind the hero orb.
+private struct GridLines: Shape {
+    var spacing: CGFloat = 26
     func path(in rect: CGRect) -> Path {
-        var path = Path()
-
-        let cornerRadius: CGFloat = 8
-        let foldSize: CGFloat = rect.width * 0.2
-
-        // Start from top-left, going clockwise
-        path.move(to: CGPoint(x: cornerRadius, y: 0))
-
-        // Top edge to fold start
-        path.addLine(to: CGPoint(x: rect.width - foldSize, y: 0))
-
-        // Folded corner (diagonal line down)
-        path.addLine(to: CGPoint(x: rect.width, y: foldSize))
-
-        // Right edge
-        path.addLine(to: CGPoint(x: rect.width, y: rect.height - cornerRadius))
-
-        // Bottom-right corner
-        path.addQuadCurve(
-            to: CGPoint(x: rect.width - cornerRadius, y: rect.height),
-            control: CGPoint(x: rect.width, y: rect.height)
-        )
-
-        // Bottom edge
-        path.addLine(to: CGPoint(x: cornerRadius, y: rect.height))
-
-        // Bottom-left corner
-        path.addQuadCurve(
-            to: CGPoint(x: 0, y: rect.height - cornerRadius),
-            control: CGPoint(x: 0, y: rect.height)
-        )
-
-        // Left edge
-        path.addLine(to: CGPoint(x: 0, y: cornerRadius))
-
-        // Top-left corner
-        path.addQuadCurve(
-            to: CGPoint(x: cornerRadius, y: 0),
-            control: CGPoint(x: 0, y: 0)
-        )
-
-        path.closeSubpath()
-
-        return path
+        var p = Path()
+        var x: CGFloat = 0
+        while x <= rect.width {
+            p.move(to: CGPoint(x: x, y: 0))
+            p.addLine(to: CGPoint(x: x, y: rect.height))
+            x += spacing
+        }
+        var y: CGFloat = 0
+        while y <= rect.height {
+            p.move(to: CGPoint(x: 0, y: y))
+            p.addLine(to: CGPoint(x: rect.width, y: y))
+            y += spacing
+        }
+        return p
     }
 }
 

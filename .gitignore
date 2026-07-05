@@ -60,3 +60,6 @@ DerivedData/
 /*.jpeg
 /*.JPG
 /*.html
+
+# Superpowers brainstorm scratch (visual companion)
+.superpowers/

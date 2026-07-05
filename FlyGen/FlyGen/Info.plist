@@ -17,9 +17,9 @@
 	<key>CFBundlePackageType</key>
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.7</string>
+	<string>3.8</string>
 	<key>CFBundleVersion</key>
-	<string>52</string>
+	<string>54</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -29,6 +29,13 @@
 	</dict>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>FlyGen needs access to save your generated flyers to your photo library.</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>SpaceGrotesk-Regular.ttf</string>
+		<string>SpaceGrotesk-Medium.ttf</string>
+		<string>SpaceGrotesk-SemiBold.ttf</string>
+		<string>SpaceGrotesk-Bold.ttf</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
