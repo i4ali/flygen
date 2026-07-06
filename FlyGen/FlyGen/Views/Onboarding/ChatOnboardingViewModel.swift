@@ -13,6 +13,7 @@ struct RenderedBeat: Identifiable {
         case brief([String])
         case worklog([String])     // the "show its work" checklist of design decisions
         case reveal([String])
+        case textQuestion(placeholder: String)   // the open "what do you do?" input field
         case chipQuestion(OnboardingQuestion)
         case cta(String)
     }
@@ -27,12 +28,14 @@ final class ChatOnboardingViewModel: ObservableObject {
     /// True while a chip question is on screen awaiting the user (auto-play is paused).
     @Published private(set) var isInteracting = false
 
-    /// The user's selections, bound by the chip-question view and returned on completion.
-    @Published var selectedCategories: Set<FlyerCategory> = []
+    /// The user's language selection, bound by the chip-question view and returned on completion.
     @Published var selectedLanguages: Set<FlyerLanguage> = []
+    /// The active text-question's draft, bound by the input view. Deliberately not persisted.
+    @Published var textDraft: String = ""
 
-    /// Called when the user taps the final CTA. Receives the two collected preferences.
-    var onComplete: (([FlyerCategory], [FlyerLanguage]) -> Void)?
+    /// Called when the user taps the final CTA. Receives the one collected preference (language);
+    /// the open "what do you do?" answer is intentionally not collected.
+    var onComplete: (([FlyerLanguage]) -> Void)?
 
     private let beats = OnboardingScript.beats
     private var index = 0
@@ -61,9 +64,33 @@ final class ChatOnboardingViewModel: ObservableObject {
         resume()
     }
 
+    /// Handle the open text question. On send, the typed words become a user bubble; on skip, no
+    /// bubble is added and the question stays visible above. Either way a skip-aware warm reply is
+    /// appended and the script resumes. Nothing typed here is stored.
+    func submitTextQuestion(skipped: Bool) {
+        guard let i = rendered.lastIndex(where: {
+            if case .textQuestion = $0.kind { return true } else { return false }
+        }) else { return }
+
+        Haptics.selection()
+        let trimmed = textDraft.trimmingCharacters(in: .whitespacesAndNewlines)
+        let answered = !skipped && !trimmed.isEmpty
+        withAnimation(FGAnimations.spring) {
+            if answered {
+                rendered[i].kind = .user(trimmed, typing: false)   // the field becomes their answer
+            } else {
+                rendered.remove(at: i)                             // drop the field; question remains above
+            }
+        }
+        textDraft = ""
+        isInteracting = false
+        append(.assistant(answered ? OnboardingScript.textReplyAnswered : OnboardingScript.textReplySkipped))
+        resume()
+    }
+
     func finish() {
         Haptics.success()
-        onComplete?(orderedCategories(), orderedLanguages())
+        onComplete?(orderedLanguages())
     }
 
     // MARK: - The runner
@@ -97,6 +124,13 @@ final class ChatOnboardingViewModel: ObservableObject {
                 await pause(OnboardingTiming.beatGap)
                 append(.reveal(names))
                 await pause(OnboardingTiming.revealHold)
+            case .textQuestion(let placeholder):
+                await pause(OnboardingTiming.beatGap)
+                if Task.isCancelled { return }
+                append(.textQuestion(placeholder: placeholder))
+                isInteracting = true
+                index += 1
+                return                                  // stop until submitTextQuestion(skipped:)
             case .chipQuestion(let q):
                 await pause(OnboardingTiming.beatGap)
                 if Task.isCancelled { return }
@@ -169,9 +203,6 @@ final class ChatOnboardingViewModel: ObservableObject {
 
     private func collapsedReply(for q: OnboardingQuestion) -> String {
         switch q.kind {
-        case .category:
-            let names = orderedCategories().map { $0.onboardingLabel }
-            return names.isEmpty ? "A bit of everything" : names.joined(separator: ", ")
         case .language:
             let names = orderedLanguages().map { $0.shortName }
             return names.isEmpty ? FlyerLanguage.english.shortName : names.joined(separator: ", ")
@@ -179,10 +210,6 @@ final class ChatOnboardingViewModel: ObservableObject {
     }
 
     /// Stable ordering (enum declaration order) regardless of tap sequence.
-    private func orderedCategories() -> [FlyerCategory] {
-        FlyerCategory.allCases.filter { selectedCategories.contains($0) }
-    }
-
     private func orderedLanguages() -> [FlyerLanguage] {
         FlyerLanguage.allCases.filter { selectedLanguages.contains($0) }
     }

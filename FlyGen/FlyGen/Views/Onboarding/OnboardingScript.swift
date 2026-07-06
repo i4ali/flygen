@@ -1,8 +1,8 @@
 import Foundation
 
 // The onboarding storyboard, expressed as data. `ChatOnboardingViewModel` walks these beats:
-// the auto beats play on a timer, and `.chipQuestion` stops the runner to wait for the user.
-// Editing the flow means editing this list - not the view or the runner.
+// the auto beats play on a timer, and `.chipQuestion` / `.textQuestion` stop the runner to wait
+// for the user. Editing the flow means editing this list - not the view or the runner.
 
 enum OnboardingBeat {
     /// Assistant plain-text line (revealed after a short gap).
@@ -18,6 +18,10 @@ enum OnboardingBeat {
     case worklog([String])
     /// The money shot: these flyer image asset names bloom in, staggered.
     case reveal([String])
+    /// Interactive free-text: pauses the runner until the user sends or skips. Renders only the
+    /// input field; the question itself is a preceding `.assistant` beat so it stays visible above
+    /// the answer. Nothing typed here is stored - it's a rapport beat.
+    case textQuestion(placeholder: String)
     /// Interactive: pauses the runner until the user submits.
     case chipQuestion(OnboardingQuestion)
     /// Final call-to-action button that completes onboarding.
@@ -25,7 +29,6 @@ enum OnboardingBeat {
 }
 
 enum OnboardingQuestionKind {
-    case category
     case language
 }
 
@@ -51,6 +54,12 @@ enum OnboardingScript {
         "Adding a QR code for RSVPs",
     ]
 
+    /// The skip-aware warm reply after the open question. The copy lives here so the flow stays
+    /// data-driven; the view model appends the matching line. It can't be a static beat in the
+    /// array because it branches on whether the user answered or skipped.
+    static let textReplyAnswered = "Nice. Let's make you something that gets noticed."
+    static let textReplySkipped = "All good - let's get you noticed."
+
     static let beats: [OnboardingBeat] = [
         .assistant("Hi - I'm your designer. Give me a sentence, I'll give you a flyer. Watch."),
         .userTypes("Summer BBQ fundraiser this Saturday, 12pm at Lincoln Park - $10 a plate, all welcome."),
@@ -58,8 +67,8 @@ enum OnboardingScript {
         .worklog(worklogItems),                                          // ...now the pro decisions
         .reveal(demoFlyerImages),
         .assistant("Three ways to go - and that was one sentence."),
-        .assistant("Your turn. Two quick things so I can tailor everything to you."),
-        .chipQuestion(OnboardingQuestion(kind: .category, prompt: "What do you make?")),
+        .assistant("Your turn. First - what do you do?"),               // open + personal; stores nothing
+        .textQuestion(placeholder: "e.g., I run a home bakery"),
         .chipQuestion(OnboardingQuestion(kind: .language, prompt: "What language do you design in?")),
         .assistant("Perfect - your flyers, your language."),
         .cta("Make your first flyer"),

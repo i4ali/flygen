@@ -39,18 +39,12 @@ struct ContentView: View {
             } else if hasCompletedOnboarding {
                 MainTabView(viewModel: viewModel, showingSettings: $showingSettings)
             } else {
-                ChatOnboardingView { categories, languages in
-                    // Persist the two preferences the chat onboarding collects. Style/mood/color
-                    // and role are no longer gathered up front - the chat decides those per flyer.
+                ChatOnboardingView { languages in
+                    // Persist the one preference onboarding still collects (language). Categories are
+                    // no longer gathered up front - Explore personalizes later from what the user makes.
                     if let profile = userProfiles.first {
-                        profile.setPreferredCategories(categories)
                         profile.setPreferredLanguages(languages)
                         try? modelContext.save()
-
-                        // Sync categories to CloudKit (drives Explore "For You").
-                        Task {
-                            await cloudKitService.savePreferredCategories(categories.map { $0.rawValue })
-                        }
                     }
                     hasCompletedOnboarding = true
                     // Show the paywall once, right after onboarding. This closure runs a single

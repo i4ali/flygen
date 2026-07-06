@@ -1,9 +1,9 @@
 import SwiftUI
 import UIKit
 
-/// The interactive turn: the assistant asks, the user taps chips (multi-select), then Continue
-/// collapses the picks into a sent user bubble (handled by the view model). Used for both the
-/// category and language questions.
+/// The interactive chip turn: the assistant asks, the user taps chips (multi-select), then Continue
+/// collapses the picks into a sent user bubble (handled by the view model). Used for the language
+/// question.
 struct OnboardingChipQuestionView: View {
     let question: OnboardingQuestion
     @ObservedObject var vm: ChatOnboardingViewModel
@@ -31,27 +31,72 @@ struct OnboardingChipQuestionView: View {
     }
 
     @ViewBuilder private var chips: some View {
-        switch question.kind {
-        case .category:
-            ForEach(FlyerCategory.allCases) { cat in
-                FGChipButton(title: cat.onboardingLabel,
-                             isSelected: vm.selectedCategories.contains(cat),
-                             icon: cat.icon) {
-                    Haptics.selection()
-                    if vm.selectedCategories.contains(cat) { vm.selectedCategories.remove(cat) }
-                    else { vm.selectedCategories.insert(cat) }
-                }
-            }
-        case .language:
-            ForEach(FlyerLanguage.allCases, id: \.self) { lang in
-                FGChipButton(title: lang.shortName,
-                             isSelected: vm.selectedLanguages.contains(lang)) {
-                    Haptics.selection()
-                    if vm.selectedLanguages.contains(lang) { vm.selectedLanguages.remove(lang) }
-                    else { vm.selectedLanguages.insert(lang) }
-                }
+        ForEach(FlyerLanguage.allCases, id: \.self) { lang in
+            FGChipButton(title: lang.shortName,
+                         isSelected: vm.selectedLanguages.contains(lang)) {
+                Haptics.selection()
+                if vm.selectedLanguages.contains(lang) { vm.selectedLanguages.remove(lang) }
+                else { vm.selectedLanguages.insert(lang) }
             }
         }
+    }
+}
+
+/// The open, personal turn. The question itself ("what do you do?") is a preceding assistant beat;
+/// this renders only the input field, a Send button, and a quiet Skip. On send or skip the view
+/// model collapses this beat and resumes the script. Nothing typed here is stored - it's rapport.
+struct OnboardingTextQuestionView: View {
+    let placeholder: String
+    @ObservedObject var vm: ChatOnboardingViewModel
+    @FocusState private var focused: Bool
+
+    private var canSend: Bool {
+        !vm.textDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: FGSpacing.xs) {
+            HStack(alignment: .center, spacing: FGSpacing.xs) {
+                TextField(placeholder, text: $vm.textDraft)
+                    .font(FGTypography.body)
+                    .foregroundColor(FGColors.textPrimary)
+                    .tint(FGColors.accentPrimary)
+                    .focused($focused)
+                    .submitLabel(.send)
+                    .onSubmit(send)
+                    .padding(.horizontal, FGSpacing.md)
+                    .padding(.vertical, FGSpacing.sm)
+                    .background(FGColors.surfaceDefault)
+                    .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+                    .overlay(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius)
+                        .stroke(FGColors.borderSubtle, lineWidth: 1))
+
+                Button(action: send) {
+                    Image(systemName: "arrow.up.circle.fill")
+                        .font(.system(size: 32))
+                        .foregroundColor(canSend ? FGColors.accentPrimary
+                                                 : FGColors.textSecondary.opacity(0.35))
+                }
+                .disabled(!canSend)
+                .animation(FGAnimations.spring, value: canSend)
+            }
+
+            Button { vm.submitTextQuestion(skipped: true) } label: {
+                Text("Skip")
+                    .font(FGTypography.caption)
+                    .foregroundColor(FGColors.textSecondary)
+                    .padding(.vertical, FGSpacing.xxs)
+                    .padding(.horizontal, FGSpacing.xs)
+            }
+            .frame(maxWidth: .infinity, alignment: .trailing)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .onAppear { focused = true }
+    }
+
+    private func send() {
+        guard canSend else { return }
+        vm.submitTextQuestion(skipped: false)
     }
 }
 
@@ -78,31 +123,6 @@ extension FlyerLanguage {
         case .urdu:    return "اردو"
         case .arabic:  return "العربية"
         case .chinese: return "中文"
-        }
-    }
-}
-
-extension FlyerCategory {
-    /// Warm, plain-language labels for the onboarding chips - the kind of thing people actually
-    /// say they make, not marketing-taxonomy jargon ("Grand Opening"). Maps 1:1 to the category,
-    /// so Explore's "For You" personalization is unchanged; only the wording differs.
-    var onboardingLabel: String {
-        switch self {
-        case .event:            return "Events & gatherings"
-        case .salePromo:        return "Sales & promos"
-        case .announcement:     return "Announcements & newsletters"
-        case .restaurantFood:   return "Restaurant & food"
-        case .realEstate:       return "Property listings"
-        case .jobPosting:       return "Hiring & jobs"
-        case .classWorkshop:    return "Classes & workshops"
-        case .grandOpening:     return "Grand openings"
-        case .partyCelebration: return "Parties & birthdays"
-        case .fitnessWellness:  return "Fitness & wellness"
-        case .nonprofitCharity: return "Fundraisers & causes"
-        case .musicConcert:     return "Concerts & gigs"
-        case .serviceBusiness:  return "My services"
-        case .beautySalon:      return "Salon & beauty"
-        case .churchReligious:  return "Faith & community"
         }
     }
 }

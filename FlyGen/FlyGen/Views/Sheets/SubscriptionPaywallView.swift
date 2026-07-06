@@ -8,6 +8,9 @@ struct SubscriptionPaywallView: View {
     @State private var selectedProduct: Product?
     @State private var isPurchasing = false
     @State private var isRestoring = false
+    /// Per-product intro-offer eligibility (async, from StoreKit). Only eligible users
+    /// see the offer; everyone else sees standard pricing.
+    @State private var introEligibility: [String: Bool] = [:]
 
     private let termsURL = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
     private let privacyURL = URL(string: "https://i4ali.github.io/flygen/privacy-policy.html")!
@@ -63,6 +66,16 @@ struct SubscriptionPaywallView: View {
                     }
                 }
             }
+            // Resolve intro-offer eligibility once products load (and again if they change).
+            // Async per StoreKit; drives whether the plan cards show the offer.
+            .task(id: entitlementService.products.map(\.id)) {
+                var eligibility: [String: Bool] = [:]
+                for product in entitlementService.products {
+                    guard let sub = product.subscription else { continue }
+                    eligibility[product.id] = await sub.isEligibleForIntroOffer
+                }
+                introEligibility = eligibility
+            }
         }
     }
 
@@ -85,28 +98,30 @@ struct SubscriptionPaywallView: View {
 
     private var heroSection: some View {
         VStack(spacing: FGSpacing.md) {
-            // Aurora badge tile: 64pt brand-gradient square with a dark crown glyph.
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(FGGradients.brand)
-                .frame(width: 64, height: 64)
+            // Lead with the payoff, not a badge: a real finished flyer (bold, dark-bg, crisp
+            // type) so the first thing they see is what they get. Rounded + violet-shadowed to
+            // sit on the Aurora glow; a white-bg flyer would clash - this neon-on-black doesn't.
+            Image("sample_mega_sale")
+                .resizable()
+                .scaledToFit()
+                .frame(maxHeight: 240)
+                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                 .overlay(
-                    Image(systemName: "crown.fill")
-                        .font(.system(size: 30))
-                        .foregroundColor(FGColors.backgroundPrimary)
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .stroke(FGColors.borderSubtle, lineWidth: 1)
                 )
-                .shadow(color: FGColors.accentPrimary.opacity(0.6), radius: 20, y: 10)
+                .shadow(color: FGColors.accentPrimary.opacity(0.45), radius: 22, y: 12)
                 .padding(.bottom, FGSpacing.xs)
 
-            HStack(spacing: 0) {
-                Text("FlyGen ")
-                    .foregroundColor(FGColors.textPrimary)
-                Text("Premium")
-                    .foregroundStyle(FGGradients.brand)
-            }
-            .font(FGTypography.heroTitle)
-            .tracking(FGTypography.Tracking.heroTitle)
+            // Outcome-led headline: sells the result (get noticed / turnout), not the feature.
+            Text("Get noticed.\nFill the room.")
+                .font(FGTypography.heroTitle)
+                .tracking(FGTypography.Tracking.heroTitle)
+                .foregroundColor(FGColors.textPrimary)
+                .multilineTextAlignment(.center)
 
-            Text("Create flyers all month long")
+            // Subhead restores the universality (sale / event / community) that "Fill the room" narrows.
+            Text("Professional flyers that make people stop - for your sale, your event, your community.")
                 .font(FGTypography.body)
                 .foregroundColor(FGColors.textSecondary)
                 .multilineTextAlignment(.center)
@@ -118,10 +133,10 @@ struct SubscriptionPaywallView: View {
 
     private var featureList: some View {
         VStack(spacing: FGSpacing.sm) {
-            FeatureRow(icon: "sparkles", text: "AI flyer generations, reset each period")
-            FeatureRow(icon: "wand.and.stars", text: "Refine & resize your flyers")
-            FeatureRow(icon: "globe", text: "All styles, formats & languages")
-            FeatureRow(icon: "arrow.clockwise", text: "Quota resets every billing period")
+            FeatureRow(icon: "eye.fill", text: "Eye-catching designs that get you noticed")
+            FeatureRow(icon: "wand.and.stars", text: "Look like you hired a designer - no skills needed")
+            FeatureRow(icon: "bolt.fill", text: "Just describe it, and it's ready in a snap")
+            FeatureRow(icon: "globe", text: "Any style, any language, sized for any post")
         }
         .padding(FGSpacing.cardPadding)
         .background(FGColors.backgroundElevated)
@@ -195,6 +210,7 @@ struct SubscriptionPaywallView: View {
                 ForEach(entitlementService.products, id: \.id) { product in
                     PlanCard(
                         product: product,
+                        introOffer: offerInfo(for: product),
                         isSelected: resolvedSelected?.id == product.id
                     ) {
                         selectedProduct = product
@@ -300,34 +316,22 @@ struct SubscriptionPaywallView: View {
 
     // MARK: - Disclosure
 
-    private var subscriptionDescription: String {
-        guard let product = resolvedSelected,
-              let period = product.subscription?.subscriptionPeriod else { return "" }
-        return "\(product.displayName) is \(product.displayPrice) per \(periodNoun(period))."
+    /// Offer copy for a product, but only when this user is *eligible*. Returns nil
+    /// otherwise, so ineligible/returning users see standard pricing untouched.
+    private func offerInfo(for product: Product) -> IntroOfferInfo? {
+        guard introEligibility[product.id] == true else { return nil }
+        return IntroOfferInfo(product: product)
     }
 
-    /// Human-readable billing-period noun.
-    ///
-    /// Normalizes on both `unit` and `value` because StoreKit reports a weekly
-    /// subscription as `.day` / 7 (not `.week` / 1). Switching on `unit` alone
-    /// would render "per day" for a weekly plan.
-    private func periodNoun(_ period: Product.SubscriptionPeriod) -> String {
-        switch (period.unit, period.value) {
-        case (.day, 1):                return "day"
-        case (.day, 7), (.week, 1):    return "week"
-        case (.month, 1):              return "month"
-        case (.month, 12), (.year, 1): return "year"
-        default:
-            let unit: String
-            switch period.unit {
-            case .day:   unit = "day"
-            case .week:  unit = "week"
-            case .month: unit = "month"
-            case .year:  unit = "year"
-            @unknown default: unit = "period"
-            }
-            return period.value == 1 ? unit : "\(period.value) \(unit)s"
+    /// Disclosure line for the selected plan: the intro terms when the user is eligible
+    /// for an offer, otherwise the standard price - all read from StoreKit.
+    private var subscriptionDescription: String {
+        guard let product = resolvedSelected else { return "" }
+        if let offer = offerInfo(for: product) {
+            return offer.disclosure
         }
+        guard let period = product.subscription?.subscriptionPeriod else { return "" }
+        return "\(product.displayName) is \(product.displayPrice) per \(subscriptionPeriodNoun(period))."
     }
 
     private var disclosureText: some View {
@@ -480,10 +484,90 @@ private struct PaywallReview: Identifiable {
     ]
 }
 
+// MARK: - Intro Offer
+
+/// Human-readable billing-period noun. Normalizes on both `unit` and `value` because
+/// StoreKit reports a weekly subscription as `.day` / 7 (not `.week` / 1); switching on
+/// `unit` alone would render "day" for a weekly plan.
+private func subscriptionPeriodNoun(_ period: Product.SubscriptionPeriod) -> String {
+    switch (period.unit, period.value) {
+    case (.day, 1):                return "day"
+    case (.day, 7), (.week, 1):    return "week"
+    case (.month, 1):              return "month"
+    case (.month, 12), (.year, 1): return "year"
+    default:
+        let unit: String
+        switch period.unit {
+        case .day:   unit = "day"
+        case .week:  unit = "week"
+        case .month: unit = "month"
+        case .year:  unit = "year"
+        @unknown default: unit = "period"
+        }
+        return period.value == 1 ? unit : "\(period.value) \(unit)s"
+    }
+}
+
+/// Presentable introductory-offer copy, derived entirely from a StoreKit `Product` -
+/// price, percent, period noun, and disclosure are all read from the offer, so changing
+/// it in App Store Connect (amount, duration, type, plan) flows through with no code edit.
+/// Returns nil when the product has no offer.
+private struct IntroOfferInfo {
+    let badge: String          // e.g. "50% OFF FIRST MONTH", "1 WEEK FREE"
+    let introPrice: String     // e.g. "$4.99"  (offer.displayPrice)
+    let standardPrice: String  // e.g. "$9.99"  (product.displayPrice, shown struck-through)
+    let thenLine: String       // e.g. "then $9.99 / month"
+    let disclosure: String     // full sentence for the legal disclosure
+
+    init?(product: Product) {
+        guard let sub = product.subscription,
+              let offer = sub.introductoryOffer else { return nil }
+
+        let unit = subscriptionPeriodNoun(sub.subscriptionPeriod)
+        let periods = offer.periodCount
+        let intro = offer.displayPrice
+        let standard = product.displayPrice
+
+        self.introPrice = intro
+        self.standardPrice = standard
+        self.thenLine = "then \(standard) / \(unit)"
+
+        switch offer.paymentMode {
+        case .freeTrial:
+            let freePhrase = periods > 1 ? "\(periods) \(unit)s" : "1 \(unit)"
+            self.badge = "\(freePhrase) free".uppercased()
+            self.disclosure = "\(freePhrase) free, then \(standard) / \(unit)."
+        case .payUpFront:
+            let pct = IntroOfferInfo.percentOff(standard: product.price, intro: offer.price)
+            let span = periods > 1 ? "\(periods) \(unit)s" : "your first \(unit)"
+            self.badge = "\(pct)% off".uppercased()
+            self.disclosure = "\(intro) for \(span), then \(standard) / \(unit)."
+        case .payAsYouGo:
+            let pct = IntroOfferInfo.percentOff(standard: product.price, intro: offer.price)
+            let span = periods > 1 ? "first \(periods) \(unit)s" : "first \(unit)"
+            self.badge = "\(pct)% off \(span)".uppercased()
+            self.disclosure = periods > 1
+                ? "\(intro) / \(unit) for \(periods) \(unit)s, then \(standard) / \(unit)."
+                : "\(intro) for your first \(unit), then \(standard) / \(unit)."
+        default:
+            return nil
+        }
+    }
+
+    /// Discount percent from the actual prices, so the badge stays correct regardless of
+    /// what the offer is set to in App Store Connect.
+    private static func percentOff(standard: Decimal, intro: Decimal) -> Int {
+        guard standard > 0 else { return 0 }
+        let ratio = (standard - intro) / standard * 100
+        return Int(NSDecimalNumber(decimal: ratio).doubleValue.rounded())
+    }
+}
+
 // MARK: - Plan Card
 
 private struct PlanCard: View {
     let product: Product
+    let introOffer: IntroOfferInfo?
     let isSelected: Bool
     let onTap: () -> Void
 
@@ -525,22 +609,54 @@ private struct PlanCard: View {
                         }
                     }
 
+                    // Intro-offer chip (eligible users only), e.g. "50% OFF FIRST MONTH".
+                    // Green "savings" chip, distinct from the accent "Best Value" chip.
+                    if let offer = introOffer {
+                        Text(offer.badge)
+                            .font(FGTypography.captionBold)
+                            .foregroundColor(FGColors.textOnAccent)
+                            .padding(.horizontal, FGSpacing.sm)
+                            .padding(.vertical, FGSpacing.xxxs)
+                            .background(FGColors.success)
+                            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.chipRadius))
+                    }
+
                     if !allotmentText.isEmpty {
                         Text(allotmentText)
                             .font(FGTypography.caption)
                             .foregroundColor(FGColors.textSecondary)
                     }
 
-                    Text(product.description.isEmpty ? product.displayPrice : product.description)
-                        .font(FGTypography.caption)
-                        .foregroundColor(FGColors.textSecondary)
+                    // "then $9.99 / month" when an offer applies; otherwise the plan's own line.
+                    if let offer = introOffer {
+                        Text(offer.thenLine)
+                            .font(FGTypography.caption)
+                            .foregroundColor(FGColors.textTertiary)
+                    } else {
+                        Text(product.description.isEmpty ? product.displayPrice : product.description)
+                            .font(FGTypography.caption)
+                            .foregroundColor(FGColors.textSecondary)
+                    }
                 }
 
                 Spacer()
 
-                Text(product.displayPrice)
-                    .font(FGTypography.h4)
-                    .foregroundColor(FGColors.textPrimary)
+                // Price: intro price with the standard price struck-through when eligible.
+                if let offer = introOffer {
+                    VStack(alignment: .trailing, spacing: FGSpacing.xxxs) {
+                        Text(offer.introPrice)
+                            .font(FGTypography.h4)
+                            .foregroundColor(FGColors.textPrimary)
+                        Text(offer.standardPrice)
+                            .font(FGTypography.caption)
+                            .foregroundColor(FGColors.textTertiary)
+                            .strikethrough(true, color: FGColors.textTertiary)
+                    }
+                } else {
+                    Text(product.displayPrice)
+                        .font(FGTypography.h4)
+                        .foregroundColor(FGColors.textPrimary)
+                }
             }
             .padding(FGSpacing.cardPadding)
             .background(FGColors.surfaceDefault)

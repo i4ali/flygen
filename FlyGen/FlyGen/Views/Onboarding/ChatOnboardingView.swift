@@ -1,12 +1,12 @@
 import SwiftUI
 
 /// Chat-first onboarding: a single scrollable thread that demos the product (a sentence becomes
-/// three flyers), then collects two quick preferences, then completes. Replaces the retired
-/// 9-screen wizard. See docs/plans/2026-07-02-chat-onboarding-design.md.
+/// three flyers), then asks one open, personal question and the design language, then completes.
+/// Replaces the retired 9-screen wizard. See docs/plans/2026-07-05-onboarding-open-question-design.md.
 struct ChatOnboardingView: View {
-    /// Called when the user taps the final CTA; the host persists these and flips
+    /// Called when the user taps the final CTA; the host persists this and flips
     /// `hasCompletedOnboarding` to enter the app.
-    let onComplete: ([FlyerCategory], [FlyerLanguage]) -> Void
+    let onComplete: ([FlyerLanguage]) -> Void
 
     @StateObject private var vm = ChatOnboardingViewModel()
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -50,6 +50,7 @@ struct ChatOnboardingView: View {
         case .brief(let chips):        briefRow(chips)
         case .worklog(let items):      WorklogView(items: items, reduceMotion: reduceMotion)
         case .reveal(let names):       DemoFlyerReveal(imageNames: names, reduceMotion: reduceMotion)
+        case .textQuestion(let ph):    OnboardingTextQuestionView(placeholder: ph, vm: vm)
         case .chipQuestion(let q):     OnboardingChipQuestionView(question: q, vm: vm)
         case .cta(let title):          ctaButton(title)
         }

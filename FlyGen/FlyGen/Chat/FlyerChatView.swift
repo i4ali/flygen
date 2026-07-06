@@ -25,6 +25,9 @@ struct FlyerChatView: View {
     @State private var showMyFlyersPicker = false     // "reuse a flyer" -> pick from My Flyers
     @State private var showExplorePicker = false      // "reuse a flyer" -> pick from Explore
 
+    /// Stable identity for the invisible end-of-thread marker the chat auto-scrolls to.
+    private static let chatBottomID = "chat-bottom"
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -35,12 +38,22 @@ struct FlyerChatView: View {
                                 bubbleView(bubble).id(bubble.id)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                             }
+                            // Invisible end-of-thread marker we auto-scroll to. A 1pt view is
+                            // laid out instantly, unlike a tall just-appended bubble whose height
+                            // is still being measured, so scrolling here lands on the true bottom.
+                            Color.clear.frame(height: 1).id(Self.chatBottomID)
                         }
                         .padding(FGSpacing.screenHorizontal)
                     }
                     .onChange(of: vm.transcript.count) { _, _ in
-                        if let last = vm.transcript.last {
-                            withAnimation { proxy.scrollTo(last.id, anchor: .bottom) }
+                        // Defer one runloop tick so the LazyVStack has laid out the freshly
+                        // appended bubbles (and re-rendered the tall review card into its approved
+                        // state) before we compute the scroll offset. Scrolling in the same tick
+                        // uses stale/estimated heights and overshoots past the content into blank
+                        // space — the "Approve & generate jumps to a blank, then I scroll up to
+                        // find the progress" bug.
+                        DispatchQueue.main.async {
+                            withAnimation { proxy.scrollTo(Self.chatBottomID, anchor: .bottom) }
                         }
                     }
                 }
