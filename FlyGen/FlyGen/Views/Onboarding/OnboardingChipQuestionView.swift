@@ -1,9 +1,9 @@
 import SwiftUI
 import UIKit
 
-/// The interactive chip turn: the assistant asks, the user taps chips (multi-select), then Continue
-/// collapses the picks into a sent user bubble (handled by the view model). Used for the language
-/// question.
+/// The interactive language turn: the assistant asks, the user picks one language from a dropdown,
+/// then Continue collapses the pick into a sent user bubble (handled by the view model). Single-select
+/// (one design language per user); the review card lets them change it per flyer later.
 struct OnboardingChipQuestionView: View {
     let question: OnboardingQuestion
     @ObservedObject var vm: ChatOnboardingViewModel
@@ -12,9 +12,7 @@ struct OnboardingChipQuestionView: View {
         VStack(alignment: .leading, spacing: FGSpacing.sm) {
             AssistantBubble(text: question.prompt)
 
-            FlowLayout(spacing: FGSpacing.xs) {
-                chips
-            }
+            LanguagePicker(selection: $vm.selectedLanguage)
 
             Button { vm.submitCurrentQuestion() } label: {
                 Text("Continue")
@@ -28,17 +26,6 @@ struct OnboardingChipQuestionView: View {
             .padding(.top, FGSpacing.xxs)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    @ViewBuilder private var chips: some View {
-        ForEach(FlyerLanguage.allCases, id: \.self) { lang in
-            FGChipButton(title: lang.shortName,
-                         isSelected: vm.selectedLanguages.contains(lang)) {
-                Haptics.selection()
-                if vm.selectedLanguages.contains(lang) { vm.selectedLanguages.remove(lang) }
-                else { vm.selectedLanguages.insert(lang) }
-            }
-        }
     }
 }
 
@@ -123,6 +110,14 @@ extension FlyerLanguage {
         case .urdu:    return "اردو"
         case .arabic:  return "العربية"
         case .chinese: return "中文"
+        case .hindi:   return "हिन्दी"
+        case .french:  return "Français"
+        case .bengali: return "বাংলা"
+        case .portuguese: return "Português"
+        case .russian: return "Русский"
+        case .indonesian: return "Indonesia"
+        case .german:  return "Deutsch"
+        case .japanese: return "日本語"
         }
     }
 }

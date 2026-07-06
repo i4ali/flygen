@@ -17,6 +17,12 @@ struct ProfileTab: View {
     @State private var showingMailComposer = false
     @State private var showingMailAlert = false
 
+    /// The current default flyer language (falls back to English until a profile exists). Seeded by
+    /// the onboarding language pick; used to pre-select the review-card language row on each flyer.
+    private var defaultLanguage: FlyerLanguage {
+        userProfiles.first?.defaultFlyerLanguageEnum ?? .english
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -32,6 +38,9 @@ struct ProfileTab: View {
 
                     // Brand Kit section
                     brandKitSection
+
+                    // Preferences section (default flyer language)
+                    preferencesSection
 
                     // iCloud section
                     iCloudSection
@@ -181,6 +190,63 @@ struct ProfileTab: View {
                     Image(systemName: "chevron.right")
                         .font(.caption)
                         .foregroundColor(FGColors.textTertiary)
+                }
+                .padding(FGSpacing.cardPadding)
+            }
+            .background(FGColors.backgroundElevated)
+            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+            .overlay(
+                RoundedRectangle(cornerRadius: FGSpacing.cardRadius)
+                    .stroke(FGColors.borderSubtle, lineWidth: 1)
+            )
+            .padding(.horizontal, FGSpacing.screenHorizontal)
+        }
+    }
+
+    // MARK: - Preferences Section
+
+    private var preferencesSection: some View {
+        VStack(alignment: .leading, spacing: FGSpacing.sm) {
+            Text("Preferences")
+                .font(FGTypography.h4)
+                .foregroundColor(FGColors.textSecondary)
+                .padding(.horizontal, FGSpacing.screenHorizontal)
+
+            VStack(spacing: 0) {
+                HStack {
+                    Label {
+                        Text("Default Flyer Language")
+                            .font(FGTypography.body)
+                            .foregroundColor(FGColors.textPrimary)
+                    } icon: {
+                        Image(systemName: "globe")
+                            .foregroundColor(FGColors.accentPrimary)
+                    }
+                    Spacer()
+                    Menu {
+                        ForEach(FlyerLanguage.allCases, id: \.self) { language in
+                            Button {
+                                if let profile = userProfiles.first {
+                                    profile.setDefaultFlyerLanguage(language)
+                                    try? modelContext.save()
+                                }
+                            } label: {
+                                HStack {
+                                    Text(language.displayName)
+                                    if defaultLanguage == language { Image(systemName: "checkmark") }
+                                }
+                            }
+                        }
+                    } label: {
+                        HStack(spacing: FGSpacing.xxs) {
+                            Text(defaultLanguage.displayName)
+                                .font(FGTypography.label)
+                                .foregroundColor(FGColors.textSecondary)
+                            Image(systemName: "chevron.up.chevron.down")
+                                .font(.system(size: 11))
+                                .foregroundColor(FGColors.textTertiary)
+                        }
+                    }
                 }
                 .padding(FGSpacing.cardPadding)
             }

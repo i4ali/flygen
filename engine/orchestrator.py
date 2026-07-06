@@ -142,7 +142,8 @@ class Engine:
         yield Event("concepts", [concept])
 
     def handle_approval(self, field_overrides=None, decision_overrides=None,
-                        answers=None, user_photos_b64=None, selected_elements=None) -> Iterator[Event]:
+                        answers=None, user_photos_b64=None, selected_elements=None,
+                        language=None) -> Iterator[Event]:
         # Each HTTP request builds a fresh Engine, so self.turn is usually None on an approve
         # turn; rebuild it from the brief the client posts back. The final design decisions
         # arrive via decision_overrides, so a content-only rebuilt turn is sufficient.
@@ -152,7 +153,7 @@ class Engine:
         if turn is None:
             yield Event("error", "no interpretation to generate from"); return
         project = self._build_project(turn, field_overrides or {}, decision_overrides or {},
-                                      selected_elements=selected_elements)
+                                      selected_elements=selected_elements, language=language)
         self.project = project
         with _materialized_images(user_photos_b64) as photo_paths:
             extra = {}
@@ -163,7 +164,7 @@ class Engine:
         yield Event("concepts", concepts)
 
     def handle_refine(self, prior_image_path=None, instruction="", mode="edit",
-                      prior_image_b64=None, annotated=False) -> Iterator[Event]:
+                      prior_image_b64=None, annotated=False, language=None) -> Iterator[Event]:
         # Annotated edits are self-contained (marked image + numbered instructions), like a
         # reference edit - no project/brief needed, and the light annotated-edit prompt replaces
         # the full design prompt. See docs/plans/2026-07-04-annotate-to-edit-design.md.
@@ -180,7 +181,7 @@ class Engine:
         project = self.project
         if project is None and self.brief:
             turn = TurnResult(**{k: v for k, v in self.brief.items() if k in TurnResult.model_fields})
-            project = self._build_project(turn, {}, {}, None)
+            project = self._build_project(turn, {}, {}, None, language=language)
         if project is None:
             yield Event("error", "no project to refine"); return
         concept = None

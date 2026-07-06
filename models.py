@@ -156,6 +156,14 @@ class FlyerLanguage(Enum):
     URDU = "ur"
     ARABIC = "ar"
     CHINESE = "zh"
+    HINDI = "hi"
+    FRENCH = "fr"
+    BENGALI = "bn"
+    PORTUGUESE = "pt"
+    RUSSIAN = "ru"
+    INDONESIAN = "id"
+    GERMAN = "de"
+    JAPANESE = "ja"
 
     @property
     def display_name(self) -> str:
@@ -165,6 +173,14 @@ class FlyerLanguage(Enum):
             "ur": "اردو (Urdu)",
             "ar": "العربية (Arabic)",
             "zh": "中文 (Chinese)",
+            "hi": "हिन्दी (Hindi)",
+            "fr": "Français (French)",
+            "bn": "বাংলা (Bengali)",
+            "pt": "Português (Portuguese)",
+            "ru": "Русский (Russian)",
+            "id": "Bahasa Indonesia (Indonesian)",
+            "de": "Deutsch (German)",
+            "ja": "日本語 (Japanese)",
         }
         return names.get(self.value, self.value)
 
@@ -172,10 +188,18 @@ class FlyerLanguage(Enum):
     def prompt_instruction(self) -> str:
         instructions = {
             "en": "Generate all text content in English.",
-            "es": "Generate all text content in Spanish (Español). Translate headlines, descriptions, and calls-to-action to Spanish. DO NOT translate addresses, phone numbers, emails, or URLs - keep them exactly as provided. If the user provides text in another language, translate it to Spanish while preserving the intended meaning and tone.",
-            "ur": "Generate all text content in Urdu (اردو). Use Nastaliq script. Render Urdu text right-to-left. Translate headlines, descriptions, and calls-to-action to Urdu. DO NOT translate addresses, phone numbers, emails, or URLs - keep them exactly as provided in left-to-right order. If the user provides text in another language, translate it to Urdu while preserving the intended meaning and tone.",
-            "ar": "Generate all text content in Arabic (العربية). Render Arabic text right-to-left. Translate headlines, descriptions, and calls-to-action to Arabic. DO NOT translate addresses, phone numbers, emails, or URLs - keep them exactly as provided in left-to-right order. If the user provides text in another language, translate it to Arabic while preserving the intended meaning and tone.",
-            "zh": "Generate all text content in Simplified Chinese (简体中文). Translate headlines, descriptions, and calls-to-action to Chinese. DO NOT translate addresses, phone numbers, emails, or URLs - keep them exactly as provided. If the user provides text in another language, translate it to Chinese while preserving the intended meaning and tone.",
+            "es": "Generate all text content in Spanish (Español). Translate headlines, descriptions, and calls-to-action to Spanish. DO NOT translate addresses, phone numbers, emails, URLs, dates, or times - keep them exactly as provided. If the user provides text in another language, translate it to Spanish while preserving the intended meaning and tone.",
+            "ur": "Generate all text content in Urdu (اردو). Use Nastaliq script. Render Urdu text right-to-left. Translate headlines, descriptions, and calls-to-action to Urdu. DO NOT translate addresses, phone numbers, emails, URLs, dates, or times - keep them exactly as provided in left-to-right order. If the user provides text in another language, translate it to Urdu while preserving the intended meaning and tone.",
+            "ar": "Generate all text content in Arabic (العربية). Render Arabic text right-to-left. Translate headlines, descriptions, and calls-to-action to Arabic. DO NOT translate addresses, phone numbers, emails, URLs, dates, or times - keep them exactly as provided in left-to-right order. If the user provides text in another language, translate it to Arabic while preserving the intended meaning and tone.",
+            "zh": "Generate all text content in Simplified Chinese (简体中文). Translate headlines, descriptions, and calls-to-action to Chinese. DO NOT translate addresses, phone numbers, emails, URLs, dates, or times - keep them exactly as provided. If the user provides text in another language, translate it to Chinese while preserving the intended meaning and tone.",
+            "hi": "Generate all text content in Hindi (हिन्दी). Use Devanagari script. Translate headlines, descriptions, and calls-to-action to Hindi. DO NOT translate addresses, phone numbers, emails, URLs, dates, or times - keep them exactly as provided. If the user provides text in another language, translate it to Hindi while preserving the intended meaning and tone.",
+            "fr": "Generate all text content in French (Français). Translate headlines, descriptions, and calls-to-action to French. DO NOT translate addresses, phone numbers, emails, URLs, dates, or times - keep them exactly as provided. If the user provides text in another language, translate it to French while preserving the intended meaning and tone.",
+            "bn": "Generate all text content in Bengali (বাংলা). Use Bengali script. Translate headlines, descriptions, and calls-to-action to Bengali. DO NOT translate addresses, phone numbers, emails, URLs, dates, or times - keep them exactly as provided. If the user provides text in another language, translate it to Bengali while preserving the intended meaning and tone.",
+            "pt": "Generate all text content in Portuguese (Português). Translate headlines, descriptions, and calls-to-action to Portuguese. DO NOT translate addresses, phone numbers, emails, URLs, dates, or times - keep them exactly as provided. If the user provides text in another language, translate it to Portuguese while preserving the intended meaning and tone.",
+            "ru": "Generate all text content in Russian (Русский). Use Cyrillic script. Translate headlines, descriptions, and calls-to-action to Russian. DO NOT translate addresses, phone numbers, emails, URLs, dates, or times - keep them exactly as provided. If the user provides text in another language, translate it to Russian while preserving the intended meaning and tone.",
+            "id": "Generate all text content in Indonesian (Bahasa Indonesia). Translate headlines, descriptions, and calls-to-action to Indonesian. DO NOT translate addresses, phone numbers, emails, URLs, dates, or times - keep them exactly as provided. If the user provides text in another language, translate it to Indonesian while preserving the intended meaning and tone.",
+            "de": "Generate all text content in German (Deutsch). Translate headlines, descriptions, and calls-to-action to German. DO NOT translate addresses, phone numbers, emails, URLs, dates, or times - keep them exactly as provided. If the user provides text in another language, translate it to German while preserving the intended meaning and tone.",
+            "ja": "Generate all text content in Japanese (日本語). Translate headlines, descriptions, and calls-to-action to Japanese. DO NOT translate addresses, phone numbers, emails, URLs, dates, or times - keep them exactly as provided. If the user provides text in another language, translate it to Japanese while preserving the intended meaning and tone.",
         }
         return instructions.get(self.value, "")
 

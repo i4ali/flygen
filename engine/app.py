@@ -27,6 +27,7 @@ class ChatIn(BaseModel):
     user_photos_b64: Optional[List[str]] = None  # uploaded source photos (sent on the approve turn)
     selected_elements: Optional[List[str]] = None  # approved creative elements from the review
     annotated: Optional[bool] = None   # marked-up flyer (numbered circles) => use the annotated-edit prompt
+    language: Optional[str] = None      # target flyer language code (en, es, ...); None -> English
 
 
 def get_generator():
@@ -54,11 +55,13 @@ def run_turn(body: ChatIn):
                                    decision_overrides=body.decision_overrides,
                                    answers=body.answers or {},
                                    user_photos_b64=body.user_photos_b64,
-                                   selected_elements=body.selected_elements)
+                                   selected_elements=body.selected_elements,
+                                   language=body.language)
     if action == "refine":
         return eng.handle_refine(body.prior_image_path, body.instruction or "",
                                  prior_image_b64=body.prior_image_b64,
-                                 annotated=bool(body.annotated))
+                                 annotated=bool(body.annotated),
+                                 language=body.language)
     if action == "resize":
         return eng.handle_resize(body.prior_image_path, body.aspect_ratio or "",
                                  prior_image_b64=body.prior_image_b64)

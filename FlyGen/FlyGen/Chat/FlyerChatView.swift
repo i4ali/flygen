@@ -20,6 +20,7 @@ struct FlyerChatView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var userProfiles: [UserProfile]
     @State private var didApplyPrefill = false
+    @State private var didSeedLanguage = false        // seed the session language from the profile once
     @State private var showingSavePrompt = false
     @State private var showingPaywall = false
     @State private var showMyFlyersPicker = false     // "reuse a flyer" -> pick from My Flyers
@@ -74,6 +75,10 @@ struct FlyerChatView: View {
             }
             .onAppear {
                 vm.start(seed: seed)
+                if !didSeedLanguage {           // seed once; the review-card row owns it afterward
+                    vm.selectedLanguage = userProfiles.first?.defaultFlyerLanguageEnum ?? .english
+                    didSeedLanguage = true
+                }
                 if !didApplyPrefill, let prefillText, vm.composerText.isEmpty {
                     vm.composerText = prefillText
                     didApplyPrefill = true
@@ -143,7 +148,8 @@ struct FlyerChatView: View {
         case .parsedFields(let b): ParsedFieldsCard(brief: b, expanded: bubble.id == latestParsedFieldsID)
         case .questions(let qs, let stage):  QuestionsCard(questions: qs, onSubmit: { vm.submitAnswers($0, order: $1, stage: stage) })
         case .designBrief(let d): DesignNotesCard(brief: d)
-        case .review(let r):      ReviewCard(review: r, isBlocked: isGenerationBlocked,
+        case .review(let r):      ReviewCard(review: r, language: $vm.selectedLanguage,
+                                      isBlocked: isGenerationBlocked,
                                       onBlocked: { showingPaywall = true },
                                       onApprove: { vm.approve(fieldOverrides: $0, decisionOverrides: $1, selectedElements: $2) })
         case .referenceImage(let c):  ReferenceImageCard(concept: c,
@@ -588,6 +594,7 @@ private struct DesignNotesCard: View {
 
 private struct ReviewCard: View {
     let review: ReviewProposalDTO
+    @Binding var language: FlyerLanguage    // the flyer's render language; declared here, sticky across edits
     var isBlocked: Bool = false             // no quota/credits -> approve opens the paywall instead
     var onBlocked: () -> Void = {}
     let onApprove: (_ fieldOverrides: [String: String], _ decisionOverrides: [String: String], _ selectedElements: [String]?) -> Void
@@ -645,6 +652,26 @@ private struct ReviewCard: View {
                         Text(d.reason).font(FGTypography.captionSmall).foregroundColor(FGColors.textTertiary)
                     }
                 }
+            }
+            // Render language: pre-selected from the profile default, changeable per flyer. The card's
+            // copy above stays English by design; this row only declares what language to render in.
+            VStack(alignment: .leading, spacing: FGSpacing.xxs) {
+                Text("Language").font(FGTypography.caption).foregroundColor(FGColors.textTertiary)
+                Menu {
+                    ForEach(FlyerLanguage.allCases, id: \.self) { lang in
+                        Button { language = lang } label: {
+                            HStack { Text(lang.displayName); if language == lang { Image(systemName: "checkmark") } }
+                        }
+                    }
+                } label: {
+                    HStack {
+                        Text(language.displayName).font(FGTypography.bodySmall).foregroundColor(FGColors.textPrimary)
+                        Spacer()
+                        Image(systemName: "chevron.up.chevron.down").font(.system(size: 11)).foregroundColor(FGColors.textTertiary)
+                    }
+                    .padding(.horizontal, FGSpacing.sm).padding(.vertical, FGSpacing.xs)
+                    .background(FGColors.backgroundTertiary).clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
+                }.disabled(approved)
             }
             creativeIdeas
             designNotes

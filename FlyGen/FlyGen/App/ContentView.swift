@@ -39,11 +39,11 @@ struct ContentView: View {
             } else if hasCompletedOnboarding {
                 MainTabView(viewModel: viewModel, showingSettings: $showingSettings)
             } else {
-                ChatOnboardingView { languages in
+                ChatOnboardingView { language in
                     // Persist the one preference onboarding still collects (language). Categories are
                     // no longer gathered up front - Explore personalizes later from what the user makes.
                     if let profile = userProfiles.first {
-                        profile.setPreferredLanguages(languages)
+                        profile.setDefaultFlyerLanguage(language)
                         try? modelContext.save()
                     }
                     hasCompletedOnboarding = true

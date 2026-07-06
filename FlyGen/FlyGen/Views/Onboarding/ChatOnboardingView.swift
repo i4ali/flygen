@@ -6,7 +6,7 @@ import SwiftUI
 struct ChatOnboardingView: View {
     /// Called when the user taps the final CTA; the host persists this and flips
     /// `hasCompletedOnboarding` to enter the app.
-    let onComplete: ([FlyerLanguage]) -> Void
+    let onComplete: (FlyerLanguage) -> Void
 
     @StateObject private var vm = ChatOnboardingViewModel()
     @Environment(\.accessibilityReduceMotion) private var reduceMotion

@@ -28,14 +28,14 @@ final class ChatOnboardingViewModel: ObservableObject {
     /// True while a chip question is on screen awaiting the user (auto-play is paused).
     @Published private(set) var isInteracting = false
 
-    /// The user's language selection, bound by the chip-question view and returned on completion.
-    @Published var selectedLanguages: Set<FlyerLanguage> = []
+    /// The user's language selection, bound by the dropdown and returned on completion.
+    @Published var selectedLanguage: FlyerLanguage = .english
     /// The active text-question's draft, bound by the input view. Deliberately not persisted.
     @Published var textDraft: String = ""
 
     /// Called when the user taps the final CTA. Receives the one collected preference (language);
     /// the open "what do you do?" answer is intentionally not collected.
-    var onComplete: (([FlyerLanguage]) -> Void)?
+    var onComplete: ((FlyerLanguage) -> Void)?
 
     private let beats = OnboardingScript.beats
     private var index = 0
@@ -47,7 +47,7 @@ final class ChatOnboardingViewModel: ObservableObject {
     func start(reduceMotion: Bool) {
         guard rendered.isEmpty else { return }        // start is idempotent across re-appearances
         self.reduceMotion = reduceMotion
-        selectedLanguages = [Self.deviceLanguage()]   // sensible default; the user can change it
+        selectedLanguage = Self.deviceLanguage()   // sensible default; the user can change it
         resume()
     }
 
@@ -90,7 +90,7 @@ final class ChatOnboardingViewModel: ObservableObject {
 
     func finish() {
         Haptics.success()
-        onComplete?(orderedLanguages())
+        onComplete?(selectedLanguage)
     }
 
     // MARK: - The runner
@@ -204,14 +204,8 @@ final class ChatOnboardingViewModel: ObservableObject {
     private func collapsedReply(for q: OnboardingQuestion) -> String {
         switch q.kind {
         case .language:
-            let names = orderedLanguages().map { $0.shortName }
-            return names.isEmpty ? FlyerLanguage.english.shortName : names.joined(separator: ", ")
+            return selectedLanguage.shortName
         }
-    }
-
-    /// Stable ordering (enum declaration order) regardless of tap sequence.
-    private func orderedLanguages() -> [FlyerLanguage] {
-        FlyerLanguage.allCases.filter { selectedLanguages.contains($0) }
     }
 
     // MARK: - Utilities

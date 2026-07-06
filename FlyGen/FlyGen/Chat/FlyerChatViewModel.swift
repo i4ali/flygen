@@ -34,6 +34,9 @@ final class FlyerChatViewModel: ObservableObject {
     @Published var attachedPhotos: [Data] = []
     @Published var referencePickerItems: [PhotosPickerItem] = []   // the "reuse a flyer" upload
     @Published var annotationEditor: AnnotationEditorRequest?      // drives the full-screen annotation editor
+    /// The flyer's target language for this session. Seeded from the profile default
+    /// (see FlyerChatView.onAppear), changeable on the review card, sticky across edits.
+    @Published var selectedLanguage: FlyerLanguage = .english
 
     private let client = FlyerChatClient()
     private var brief: ExtractedBriefDTO?
@@ -383,7 +386,7 @@ final class FlyerChatViewModel: ObservableObject {
     /// only before any brief is parsed — concepts always follow one, so in practice it's set.
     func chatFlyerProject() -> FlyerProject? {
         let category = brief?.category.flatMap { FlyerCategory(rawValue: $0) } ?? .announcement
-        var project = FlyerProject(category: category)
+        var project = FlyerProject(category: category, language: selectedLanguage)
         project.origin = .chat
         // A reused/edited flyer has no brief (its content lives in the image itself); save it with a
         // minimal project so the edited image still lands in My Flyers.
@@ -418,6 +421,8 @@ final class FlyerChatViewModel: ObservableObject {
         "That one didn't go through — the image didn't come back. Mind trying again? Rewording the change can help."
 
     private func run(_ request: ChatRequest, thinking: String) {
+        var request = request
+        request.language = selectedLanguage.rawValue          // every request carries the session language
         isStreaming = true
         awaitingPhotoChoice = false; pendingReview = nil     // each turn starts un-gated
         let typing = ChatBubble(.typing(thinking))

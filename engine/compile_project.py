@@ -1,7 +1,7 @@
 """Approved TurnResult + user overrides -> FlyerProject (then the unchanged FlyerPromptBuilder runs)."""
 from typing import Optional
-from models import (FlyerProject, FlyerCategory, TextContent, OutputSettings, VisualSettings,
-                    ColorSettings, ColorSchemePreset, AspectRatio, VisualStyle, Mood)
+from models import (FlyerProject, FlyerCategory, FlyerLanguage, TextContent, OutputSettings,
+                    VisualSettings, ColorSettings, ColorSchemePreset, AspectRatio, VisualStyle, Mood)
 from engine.rubrics import PALETTE_SWATCHES
 
 _CONTENT_FIELDS = ["headline", "subheadline", "body_text", "date", "time", "venue_name",
@@ -48,7 +48,8 @@ def _colors_for(palette_name: Optional[str]) -> ColorSettings:
                          description=description)
 
 def build_project(turn, field_overrides: dict, decision_overrides: dict,
-                  selected_elements: Optional[list] = None) -> FlyerProject:
+                  selected_elements: Optional[list] = None,
+                  language: Optional[str] = None) -> FlyerProject:
     fo = field_overrides or {}
     tc = TextContent(**{f: (fo.get(f) if f in fo else getattr(turn, f, None)) for f in _CONTENT_FIELDS})
     tc.headline = tc.headline or ""
@@ -68,6 +69,10 @@ def build_project(turn, field_overrides: dict, decision_overrides: dict,
     imagery = "; ".join(chosen) or None
     instructions = turn.purpose or None
 
-    return FlyerProject(category=_category(turn.category), text_content=tc, output=output,
-                        visuals=visuals, colors=colors,
+    try:
+        lang = FlyerLanguage(language) if language else FlyerLanguage.ENGLISH
+    except ValueError:
+        lang = FlyerLanguage.ENGLISH          # unknown code -> safe English default
+    return FlyerProject(category=_category(turn.category), language=lang, text_content=tc,
+                        output=output, visuals=visuals, colors=colors,
                         imagery_description=imagery, special_instructions=instructions)

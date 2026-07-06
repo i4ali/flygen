@@ -28,6 +28,11 @@ final class UserProfile {
     /// Preferred languages (stored as raw values)
     var preferredLanguages: [String] = []
 
+    /// The user's default flyer language (raw value). Seeded at onboarding, editable in Settings,
+    /// and used to pre-select the review-card language row. Replaces the retired preferredLanguages
+    /// multi-select as the single source for a default. Additive, defaulted field (CloudKit-safe).
+    var defaultFlyerLanguage: String = "en"
+
     init() {
         self.id = UUID()
         self.credits = 0
@@ -41,6 +46,7 @@ final class UserProfile {
         self.preferredMood = nil
         self.preferredColorScheme = nil
         self.preferredLanguages = []
+        self.defaultFlyerLanguage = "en"
     }
 
     /// Get preferred categories as FlyerCategory enum values
@@ -81,6 +87,14 @@ final class UserProfile {
 
     func setPreferredLanguages(_ languages: [FlyerLanguage]) {
         preferredLanguages = languages.map { $0.rawValue }
+    }
+
+    var defaultFlyerLanguageEnum: FlyerLanguage {
+        FlyerLanguage(rawValue: defaultFlyerLanguage) ?? .english
+    }
+
+    func setDefaultFlyerLanguage(_ language: FlyerLanguage) {
+        defaultFlyerLanguage = language.rawValue
     }
 
     func setUserRole(_ role: UserRole?) {

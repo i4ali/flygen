@@ -271,8 +271,10 @@ class FlyerPromptBuilder:
         if self.project.language != FlyerLanguage.ENGLISH:
             sections.append(
                 f"CRITICAL LANGUAGE REQUIREMENT: {self.project.language.prompt_instruction} "
-                "You MUST ensure ALL text content appears in the target language. "
-                "Translate any English or non-target-language text. Do NOT render English text as-is."
+                "All text content MUST appear in the target language, EXCEPT addresses, phone "
+                "numbers, emails, URLs, dates, and times, which stay exactly as provided. "
+                "Translate all other English or non-target-language text; do not leave "
+                "translatable text in English."
             )
 
         # 2. Aspect ratio / format
@@ -390,6 +392,19 @@ class FlyerPromptBuilder:
                 "right-to-left calligraphy. Keep it in its original script - do NOT transliterate it, "
                 "and do NOT translate the English text into Arabic. Each Arabic phrase must appear "
                 "EXACTLY ONCE, cleanly placed so it never overlaps, duplicates, or collides with other text."
+            )
+
+        # 14.6 RTL rendering quality when the TARGET language is Arabic/Urdu. The copy is still
+        # English at build time (translated at render), so _has_arabic_content() above won't fire;
+        # gate on the target language and give calligraphy-quality guidance WITHOUT a "don't
+        # translate English" clause (here we DO want translation).
+        if self.project.language in (FlyerLanguage.ARABIC, FlyerLanguage.URDU):
+            sections.append(
+                f"RIGHT-TO-LEFT RENDERING: Render all translated text as correctly-spelled, "
+                f"connected {self.project.language.display_name} calligraphy laid out right-to-left. "
+                "Each phrase must appear EXACTLY ONCE, cleanly placed so nothing overlaps, "
+                "duplicates, or collides. Keep addresses, phone numbers, emails, URLs, dates, and "
+                "times in their original left-to-right form."
             )
 
         # 15. Quality reminders (conditional based on NO_TEXT mode)
@@ -511,9 +526,10 @@ class FlyerPromptBuilder:
         # Add translation reminder for non-English languages
         if self.project.language != FlyerLanguage.ENGLISH:
             parts.append(
-                f"IMPORTANT: All text below MUST appear in {self.project.language.display_name}. "
-                "If any text is in English or another language, translate it. "
-                "If text is already in the target language, use it as-is."
+                f"IMPORTANT: All text below MUST appear in {self.project.language.display_name}, "
+                "EXCEPT addresses, phone numbers, emails, URLs, dates, and times (keep those exactly "
+                "as provided). Translate any other English or non-target-language text; if text is "
+                "already in the target language, use it as-is."
             )
 
         parts.append("TEXT CONTENT - CRITICAL: Spell ALL text EXACTLY as shown, letter by letter:")
