@@ -165,7 +165,7 @@ class FlyerCreationViewModel: ObservableObject {
         generatedImageData = nil
         showingCreationFlow = true
 
-        if let brandKit = brandKit, brandKit.hasContent {
+        if FeatureFlags.brandKitEnabled, let brandKit = brandKit, brandKit.hasContent {
             pendingBrandKitAction = { [weak self] in
                 self?.applyBrandKit(overwriteExisting: true)
             }
@@ -183,7 +183,7 @@ class FlyerCreationViewModel: ObservableObject {
         generatedFlyer = nil
         showingCreationFlow = true
 
-        if let brandKit = brandKit, brandKit.hasContent {
+        if FeatureFlags.brandKitEnabled, let brandKit = brandKit, brandKit.hasContent {
             pendingBrandKitAction = { [weak self] in
                 self?.applyBrandKit(overwriteExisting: false)
                 self?.clearNonVisibleFields()
@@ -207,7 +207,7 @@ class FlyerCreationViewModel: ObservableObject {
         generatedFlyer = nil
         showingCreationFlow = true
 
-        if let brandKit = brandKit, brandKit.hasContent {
+        if FeatureFlags.brandKitEnabled, let brandKit = brandKit, brandKit.hasContent {
             pendingBrandKitAction = { [weak self] in
                 self?.applyBrandKit(overwriteExisting: false)
                 self?.clearNonVisibleFields()
@@ -228,7 +228,7 @@ class FlyerCreationViewModel: ObservableObject {
         generatedFlyer = nil
         showingCreationFlow = true
 
-        if let brandKit = brandKit, brandKit.hasContent {
+        if FeatureFlags.brandKitEnabled, let brandKit = brandKit, brandKit.hasContent {
             pendingBrandKitAction = { [weak self] in
                 self?.applyBrandKit(overwriteExisting: false)
                 self?.clearNonVisibleFields()

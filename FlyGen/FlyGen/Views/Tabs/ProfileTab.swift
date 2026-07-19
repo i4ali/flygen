@@ -36,8 +36,10 @@ struct ProfileTab: View {
                     // Subscription section
                     subscriptionSection
 
-                    // Brand Kit section
-                    brandKitSection
+                    // Brand Kit section (hidden while the feature is on hold - see FeatureFlags.brandKitEnabled)
+                    if FeatureFlags.brandKitEnabled {
+                        brandKitSection
+                    }
 
                     // Preferences section (default flyer language)
                     preferencesSection

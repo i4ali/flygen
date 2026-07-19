@@ -71,8 +71,9 @@ struct ContentView: View {
             await notificationService.scheduleSeasonalNotifications()
             // Inject brand kit into view model
             viewModel.brandKit = brandKits.first
-            // Show brand kit intro to existing users (one-time)
-            if hasCompletedOnboarding && !hasSeenBrandKitIntro {
+            // Show brand kit intro to existing users (one-time) - suppressed while the
+            // Brand Kit feature is on hold (see FeatureFlags.brandKitEnabled).
+            if FeatureFlags.brandKitEnabled && hasCompletedOnboarding && !hasSeenBrandKitIntro {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     showingBrandKitIntro = true
                 }

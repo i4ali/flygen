@@ -13,6 +13,13 @@ enum FeatureFlags {
     /// Use Template, Resume Draft, Use as Template). Retired in favor of chat; the code
     /// is retained and still compiled - set this to `true` to bring the entry points back.
     static let classicCreationEnabled = false
+
+    /// Brand Kit - the reusable logo / contact-info / QR defaults saved in Profile and
+    /// auto-applied to new flyers, plus its two nudges (the one-time existing-user intro
+    /// sheet and the in-creation "Apply Brand Kit?" prompt). Hidden while the feature is
+    /// on hold; the setup screens, `BrandKit` model, and CloudKit-synced data are all
+    /// retained - set this to `true` to bring the entry point and prompts back as they were.
+    static let brandKitEnabled = false
 }
 
 @main
