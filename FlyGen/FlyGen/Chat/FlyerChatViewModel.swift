@@ -246,6 +246,14 @@ final class FlyerChatViewModel: ObservableObject {
                          || !attachedPhotos.isEmpty)
     }
 
+    /// True when the next `send()` calls the engine and therefore costs money: typed text runs
+    /// either a reference edit (a paid image generation) or a describe turn (the gate + design
+    /// brain LLM calls). The composer gates these on access like every other engine action.
+    /// A photos-only send just commits photos to the tray locally, so it stays ungated.
+    var sendReachesEngine: Bool {
+        !composerText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
     func send() {
         guard !isStreaming else { return }
         let text = composerText.trimmingCharacters(in: .whitespacesAndNewlines)

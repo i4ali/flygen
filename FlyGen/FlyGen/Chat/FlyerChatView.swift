@@ -122,8 +122,10 @@ struct FlyerChatView: View {
         return entitlementService.access(for: profile) == .blocked
     }
 
-    /// Run a generation action only if the user can generate; otherwise open the paywall. Used for
-    /// refine/resize; the review card's approve button gates the same way via `isBlocked`/`onBlocked`.
+    /// Run an engine-reaching action only if the user can generate; otherwise open the paywall.
+    /// Every chat turn costs money (LLM brain calls or image generation), so ALL of them gate:
+    /// text sends, question answers, refine/resize/mark-up. The review card's approve button
+    /// gates the same way via `isBlocked`/`onBlocked`.
     private func gated(_ action: () -> Void) {
         if isGenerationBlocked { showingPaywall = true } else { action() }
     }
@@ -146,7 +148,8 @@ struct FlyerChatView: View {
                                       onDismiss: { vm.dismissReferenceNudge() })
         case .typing(let t):      TypingBubble(text: t)
         case .parsedFields(let b): ParsedFieldsCard(brief: b, expanded: bubble.id == latestParsedFieldsID)
-        case .questions(let qs, let stage):  QuestionsCard(questions: qs, onSubmit: { vm.submitAnswers($0, order: $1, stage: stage) })
+        case .questions(let qs, let stage):  QuestionsCard(questions: qs, onSubmit: { answers, order in
+                                                  gated { vm.submitAnswers(answers, order: order, stage: stage) } })
         case .designBrief(let d): DesignNotesCard(brief: d)
         case .review(let r):      ReviewCard(review: r, language: $vm.selectedLanguage,
                                       isBlocked: isGenerationBlocked,
@@ -197,7 +200,12 @@ struct FlyerChatView: View {
                 )
                 .background(FGColors.surfaceDefault)
                 .clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
-                Button { vm.send() } label: {
+                Button {
+                    // Any text send reaches the engine (a paid image edit in reference mode, LLM
+                    // brain calls otherwise), so it gates on access like refine/resize. A
+                    // photos-only send is a free local commit and stays ungated.
+                    if vm.sendReachesEngine { gated { vm.send() } } else { vm.send() }
+                } label: {
                     Image(systemName: "arrow.up.circle.fill").font(.system(size: 32))
                         .foregroundColor(vm.canSend ? FGColors.accentPrimary : FGColors.textTertiary)
                 }
