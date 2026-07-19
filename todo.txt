@@ -1,0 +1,2 @@
+update onboarding to remove all the categories user has to select
+lock the chat send button until user answers the question if user wants to include a flyer

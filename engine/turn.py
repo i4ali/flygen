@@ -33,6 +33,13 @@ class CreativeElement(BaseModel):
     sensitivity: str = "safe"  # "safe" => pre-selected; "sensitive" => opt-in
 
 
+class TurnQR(BaseModel):
+    enabled: bool = False
+    kind: str = "website"      # website | phone | whatsapp | instagram
+    value: str = ""            # raw target (URL / phone / handle) - code builds the encoding
+    corner: str = "bottom_right"
+
+
 class TurnResult(BaseModel):
     status: str = "ready"    # "need_input" | "ready"
     # --- brief (content) ---
@@ -64,6 +71,8 @@ class TurnResult(BaseModel):
     notes: str = ""
     checklist: List[str] = []
     recommendations: List[str] = []
+    # --- QR code (standalone wire object, NOT part of the brief; None = never discussed) ---
+    qr: Optional[TurnQR] = None
 
     @field_validator("category", mode="before")
     @classmethod

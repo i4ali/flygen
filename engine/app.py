@@ -28,6 +28,7 @@ class ChatIn(BaseModel):
     selected_elements: Optional[List[str]] = None  # approved creative elements from the review
     annotated: Optional[bool] = None   # marked-up flyer (numbered circles) => use the annotated-edit prompt
     language: Optional[str] = None      # target flyer language code (en, es, ...); None -> English
+    qr: Optional[dict] = None           # standalone QR wire state {enabled, kind, value, corner}; echoed each turn
 
 
 def get_generator():
@@ -44,6 +45,7 @@ def run_turn(body: ChatIn):
     eng = Engine(client=get_client(), generator=get_generator() if needs_gen else None)
     if body.brief:
         eng.brief = dict(body.brief)             # ExtractedBrief-shaped wire state (plain dict)
+    eng.qr = dict(body.qr) if body.qr else None  # standalone QR state, echoed by the client each turn
     if action == "reference":
         # Reuse an uploaded flyer: the image + the user's words go straight to the image model.
         return eng.handle_reference(body.reference_image_b64, instruction=body.message or "",

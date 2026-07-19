@@ -1,8 +1,10 @@
 """Approved TurnResult + user overrides -> FlyerProject (then the unchanged FlyerPromptBuilder runs)."""
 from typing import Optional
 from models import (FlyerProject, FlyerCategory, FlyerLanguage, TextContent, OutputSettings,
-                    VisualSettings, ColorSettings, ColorSchemePreset, AspectRatio, VisualStyle, Mood)
+                    VisualSettings, ColorSettings, ColorSchemePreset, AspectRatio, VisualStyle,
+                    Mood, QRCodeSettings)
 from engine.rubrics import PALETTE_SWATCHES
+from qr_service import build_qr_payload
 
 _CONTENT_FIELDS = ["headline", "subheadline", "body_text", "date", "time", "venue_name",
                    "address", "price", "discount_text", "cta_text", "phone", "email",
@@ -49,7 +51,8 @@ def _colors_for(palette_name: Optional[str]) -> ColorSettings:
 
 def build_project(turn, field_overrides: dict, decision_overrides: dict,
                   selected_elements: Optional[list] = None,
-                  language: Optional[str] = None) -> FlyerProject:
+                  language: Optional[str] = None,
+                  qr: Optional[dict] = None) -> FlyerProject:
     fo = field_overrides or {}
     tc = TextContent(**{f: (fo.get(f) if f in fo else getattr(turn, f, None)) for f in _CONTENT_FIELDS})
     tc.headline = tc.headline or ""
@@ -73,6 +76,14 @@ def build_project(turn, field_overrides: dict, decision_overrides: dict,
         lang = FlyerLanguage(language) if language else FlyerLanguage.ENGLISH
     except ValueError:
         lang = FlyerLanguage.ENGLISH          # unknown code -> safe English default
-    return FlyerProject(category=_category(turn.category), language=lang, text_content=tc,
-                        output=output, visuals=visuals, colors=colors,
-                        imagery_description=imagery, special_instructions=instructions)
+    project = FlyerProject(category=_category(turn.category), language=lang, text_content=tc,
+                           output=output, visuals=visuals, colors=colors,
+                           imagery_description=imagery, special_instructions=instructions)
+    # QR is standalone wire state (not part of the brief). When enabled with a target, encode it
+    # deterministically here so the prompt reserves the corner; qr_service composites the real one.
+    if qr and qr.get("enabled") and qr.get("value"):
+        project.qr_settings = QRCodeSettings(
+            enabled=True,
+            url=build_qr_payload(qr.get("kind", "website"), qr["value"]),
+            corner=qr.get("corner", "bottom_right"))
+    return project

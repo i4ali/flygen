@@ -13,6 +13,7 @@ struct ChatBubble: Identifiable {
         case userPhotos([Data])
         case assistant(String)
         case photoSuggestion(String, Bool)   // (message, resolved) - the brain's "add a photo of X" nudge; resolved hides the choices
+        case qrOffer(QROfferDTO, resolved: Bool)   // proactive "add a QR?" offer; resolved hides the Yes/No choices
         case referenceNudge                  // "reuse a flyer you already have" - inline upload picker, shown once at start
         case typing(String)
         case parsedFields(ExtractedBriefDTO)
@@ -40,6 +41,7 @@ final class FlyerChatViewModel: ObservableObject {
 
     private let client = FlyerChatClient()
     private var brief: ExtractedBriefDTO?
+    private var qr: QRSettingsDTO?              // standalone QR state, echoed on every action; no UI
     private var answers: [String: String] = [:]
     private var photoNudged = false
     // Reuse-a-flyer mode: once the user picks a flyer to edit, the composer AND the refine box route
@@ -171,7 +173,7 @@ final class FlyerChatViewModel: ObservableObject {
     /// no questions, no review card - just edit and show, mirroring the seed-from-sample flow.
     private func enterReferenceMode(with imageData: Data) {
         inReferenceMode = true
-        brief = nil; answers = [:]
+        brief = nil; qr = nil; answers = [:]
         let b64 = imageData.base64EncodedString()
         currentReferenceB64 = b64
         // The upload is the starting point, not a generated result - show it as a plain image
@@ -184,7 +186,7 @@ final class FlyerChatViewModel: ObservableObject {
     /// Leave reuse-a-flyer mode so the composer starts a fresh flyer again.
     func startNewFlyer() {
         inReferenceMode = false; currentReferenceB64 = nil
-        brief = nil; answers = [:]; composerText = ""
+        brief = nil; qr = nil; answers = [:]; composerText = ""
         transcript.append(ChatBubble(.assistant("Sure — describe a new flyer and I'll start fresh.")))
     }
 
@@ -228,6 +230,36 @@ final class FlyerChatViewModel: ObservableObject {
             transcript[i] = ChatBubble(.photoSuggestion(msg, true), id: id)
         }
         if let r = pendingReview { transcript.append(ChatBubble(.review(r))); pendingReview = nil }
+    }
+
+    // MARK: QR offer
+
+    /// User tapped "Yes, add it" on the proactive QR offer. Enable the QR locally - it composites
+    /// at the next generation because every request echoes `qr` - and mark the card answered. No
+    /// engine round-trip and no quota cost; the paid step is the generation the QR rides on.
+    func acceptQROffer(_ offer: QROfferDTO, bubbleID: UUID) {
+        qr = QRSettingsDTO(enabled: true, kind: offer.kind, value: offer.value,
+                           corner: offer.corner ?? "bottom_right")
+        transcript.append(ChatBubble(.user("Yes, add the QR")))
+        let target = offer.value.map { " that opens \($0)" } ?? ""
+        transcript.append(ChatBubble(.assistant(
+            "Done - I'll add a scannable QR\(target) to the flyer when you generate.")))
+        resolveQROffer(bubbleID)
+    }
+
+    /// User declined. Record an explicit {enabled:false} (echoed next turn) so the brain sees a
+    /// decision and never re-offers, and mark the card answered.
+    func declineQROffer(_ offer: QROfferDTO, bubbleID: UUID) {
+        qr = QRSettingsDTO(enabled: false, kind: offer.kind, value: offer.value, corner: offer.corner)
+        transcript.append(ChatBubble(.user("No thanks")))
+        resolveQROffer(bubbleID)
+    }
+
+    /// Flip the specific offer card to resolved so its Yes/No choices hide (message stays).
+    private func resolveQROffer(_ bubbleID: UUID) {
+        guard let i = transcript.firstIndex(where: { $0.id == bubbleID }),
+              case .qrOffer(let offer, _) = transcript[i].kind else { return }
+        transcript[i] = ChatBubble(.qrOffer(offer, resolved: true), id: bubbleID)
     }
 
     // MARK: Intents
@@ -285,7 +317,7 @@ final class FlyerChatViewModel: ObservableObject {
         // Text describes a flyer, which starts a fresh one. Photos just committed carry into it.
         if !text.isEmpty {
             composerText = ""
-            brief = nil; answers = [:]
+            brief = nil; qr = nil; answers = [:]
             inReferenceMode = false                     // composing a new flyer leaves reuse-a-flyer mode
             photoNudged = !generationPhotos.isEmpty     // already have photos -> skip the nudge
             transcript.append(ChatBubble(.user(text)))
@@ -431,6 +463,7 @@ final class FlyerChatViewModel: ObservableObject {
     private func run(_ request: ChatRequest, thinking: String) {
         var request = request
         request.language = selectedLanguage.rawValue          // every request carries the session language
+        request.qr = qr                                       // echo QR state on every action (incl. reference)
         isStreaming = true
         awaitingPhotoChoice = false; pendingReview = nil     // each turn starts un-gated
         let typing = ChatBubble(.typing(thinking))
@@ -477,6 +510,8 @@ final class FlyerChatViewModel: ObservableObject {
                 insertBeforeTyping(ChatBubble(.error(Self.generationFailedMessage)), typingID: typingID)
                 reopenAnnotationIfPending()                        // bring the circles back to reword & retry
             }
+        case .qr(let dto):         qr = dto                    // store latest QR state; no UI, echoed next turn
+        case .qrOffer(let dto):    insertBeforeTyping(ChatBubble(.qrOffer(dto, resolved: false)), typingID: typingID)
         case .note(let t):         insertBeforeTyping(ChatBubble(.assistant(t)), typingID: typingID)
         case .error(let msg):
             insertBeforeTyping(ChatBubble(.error(msg)), typingID: typingID)

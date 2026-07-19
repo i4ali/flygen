@@ -11,6 +11,7 @@ from engine.gate import is_flyer_request as _is_flyer_request
 from engine.review import assemble_review, to_brief_dict, to_question_set
 from engine.compile_project import build_project
 from engine import tools as _tools
+import engine.qr_intent as _qr_intent
 
 
 # Shown (as a plain assistant line) when the gate decides a typed message isn't a flyer request.
@@ -22,7 +23,7 @@ DEFLECTION = ("I only design flyers here, so I can't help with that one. Tell me
 
 @dataclass
 class Event:
-    kind: str            # parsed_fields | questions | review | note
+    kind: str            # parsed_fields | questions | review | note | qr | qr_offer
                          # | concepts | refined | resized | error
     payload: Any = None
 
@@ -73,6 +74,50 @@ def _materialized_images(b64_list):
                 pass
 
 
+def _with_qr(concept, qr):
+    """Composite the real QR onto a concept's base64. Fail open: any error returns the
+    concept untouched - a flyer without a QR beats a failed turn."""
+    if not (qr and qr.get("enabled") and qr.get("value")):
+        return concept
+    if concept is None or not getattr(concept, "image_base64", None):
+        return concept
+    try:
+        from qr_service import build_qr_payload, composite_qr_onto_bytes
+        raw = base64.b64decode(concept.image_base64)
+        out = composite_qr_onto_bytes(raw, build_qr_payload(qr.get("kind", "website"), qr["value"]),
+                                      qr.get("corner", "bottom_right"))
+        concept.image_base64 = base64.b64encode(out).decode("ascii")
+    except Exception as e:
+        logging.getLogger(__name__).warning("qr composite failed, returning bare flyer: %s", e)
+    return concept
+
+
+def _qr_offer(turn, brief, current_qr):
+    """Build a proactive QR offer from this turn, or None.
+
+    The brain proposes a QR via a `qr` question (it never enables one unprompted) - even on a
+    ready draft, where questions are otherwise dropped. We surface that as a tappable Yes/No offer
+    for an UNAMBIGUOUS target (a website or social handle), deriving kind+value from the brief so
+    the client sets the state on Yes with no extra round-trip. A phone-only brief is skipped here
+    (tel: vs WhatsApp needs a follow-up); the explicit ask still handles phones. Suppressed once
+    any QR state exists, so a decline is never re-offered."""
+    if current_qr is not None:
+        return None
+    q = next((q for q in turn.questions if q.field == "qr"), None)
+    if not q:
+        return None
+    website = (brief or {}).get("website")
+    social = (brief or {}).get("social_handle")
+    if website:
+        kind, value = "website", website
+    elif social:
+        kind, value = "instagram", social
+    else:
+        return None
+    text = q.text or f"Want a scannable QR code that opens {value}?"
+    return {"kind": kind, "value": value, "corner": "bottom_right", "text": text}
+
+
 class Engine:
     def __init__(self, client, interpret_fn=None, assemble_fn=None, build_project_fn=None,
                  generate_concepts=None, generator=None, refine_concept=None, resize_concept=None,
@@ -91,10 +136,11 @@ class Engine:
         self.turn: Optional[TurnResult] = None
         self.brief: dict = {}        # wire state (ExtractedBrief-shaped), persisted in/out
         self.project = None
+        self.qr: Optional[dict] = None   # standalone QR wire state {enabled, kind, value, corner}
 
     def _run(self, user_text=None, answers=None) -> Iterator[Event]:
         try:
-            turn = self._interpret(self.brief or None, user_text, answers, client=self.client)
+            turn = self._interpret(self.brief or None, user_text, answers, qr=self.qr, client=self.client)
         except Exception as e:                       # never surface a raw internal error to the user
             logging.getLogger(__name__).warning("interpret failed: %s", e)
             yield Event("error", "Sorry - I had trouble putting that together. "
@@ -103,10 +149,22 @@ class Engine:
         self.turn = turn
         self.brief = to_brief_dict(turn)             # ExtractedBrief-shaped dict for persistence
         yield Event("parsed_fields", self.brief)
-        if turn.status == "need_input" and turn.questions:
+        # QR is separate wire state. The brain's word wins unless it dropped it (None = untouched);
+        # echo the current state each turn so the client keeps it in sync.
+        if turn.qr is not None:
+            self.qr = turn.qr.model_dump()
+        if self.qr is not None:
+            yield Event("qr", self.qr)
+        # The brain offers a QR via a "qr" question even on a ready draft (where questions are
+        # otherwise dropped). Surface it as its own tappable offer and keep it OUT of the generic
+        # questions card; the client sets the qr state on Yes/No, so nothing here enables it.
+        offer = _qr_offer(turn, self.brief, self.qr)
+        if turn.status == "need_input" and any(q.field != "qr" for q in turn.questions):
             yield Event("questions", to_question_set(turn))
         else:
             yield Event("review", self._assemble(turn))
+        if offer:
+            yield Event("qr_offer", offer)
 
     def handle_user_message(self, text: str) -> Iterator[Event]:
         # Cheap gate first: a non-flyer message (a question about the app, a greeting, small talk,
@@ -133,13 +191,21 @@ class Engine:
         if not (instruction or "").strip():
             yield Event("note", "Got your flyer. What would you like to change?")
             return
+        # QR is brain-free here too: the scoped extractor fires ONLY when the edit mentions "QR".
+        if _qr_intent.mentions_qr(instruction):
+            new_qr, instruction, ask = _qr_intent.qr_update(instruction, self.qr, self.client)
+            if ask:
+                yield Event("note", ask); return
+            if new_qr is not None:
+                self.qr = new_qr
+                yield Event("qr", self.qr)
         with _materialized_images([reference_b64]) as ref_paths:
             if not ref_paths:
                 yield Event("error", "I couldn't read that flyer - want to try attaching it again?")
                 return
             edit = self._annotated_edit if annotated else self._edit_reference
             concept = edit(ref_paths[0], self._generator, instruction)
-        yield Event("concepts", [concept])
+        yield Event("concepts", [_with_qr(concept, self.qr)])
 
     def handle_approval(self, field_overrides=None, decision_overrides=None,
                         answers=None, user_photos_b64=None, selected_elements=None,
@@ -153,7 +219,8 @@ class Engine:
         if turn is None:
             yield Event("error", "no interpretation to generate from"); return
         project = self._build_project(turn, field_overrides or {}, decision_overrides or {},
-                                      selected_elements=selected_elements, language=language)
+                                      selected_elements=selected_elements, language=language,
+                                      qr=self.qr)
         self.project = project
         with _materialized_images(user_photos_b64) as photo_paths:
             extra = {}
@@ -161,6 +228,7 @@ class Engine:
                 project.user_photo_path = photo_paths[0]   # fires the prompt's "feature the photo(s)" instruction
                 extra["user_photo_paths"] = photo_paths
             concepts = self._generate_concepts(project, generator=self._generator, n=3, **extra)
+        concepts = [_with_qr(c, self.qr) for c in concepts]   # composite the real QR as the last step
         yield Event("concepts", concepts)
 
     def handle_refine(self, prior_image_path=None, instruction="", mode="edit",
@@ -168,12 +236,22 @@ class Engine:
         # Annotated edits are self-contained (marked image + numbered instructions), like a
         # reference edit - no project/brief needed, and the light annotated-edit prompt replaces
         # the full design prompt. See docs/plans/2026-07-04-annotate-to-edit-design.md.
+        # QR is brain-free here: the scoped extractor fires ONLY when the edit mentions "QR";
+        # every other edit stays pure trust-the-model. It augments `instruction` (keep-clear /
+        # remove) and updates self.qr; if a QR is requested with no target it asks and returns.
+        if _qr_intent.mentions_qr(instruction):
+            new_qr, instruction, ask = _qr_intent.qr_update(instruction, self.qr, self.client)
+            if ask:
+                yield Event("note", ask); return
+            if new_qr is not None:
+                self.qr = new_qr
+                yield Event("qr", self.qr)
         if annotated:
             with _resolved_image(prior_image_path, prior_image_b64) as path:
                 if path is None:
                     yield Event("error", "no prior image to refine"); return
                 concept = self._annotated_edit(path, self._generator, instruction)
-            yield Event("refined", concept)
+            yield Event("refined", _with_qr(concept, self.qr))
             return
         # Each HTTP request builds a fresh Engine, so self.project is usually None on a refine
         # turn; rebuild it from the brief the client posts back (mirrors the old engine's
@@ -181,7 +259,7 @@ class Engine:
         project = self.project
         if project is None and self.brief:
             turn = TurnResult(**{k: v for k, v in self.brief.items() if k in TurnResult.model_fields})
-            project = self._build_project(turn, {}, {}, None, language=language)
+            project = self._build_project(turn, {}, {}, None, language=language, qr=self.qr)
         if project is None:
             yield Event("error", "no project to refine"); return
         concept = None
@@ -189,7 +267,7 @@ class Engine:
             if path is None:
                 yield Event("error", "no prior image to refine"); return
             concept = self._refine(project, path, instruction, generator=self._generator, mode=mode)
-        yield Event("refined", concept)
+        yield Event("refined", _with_qr(concept, self.qr))
 
     def handle_resize(self, prior_image_path=None, aspect_ratio="",
                       prior_image_b64=None) -> Iterator[Event]:
@@ -200,4 +278,4 @@ class Engine:
             if path is None:
                 yield Event("error", "no prior image to resize"); return
             concept = self._resize(path, aspect_ratio, generator=self._generator)
-        yield Event("resized", concept)
+        yield Event("resized", _with_qr(concept, self.qr))

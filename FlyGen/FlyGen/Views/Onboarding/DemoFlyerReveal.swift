@@ -2,7 +2,8 @@ import SwiftUI
 import UIKit
 
 /// Beat ④, the reveal - the money shot: three flyer cards fan in with 3D depth while the
-/// signature radial glow blooms behind them and a light sweeps across each. Real bundled images
+/// signature radial glow blooms behind them and a light sweeps across each. A single image
+/// renders as one centered, untilted hero card (the edit-demo reveal). Real bundled images
 /// when present; a styled placeholder until the owner drops the engine-generated BBQ flyers in.
 struct DemoFlyerReveal: View {
     let imageNames: [String]
@@ -26,15 +27,15 @@ struct DemoFlyerReveal: View {
 
             HStack(spacing: FGSpacing.xs) {
                 ForEach(Array(imageNames.enumerated()), id: \.offset) { idx, name in
-                    let mid = (idx == 1)
+                    let hero = solo || idx == 1
                     DemoFlyerCard(name: name, sweep: shown, reduceMotion: reduceMotion)
-                        .frame(width: mid ? 104 : 88)
+                        .frame(width: solo ? 124 : (hero ? 104 : 88))
                         .rotation3DEffect(.degrees(shown ? fanAngle(idx) : 0),
                                           axis: (x: 0, y: 1, z: 0), perspective: 0.6)
-                        .scaleEffect(shown ? (mid ? 1.06 : 1.0) : 0.9)
-                        .offset(y: shown ? (mid ? -10 : 0) : 26)
+                        .scaleEffect(shown ? (hero ? 1.06 : 1.0) : 0.9)
+                        .offset(y: shown ? (hero && !solo ? -10 : 0) : 26)
                         .opacity(shown ? 1 : 0)
-                        .zIndex(mid ? 1 : 0)
+                        .zIndex(hero ? 1 : 0)
                         .animation(reduceMotion ? nil
                                    : FGAnimations.springBouncy.delay(Double(idx) * OnboardingTiming.revealStagger),
                                    value: shown)
@@ -45,7 +46,12 @@ struct DemoFlyerReveal: View {
         .onAppear { shown = true }
     }
 
-    private func fanAngle(_ idx: Int) -> Double { idx == 0 ? 18 : (idx == 2 ? -18 : 0) }
+    private var solo: Bool { imageNames.count == 1 }
+
+    private func fanAngle(_ idx: Int) -> Double {
+        guard !solo else { return 0 }
+        return idx == 0 ? 18 : (idx == 2 ? -18 : 0)
+    }
 }
 
 /// A single portrait flyer card with a light-sweep gloss; falls back to a branded placeholder

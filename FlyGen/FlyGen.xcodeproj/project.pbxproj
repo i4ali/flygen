@@ -16,6 +16,7 @@
 		216C56E6B218DA5C1BF072D8 /* RefinementBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF2FFDC8FE9FB5A25AA9DC55 /* RefinementBuilder.swift */; };
 		22669209B86AEA1D9CD4BDF3 /* ChatOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C0526DA2A47D62F2F4C4AD2 /* ChatOnboardingView.swift */; };
 		23489EA620ACBFB14235A1C4 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB709BFEED3D9A7E60798343 /* UserProfile.swift */; };
+		238EC5EA9148FEEFCE0F6924 /* OnboardingMarkupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D27C26E7714C0F797FF973EE /* OnboardingMarkupView.swift */; };
 		277B13203FA5FBD8FC6CA8CB /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 730206EB978BE7E39383D4E7 /* Color+Hex.swift */; };
 		3B94A4B396C8D3435B1B7036 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B77BF34CD3B703956CC91DE /* SettingsView.swift */; };
 		3EE8F26D91AC96BF67320A69 /* FlyerAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A626C239CF4CCCD0E0F382 /* FlyerAnnotationView.swift */; };
@@ -26,6 +27,7 @@
 		51A412CAA71CCC99E9905560 /* BackgroundType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CE5F8A345997A42000089FD /* BackgroundType.swift */; };
 		523749073694C209490B6669 /* FGModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0125D0C65BCA7D001A0EE3C6 /* FGModifiers.swift */; };
 		55BC12E203F28484A23A0271 /* ChatModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39B24F45CF2E79E2EB956607 /* ChatModels.swift */; };
+		56CFA7C78515914E55A1E844 /* OnboardingQROfferView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8029CE584483B2C5AEDB252F /* OnboardingQROfferView.swift */; };
 		580462DCC3C131BE42F89718 /* PromptsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79529A0F2276152A81665116 /* PromptsTab.swift */; };
 		583C195202B2E418A93257F1 /* GalleryTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 406E392633E0FE2FA6DCA496 /* GalleryTab.swift */; };
 		5C7C3B7B30AEBC3B92E6197E /* ReviewService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E794700C37A8E743419C16 /* ReviewService.swift */; };
@@ -64,6 +66,7 @@
 		95D0F8F627BD2D5768EFA97F /* StoreKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A127BBD1A88D83A876C6249C /* StoreKitService.swift */; };
 		98A9AE6C48084B2A24CE0E99 /* SpaceGrotesk-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DAB10B9A50AB09E7D83C2772 /* SpaceGrotesk-Bold.ttf */; };
 		99A104086420FCC441766ECB /* FlyGenProducts.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 0D3E46940C3FF0B96D5406A0 /* FlyGenProducts.storekit */; };
+		99CFD645058052006B06516D /* OnboardingResizeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6EC55E091B32B8901B98A83 /* OnboardingResizeView.swift */; };
 		99D720E6840CE49CB75168A3 /* FlyGenApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F969BABBE5624EFD6A441E /* FlyGenApp.swift */; };
 		9AF92378203559B840D6DC15 /* OnboardingScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 038F3D1486CC6993C2922585 /* OnboardingScript.swift */; };
 		9FC6E6C9D0FF652459D20F78 /* PromptDescriptors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FA816BFB754005DF233AD04 /* PromptDescriptors.swift */; };
@@ -108,6 +111,7 @@
 		AF8A46FDD739A68963EAE7EE /* CategoryStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C0B42D66AE1AED299093D64 /* CategoryStepView.swift */; };
 		B1AF5D2BC6C1DEA70A386BEF /* ReviewStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C751A204A7CDA258A17B6A21 /* ReviewStepView.swift */; };
 		B94B89CECC7D7E3CDAB7050B /* FlyerChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2EEACFB2F2BBDEC9670AA26 /* FlyerChatView.swift */; };
+		BC72B29597A67D24D9EF54BB /* OnboardingSavePromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9004903E94F4D3D570D0121 /* OnboardingSavePromptView.swift */; };
 		C1CD44B611E655EE6AE96973 /* QRCodeSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 827EC63DDC6A4957895A8B11 /* QRCodeSettings.swift */; };
 		C1E4818D4049DED2EA4A4C4D /* FlyerCreationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 898F624DFE2689054E2A708A /* FlyerCreationViewModel.swift */; };
 		C26FE3379FE83AE1651A5BE4 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B8C8492F364170AB2291CB /* NotificationService.swift */; };
@@ -182,6 +186,7 @@
 		79529A0F2276152A81665116 /* PromptsTab.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PromptsTab.swift; sourceTree = "<group>"; };
 		7B6788CB5BD9273879C5F53E /* FlyGen.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FlyGen.entitlements; sourceTree = "<group>"; };
 		7C61A47D28D08C6960017130 /* PhotoLibraryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLibraryService.swift; sourceTree = "<group>"; };
+		8029CE584483B2C5AEDB252F /* OnboardingQROfferView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingQROfferView.swift; sourceTree = "<group>"; };
 		802D02689D38132C24042AFA /* ColorsStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorsStepView.swift; sourceTree = "<group>"; };
 		827EC63DDC6A4957895A8B11 /* QRCodeSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeSettings.swift; sourceTree = "<group>"; };
 		86A626C239CF4CCCD0E0F382 /* FlyerAnnotationView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FlyerAnnotationView.swift; path = ../../Chat/FlyerAnnotationView.swift; sourceTree = "<group>"; };
@@ -212,6 +217,7 @@
 		A418B28EFEC046775983D673 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		A4E86A123D7FDBB3C7C8AAEF /* TextContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextContent.swift; sourceTree = "<group>"; };
 		A5F0A68F65B4BF9A1CFA475A /* NegativePrompts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NegativePrompts.swift; sourceTree = "<group>"; };
+		A6EC55E091B32B8901B98A83 /* OnboardingResizeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingResizeView.swift; sourceTree = "<group>"; };
 		A94669CCDA2F09E03E777709 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		ABD932742A9E1DC6131CEFEE /* QRCodeStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeStepView.swift; sourceTree = "<group>"; };
 		B0EB877522770E516371B37D /* FlyerChatViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FlyerChatViewModel.swift; path = ../../Chat/FlyerChatViewModel.swift; sourceTree = "<group>"; };
@@ -252,8 +258,10 @@
 		BD83E70692A589F8678D5A0D /* ResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultView.swift; sourceTree = "<group>"; };
 		BF2FFDC8FE9FB5A25AA9DC55 /* RefinementBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefinementBuilder.swift; sourceTree = "<group>"; };
 		C751A204A7CDA258A17B6A21 /* ReviewStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewStepView.swift; sourceTree = "<group>"; };
+		C9004903E94F4D3D570D0121 /* OnboardingSavePromptView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingSavePromptView.swift; sourceTree = "<group>"; };
 		CEB654DCA88FF679FBEFB358 /* RefinementSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefinementSheet.swift; sourceTree = "<group>"; };
 		D0A16D10E4B1927A2E2B94EE /* OnboardingChipQuestionView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingChipQuestionView.swift; sourceTree = "<group>"; };
+		D27C26E7714C0F797FF973EE /* OnboardingMarkupView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingMarkupView.swift; sourceTree = "<group>"; };
 		D77094514BDAD21090480D3A /* CloudKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitService.swift; sourceTree = "<group>"; };
 		DAB10B9A50AB09E7D83C2772 /* SpaceGrotesk-Bold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; path = "SpaceGrotesk-Bold.ttf"; sourceTree = "<group>"; };
 		DE68BC1381C77E543EAE2C81 /* SuggestionService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SuggestionService.swift; sourceTree = "<group>"; };
@@ -445,6 +453,10 @@
 			isa = PBXGroup;
 			children = (
 				8BF224AE2EE5FE9700E8776A /* LottieAnimationView.swift */,
+				D27C26E7714C0F797FF973EE /* OnboardingMarkupView.swift */,
+				8029CE584483B2C5AEDB252F /* OnboardingQROfferView.swift */,
+				A6EC55E091B32B8901B98A83 /* OnboardingResizeView.swift */,
+				C9004903E94F4D3D570D0121 /* OnboardingSavePromptView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -860,6 +872,10 @@
 				523749073694C209490B6669 /* FGModifiers.swift in Sources */,
 				E1B5ACB136DF9F51E260F489 /* AuroraTabBar.swift in Sources */,
 				3EE8F26D91AC96BF67320A69 /* FlyerAnnotationView.swift in Sources */,
+				238EC5EA9148FEEFCE0F6924 /* OnboardingMarkupView.swift in Sources */,
+				56CFA7C78515914E55A1E844 /* OnboardingQROfferView.swift in Sources */,
+				99CFD645058052006B06516D /* OnboardingResizeView.swift in Sources */,
+				BC72B29597A67D24D9EF54BB /* OnboardingSavePromptView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

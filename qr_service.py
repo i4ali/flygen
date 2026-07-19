@@ -4,6 +4,10 @@ QR Code Service for Flyer Generation
 Provides QR code generation and compositing onto flyer images.
 Matches iOS app behavior: 15% width, 3% margin, 8px white padding.
 """
+import base64
+import io
+import re
+
 import qrcode
 from PIL import Image
 from pathlib import Path
@@ -14,6 +18,8 @@ from typing import Optional, Union
 QR_SIZE_PERCENT = 0.15  # 15% of flyer width
 QR_MARGIN_PERCENT = 0.03  # 3% margin from edge
 QR_PADDING_PX = 8  # 8px white padding around QR code
+
+CORNERS = ("bottom_right", "bottom_left", "top_right", "top_left")
 
 
 def generate_qr_code(url: str, size: int = 200) -> Image.Image:
@@ -100,3 +106,40 @@ def composite_qr_onto_flyer(
     flyer.save(output_path)
 
     return str(output_path)
+
+
+def build_qr_payload(kind: str, value: str) -> str:
+    """Deterministic encode target -> URI. The brain/extractor only supply kind + raw value."""
+    v = (value or "").strip()
+    if kind == "website":
+        return v if re.match(r"^https?://", v, re.I) else f"https://{v}"
+    if kind == "phone":
+        return "tel:" + re.sub(r"[^\d+]", "", v)
+    if kind == "whatsapp":
+        return "https://wa.me/" + re.sub(r"\D", "", v)
+    if kind == "instagram":
+        return "https://instagram.com/" + v.lstrip("@").split("/")[-1]
+    return v   # unknown kind: encode verbatim rather than fail
+
+
+def composite_qr_onto_bytes(image_bytes: bytes, payload: str,
+                            corner: str = "bottom_right") -> bytes:
+    """Bytes-in/bytes-out composite for the engine (concepts are base64, no disk).
+    Same size math as composite_qr_onto_flyer; padding scales so 4K output isn't hairline."""
+    flyer = Image.open(io.BytesIO(image_bytes))
+    if flyer.mode != "RGB":
+        flyer = flyer.convert("RGB")
+    w, h = flyer.size
+    qr_size = int(w * QR_SIZE_PERCENT)
+    pad = max(QR_PADDING_PX, qr_size // 25)
+    qr_image = generate_qr_code(payload, size=qr_size)
+    padded = qr_size + pad * 2
+    white_bg = Image.new("RGB", (padded, padded), "white")
+    white_bg.paste(qr_image, (pad, pad))
+    margin = int(w * QR_MARGIN_PERCENT)
+    x = margin if "left" in corner else w - padded - margin
+    y = margin if "top" in corner else h - padded - margin
+    flyer.paste(white_bg, (x, y))
+    out = io.BytesIO()
+    flyer.save(out, format="PNG")
+    return out.getvalue()

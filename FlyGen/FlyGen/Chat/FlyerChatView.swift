@@ -143,6 +143,9 @@ struct FlyerChatView: View {
         case .userPhotos(let p):  UserPhotosBubble(photos: p)
         case .assistant(let t):   AssistantBubble(text: t)
         case .photoSuggestion(let t, let resolved): PhotoSuggestionBubble(text: t, selection: $vm.photoPickerItems, disabled: vm.isStreaming, resolved: resolved, onDecline: { vm.declinePhotoSuggestion() })
+        case .qrOffer(let dto, let resolved): QROfferBubble(offer: dto, disabled: vm.isStreaming, resolved: resolved,
+                                                  onAccept: { vm.acceptQROffer(dto, bubbleID: bubble.id) },
+                                                  onDecline: { vm.declineQROffer(dto, bubbleID: bubble.id) })
         case .referenceNudge:     ReferenceUploadBubble(selection: $vm.referencePickerItems, disabled: vm.isStreaming,
                                       onMyFlyers: { showMyFlyersPicker = true }, onExplore: { showExplorePicker = true },
                                       onDismiss: { vm.dismissReferenceNudge() })
@@ -294,6 +297,46 @@ private struct PhotoSuggestionBubble: View {
                 }
                 .disabled(disabled)
                 if !resolved {
+                    Button(action: onDecline) {
+                        Text("No thanks").fgDismissButtonStyle()
+                    }
+                    .disabled(disabled)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(FGSpacing.md)
+        .background(FGColors.accentSecondary.opacity(0.10)).clipShape(RoundedRectangle(cornerRadius: FGSpacing.cardRadius))
+        .overlay(RoundedRectangle(cornerRadius: FGSpacing.cardRadius).stroke(FGColors.accentSecondary.opacity(0.35), lineWidth: 1))
+    }
+}
+/// The engine's proactive "add a scannable QR?" offer, rendered like the photo nudge: an
+/// accent-tinted card with the offer line and one-tap Yes / No thanks. "Yes" sets the QR state
+/// locally (it composites at the next generation, which is where the paid step already is); "No
+/// thanks" records a decline so it's never re-offered. Choices hide once resolved.
+private struct QROfferBubble: View {
+    let offer: QROfferDTO
+    var disabled: Bool
+    var resolved: Bool
+    var onAccept: () -> Void
+    var onDecline: () -> Void
+    var body: some View {
+        VStack(alignment: .leading, spacing: FGSpacing.sm) {
+            HStack(alignment: .top, spacing: FGSpacing.sm) {
+                Image(systemName: "qrcode").font(.system(size: 16))
+                    .foregroundColor(FGColors.accentSecondary).padding(.top, 2)
+                Text(offer.text).font(FGTypography.body).foregroundColor(FGColors.textPrimary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            if !resolved {
+                HStack(spacing: FGSpacing.sm) {
+                    Button(action: onAccept) {
+                        Label("Yes, add it", systemImage: "checkmark").font(FGTypography.button)
+                            .foregroundColor(FGColors.textOnAccent)
+                            .frame(maxWidth: .infinity).padding(.vertical, FGSpacing.sm)
+                            .background(FGColors.accentPrimary).clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+                    }
+                    .disabled(disabled)
                     Button(action: onDecline) {
                         Text("No thanks").fgDismissButtonStyle()
                     }

@@ -266,7 +266,8 @@ class OutputSettings:
 class QRCodeSettings:
     """QR code configuration for flyer"""
     enabled: bool = False
-    url: str = ""  # URL to encode in QR code
+    url: str = ""      # final encoded payload (from qr_service.build_qr_payload)
+    corner: str = "bottom_right"
 
 
 @dataclass

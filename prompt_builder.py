@@ -427,7 +427,17 @@ class FlyerPromptBuilder:
                 "Visually striking and memorable design. "
                 "Balanced composition suitable for text overlay."
             )
-        
+
+        # 16. QR keep-clear zone. A real scannable QR is composited at this corner after render,
+        # so reserve the space and forbid a model-drawn (non-scanning) QR here.
+        if self.project.qr_settings and self.project.qr_settings.enabled:
+            corner_h = self.project.qr_settings.corner.replace("_", " ")
+            sections.append(
+                f"A real scannable QR code will be added programmatically at the {corner_h} after "
+                "render: keep that corner area clean and free of text or key artwork, and do NOT "
+                "draw any QR code yourself."
+            )
+
         return " ".join([s for s in sections if s])
     
     def _build_color_section(self) -> str:
@@ -687,7 +697,11 @@ class FlyerPromptBuilder:
         # Add user-specified avoidances
         if self.project.visuals.avoid_elements:
             negatives.extend(self.project.visuals.avoid_elements)
-        
+
+        # Global ban: image models draw decorative, non-scanning QR patterns. A real scannable QR
+        # is composited by qr_service after render, so no generation should ever draw one.
+        negatives.append("QR code (never draw or render any QR code pattern)")
+
         return ", ".join(negatives)
 
 

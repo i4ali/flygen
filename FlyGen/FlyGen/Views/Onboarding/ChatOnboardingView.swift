@@ -50,6 +50,10 @@ struct ChatOnboardingView: View {
         case .brief(let chips):        briefRow(chips)
         case .worklog(let items):      WorklogView(items: items, reduceMotion: reduceMotion)
         case .reveal(let names):       DemoFlyerReveal(imageNames: names, reduceMotion: reduceMotion)
+        case .qrOffer(let d, let ok):  OnboardingQROfferView(demo: d, accepted: ok)
+        case .markup(let d):           OnboardingMarkupView(demo: d, reduceMotion: reduceMotion)
+        case .resize(let d):           OnboardingResizeView(demo: d, reduceMotion: reduceMotion)
+        case .savePrompt(let saved):   OnboardingSavePromptView(saved: saved)
         case .textQuestion(let ph):    OnboardingTextQuestionView(placeholder: ph, vm: vm)
         case .chipQuestion(let q):     OnboardingChipQuestionView(question: q, vm: vm)
         case .cta(let title):          ctaButton(title)
@@ -93,7 +97,20 @@ struct ChatOnboardingView: View {
         HStack {
             OnboardingBrandMark(reduceMotion: reduceMotion)
             Spacer()
+            if !vm.isInteracting {
+                Button { vm.skipToEnding() } label: {
+                    HStack(spacing: 2) {
+                        Text("Skip").font(FGTypography.caption)
+                        Image(systemName: "chevron.right").font(.system(size: 10, weight: .semibold))
+                    }
+                    .foregroundColor(FGColors.textSecondary)
+                    .padding(.vertical, FGSpacing.xxs)
+                    .contentShape(Rectangle())
+                }
+                .transition(.opacity)
+            }
         }
+        .animation(FGAnimations.spring, value: vm.isInteracting)
         .padding(.horizontal, FGSpacing.xl)                 // align the brand mark with the content margin
         .padding(.vertical, FGSpacing.sm)
         .frame(maxWidth: .infinity)

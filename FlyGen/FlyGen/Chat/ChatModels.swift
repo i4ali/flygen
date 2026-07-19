@@ -18,6 +18,27 @@ struct ChatRequest: Encodable {
     var selected_elements: [String]?    // chosen creative elements (their what-text), sent on approve
     var annotated: Bool?                // marked-up flyer (numbered circles) => engine uses the annotated-edit prompt
     var language: String?               // target flyer language code; stamped centrally in run(...)
+    var qr: QRSettingsDTO?              // standalone QR state, echoed on every action; stamped centrally in run(...)
+}
+
+// MARK: - QR code (standalone wire state; not part of the brief)
+
+/// Mirrors the engine's `qr` object. Codable both ways: encoded onto every request, decoded from
+/// the `qr` SSE event. No UI - the QR arrives baked into concept images.
+struct QRSettingsDTO: Codable, Equatable {
+    var enabled: Bool?
+    var kind: String?
+    var value: String?
+    var corner: String?
+}
+
+/// A proactive QR offer from the engine (the brain proposed a QR on an otherwise-ready draft).
+/// `text` is the card headline; kind/value/corner build the QRSettingsDTO when the user taps Yes.
+struct QROfferDTO: Decodable, Equatable {
+    let kind: String?
+    let value: String?
+    let corner: String?
+    let text: String
 }
 
 // MARK: - parsed_fields payload (round-trips as `brief`)
@@ -133,6 +154,8 @@ enum SSEEvent {
     case concepts([ConceptDTO])
     case refined(ConceptDTO)
     case resized(ConceptDTO)
+    case qr(QRSettingsDTO)                   // updated QR state; stored and echoed, no UI
+    case qrOffer(QROfferDTO)                 // proactive "add a QR?" offer -> tappable Yes/No card
     case note(String)                       // a conversational assistant line
     case error(String)
     case unknown(String)
@@ -153,6 +176,8 @@ enum SSEEvent {
             case "concepts":      return .concepts(try dec.decode([ConceptDTO].self, from: data))
             case "refined":       return .refined(try dec.decode(ConceptDTO.self, from: data))
             case "resized":       return .resized(try dec.decode(ConceptDTO.self, from: data))
+            case "qr":            return .qr(try dec.decode(QRSettingsDTO.self, from: data))
+            case "qr_offer":      return .qrOffer(try dec.decode(QROfferDTO.self, from: data))
             case "error":
                 let msg = (try? dec.decode(String.self, from: data)) ?? String(data: data, encoding: .utf8) ?? "error"
                 return .error(msg)

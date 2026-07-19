@@ -13,7 +13,11 @@ struct RenderedBeat: Identifiable {
         case brief([String])
         case worklog([String])     // the "show its work" checklist of design decisions
         case reveal([String])
-        case textQuestion(placeholder: String)   // the open "what do you do?" input field
+        case qrOffer(QROfferDemo, accepted: Bool)   // accepted flips true to animate the auto-tap
+        case markup(MarkupDemo)                     // circle-to-edit playing itself
+        case resize(ResizeDemo)                     // format chips + aspect morph
+        case savePrompt(saved: Bool)                // saved flips true to show the confirmation
+        case textQuestion(placeholder: String)   // the "what are you promoting?" input field
         case chipQuestion(OnboardingQuestion)
         case cta(String)
     }
@@ -93,6 +97,20 @@ final class ChatOnboardingViewModel: ObservableObject {
         onComplete?(selectedLanguage)
     }
 
+    /// "Skip ▸": jump past the auto-play demo straight to the "what are you promoting?" hand-off.
+    /// Cancels the runner and resumes at the "Your turn" assistant line + text question. A no-op
+    /// once the thread is already interactive or past the demo.
+    func skipToEnding() {
+        guard !isInteracting else { return }
+        guard let q = beats.firstIndex(where: {
+            if case .textQuestion = $0 { return true } else { return false }
+        }), index < q else { return }
+        Haptics.selection()
+        runTask?.cancel()
+        index = max(0, q - 1)     // include the "Your turn. What are you promoting?" line
+        resume()
+    }
+
     // MARK: - The runner
 
     private func resume() {
@@ -124,6 +142,36 @@ final class ChatOnboardingViewModel: ObservableObject {
                 await pause(OnboardingTiming.beatGap)
                 append(.reveal(names))
                 await pause(OnboardingTiming.revealHold)
+            case .qrOffer(let demo):
+                await pause(OnboardingTiming.beatGap)
+                let id = append(.qrOffer(demo, accepted: false))
+                await pause(OnboardingTiming.qrOfferDwell)             // let the card read
+                if Task.isCancelled { return }
+                withAnimation(FGAnimations.spring) { update(id, .qrOffer(demo, accepted: true)) }
+                await pause(OnboardingTiming.qrAcceptHold)             // the "Yes" tap lands
+                append(.reveal([demo.revealImage]))                   // hero re-blooms WITH the QR
+                await pause(OnboardingTiming.revealHold)
+            case .markup(let demo):
+                await pause(OnboardingTiming.beatGap)
+                append(.markup(demo))
+                await pause(OnboardingMarkupView.duration(for: demo))  // draw circles + type notes + Apply
+                if Task.isCancelled { return }
+                append(.worklog(demo.worklog))
+                await pause(WorklogView.duration(for: demo.worklog))
+                append(.reveal([demo.resultImage]))                   // edited hero
+                await pause(OnboardingTiming.revealHold)
+            case .resize(let demo):
+                await pause(OnboardingTiming.beatGap)
+                append(.resize(demo))
+                await pause(OnboardingResizeView.duration)            // chips + morph
+                await pause(OnboardingTiming.revealHold)
+            case .savePrompt:
+                await pause(OnboardingTiming.beatGap)
+                let id = append(.savePrompt(saved: false))
+                await pause(OnboardingTiming.saveTapDelay)
+                if Task.isCancelled { return }
+                withAnimation(FGAnimations.spring) { update(id, .savePrompt(saved: true)) }
+                await pause(OnboardingTiming.saveConfirmHold)
             case .textQuestion(let placeholder):
                 await pause(OnboardingTiming.beatGap)
                 if Task.isCancelled { return }

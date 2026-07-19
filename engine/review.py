@@ -24,7 +24,10 @@ def to_brief_dict(turn: TurnResult) -> dict:
 
 
 def to_question_set(turn: TurnResult) -> QuestionSet:
-    return QuestionSet(questions=[Question(field=q.field, text=q.text) for q in turn.questions],
+    # The `qr` question is surfaced separately as a tappable QR offer (see orchestrator._qr_offer),
+    # so keep it out of the generic must-answer questions card.
+    return QuestionSet(questions=[Question(field=q.field, text=q.text)
+                                  for q in turn.questions if q.field != "qr"],
                        stage="gaps")
 
 
