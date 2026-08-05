@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 from dataclasses import is_dataclass, asdict
 from typing import Optional, List
@@ -85,8 +86,16 @@ def _to_jsonable(obj):
 
 
 def _sse(events):
-    for e in events:
-        yield f"event: {e.kind}\ndata: {json.dumps(_to_jsonable(e.payload), default=str)}\n\n"
+    # StreamingResponse has already sent the 200 by the time these run, so an unhandled
+    # exception here reaches the app as a dropped connection ("The network connection was
+    # lost") - catch it and send a real error event instead, keeping the details server-side.
+    try:
+        for e in events:
+            yield f"event: {e.kind}\ndata: {json.dumps(_to_jsonable(e.payload), default=str)}\n\n"
+    except Exception:
+        logging.getLogger(__name__).exception("turn failed mid-stream")
+        msg = "Something went wrong on my end - please try that again."
+        yield f"event: error\ndata: {json.dumps(msg)}\n\n"
 
 
 # Shared-secret gate. When ENGINE_SHARED_SECRET is set (Cloud Run), every /chat

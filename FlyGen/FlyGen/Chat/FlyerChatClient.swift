@@ -40,6 +40,15 @@ struct FlyerChatClient {
     func stream(_ body: ChatRequest) -> AsyncThrowingStream<SSEEvent, Error> {
         AsyncThrowingStream { continuation in
             let task = Task {
+                var eventName = "message"
+                var dataLines: [String] = []
+                func flush() {
+                    guard !dataLines.isEmpty else { return }
+                    if let data = dataLines.joined(separator: "\n").data(using: .utf8) {
+                        continuation.yield(SSEEvent.decode(event: eventName, data: data))
+                    }
+                    eventName = "message"; dataLines = []
+                }
                 do {
                     var req = URLRequest(url: Self.baseURL.appendingPathComponent("chat"))
                     req.httpMethod = "POST"
@@ -51,16 +60,6 @@ struct FlyerChatClient {
                     let (bytes, response) = try await session.bytes(for: req)
                     if let http = response as? HTTPURLResponse, http.statusCode != 200 {
                         continuation.finish(throwing: ChatClientError.badStatus(http.statusCode)); return
-                    }
-
-                    var eventName = "message"
-                    var dataLines: [String] = []
-                    func flush() {
-                        guard !dataLines.isEmpty else { return }
-                        if let data = dataLines.joined(separator: "\n").data(using: .utf8) {
-                            continuation.yield(SSEEvent.decode(event: eventName, data: data))
-                        }
-                        eventName = "message"; dataLines = []
                     }
 
                     for try await line in bytes.lines {
@@ -80,6 +79,10 @@ struct FlyerChatClient {
                     flush()
                     continuation.finish()
                 } catch {
+                    // The final frame only flushes after the loop, so a tail-side socket fault
+                    // used to discard a fully-buffered event - on an approve turn, the ONLY
+                    // event, i.e. three paid concepts. Deliver whatever is complete, then fail.
+                    flush()
                     continuation.finish(throwing: error)
                 }
             }

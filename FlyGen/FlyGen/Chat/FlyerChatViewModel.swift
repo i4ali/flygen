@@ -38,6 +38,12 @@ final class FlyerChatViewModel: ObservableObject {
     /// The flyer's target language for this session. Seeded from the profile default
     /// (see FlyerChatView.onAppear), changeable on the review card, sticky across edits.
     @Published var selectedLanguage: FlyerLanguage = .english
+    /// Cards (questions / review) whose turn COMPLETED successfully - only these stay disabled.
+    /// A card used to latch itself off before dispatch, so a network blip, paywall hit, or empty
+    /// submit bricked it forever; now the latch lives here and is only set on success.
+    @Published private(set) var resolvedCardIDs: Set<UUID> = []
+    /// The card whose action is currently in flight (disabled while pending, re-enabled on failure).
+    @Published private(set) var inFlightCardID: UUID?
 
     private let client = FlyerChatClient()
     private var brief: ExtractedBriefDTO?
@@ -56,6 +62,9 @@ final class FlyerChatViewModel: ObservableObject {
     private var pendingReview: ReviewProposalDTO?
     private var awaitingPhotoChoice = false
     private var photoSuggestionID: UUID?
+    private var turnHadError = false            // set by error events / failed generations within a turn
+    private var restoreOnFailedTurn: (() -> Void)?   // puts pre-send state back if the turn dies before any event
+    private var clearPhotosOnSuccess = false    // approve turn only: staged photos survive a failed turn for retry
 
     /// Fires once per SUCCESSFUL image generation (create / refine / resize) so the view can consume
     /// one unit of subscription quota. Mirrors FlyerCreationViewModel.onCreditDeduction; wired in
@@ -272,6 +281,17 @@ final class FlyerChatViewModel: ObservableObject {
         return nil
     }
 
+    /// True when closing the chat would destroy something costly: a generation in flight, or
+    /// generated flyers that exist only in this transcript. Seeded "Starting point" cards don't
+    /// count (the sample still lives in Explore); nothing here is persisted anywhere else.
+    var hasUnsavedWork: Bool {
+        if isStreaming { return true }
+        return transcript.contains { bubble in
+            if case .concepts(_, let heading) = bubble.kind, heading == nil { return true }
+            return false
+        }
+    }
+
     /// Send is enabled when there's text to describe OR a photo to attach.
     var canSend: Bool {
         !isStreaming && (!composerText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -317,6 +337,15 @@ final class FlyerChatViewModel: ObservableObject {
         // Text describes a flyer, which starts a fresh one. Photos just committed carry into it.
         if !text.isEmpty {
             composerText = ""
+            // Clearing here keeps the request's new-flyer semantics, but the old state must
+            // survive a turn that dies before ANY event arrives - otherwise one network blip
+            // converts a built-up brief (answers, QR choice, reference mode) into nothing.
+            let (b, q, a, nudged, refMode) = (brief, qr, answers, photoNudged, inReferenceMode)
+            restoreOnFailedTurn = { [weak self] in
+                guard let self else { return }
+                self.brief = b; self.qr = q; self.answers = a
+                self.photoNudged = nudged; self.inReferenceMode = refMode
+            }
             brief = nil; qr = nil; answers = [:]
             inReferenceMode = false                     // composing a new flyer leaves reuse-a-flyer mode
             photoNudged = !generationPhotos.isEmpty     // already have photos -> skip the nudge
@@ -327,7 +356,7 @@ final class FlyerChatViewModel: ObservableObject {
         }
     }
 
-    func submitAnswers(_ provided: [String: String], order: [String], stage: String) {
+    func submitAnswers(_ provided: [String: String], order: [String], stage: String, cardID: UUID) {
         let cleaned = provided.filter { !$0.value.trimmingCharacters(in: .whitespaces).isEmpty }
         guard !cleaned.isEmpty, !isStreaming else { return }
         answers.merge(cleaned) { _, new in new }
@@ -338,18 +367,24 @@ final class FlyerChatViewModel: ObservableObject {
             cleaned[k].map { "\(k.replacingOccurrences(of: "_", with: " ")): \($0)" }
         }.joined(separator: ", ")
         transcript.append(ChatBubble(.user(summary)))
+        inFlightCardID = cardID                     // resolved on success, re-enabled on failure
         let isDesign = stage == "design"
         run(ChatRequest(action: "answers", stage: isDesign ? "design" : nil, brief: brief, answers: cleaned),
             thinking: isDesign ? "Finalizing…" : "Designing…")
     }
 
-    func approve(fieldOverrides: [String: String], decisionOverrides: [String: String], selectedElements: [String]?) {
+    func approve(fieldOverrides: [String: String], decisionOverrides: [String: String],
+                 selectedElements: [String]?, cardID: UUID) {
         guard !isStreaming else { return }
         // Everything committed via send, plus anything still staged in the tray.
         let photos = (generationPhotos + attachedPhotos).map { $0.base64EncodedString() }
         let label = photos.isEmpty ? "Looks good — generate concepts."
             : "Looks good — generate concepts (with \(photos.count) photo\(photos.count == 1 ? "" : "s"))."
         transcript.append(ChatBubble(.user(label)))
+        inFlightCardID = cardID                     // resolved on success, re-enabled on failure
+        // Photos stay staged until the turn SUCCEEDS (cleared in the concepts success branch):
+        // clearing here made a failed approve lose them with no way to re-attach.
+        clearPhotosOnSuccess = true
         // selectedElements: nil => no creative ideas were offered (engine uses its safe defaults);
         // [] => offered but user turned them all off; [..] => the exact elements to include.
         run(ChatRequest(action: "approve", brief: brief, answers: answers,
@@ -358,7 +393,6 @@ final class FlyerChatViewModel: ObservableObject {
                         user_photos_b64: photos.isEmpty ? nil : photos,
                         selected_elements: selectedElements),
             thinking: "Generating 3 concepts — about a minute…")
-        generationPhotos = []; attachedPhotos = []; photoPickerItems = []   // sent with this generation
     }
 
     func refine(concept: ConceptDTO, instruction: String) {
@@ -460,21 +494,45 @@ final class FlyerChatViewModel: ObservableObject {
     private static let generationFailedMessage =
         "That one didn't go through — the image didn't come back. Mind trying again? Rewording the change can help."
 
+    /// Shown when a stream ends cleanly but delivered nothing decodable - without this the
+    /// spinner just vanished, leaving no way to know whether anything generated or was charged.
+    private static let emptyTurnMessage =
+        "Nothing came back for that one — the connection ended early. Mind trying again?"
+
     private func run(_ request: ChatRequest, thinking: String) {
         var request = request
         request.language = selectedLanguage.rawValue          // every request carries the session language
         request.qr = qr                                       // echo QR state on every action (incl. reference)
         isStreaming = true
+        turnHadError = false
         awaitingPhotoChoice = false; pendingReview = nil     // each turn starts un-gated
         let typing = ChatBubble(.typing(thinking))
         transcript.append(typing)               // pinned at the bottom until the turn ends
         Task {
+            var sawEvent = false
             do {
-                for try await event in client.stream(request) { apply(event, typingID: typing.id) }
+                for try await event in client.stream(request) {
+                    sawEvent = true
+                    restoreOnFailedTurn = nil       // the engine answered; the new state owns from here
+                    apply(event, typingID: typing.id)
+                }
             } catch {
+                turnHadError = true
                 insertBeforeTyping(ChatBubble(.error(error.localizedDescription)), typingID: typing.id)
                 reopenAnnotationIfPending()
             }
+            if !sawEvent && !turnHadError {         // clean stream, zero events: surface it
+                turnHadError = true
+                insertBeforeTyping(ChatBubble(.error(Self.emptyTurnMessage)), typingID: typing.id)
+                reopenAnnotationIfPending()
+            }
+            if !sawEvent { restoreOnFailedTurn?() } // the turn died whole: put the pre-send state back
+            restoreOnFailedTurn = nil
+            if let card = inFlightCardID {          // success latches the card; failure re-enables it
+                if !turnHadError { resolvedCardIDs.insert(card) }
+                inFlightCardID = nil
+            }
+            clearPhotosOnSuccess = false
             removeTyping(typing.id)
             isStreaming = false
         }
@@ -486,6 +544,8 @@ final class FlyerChatViewModel: ObservableObject {
             brief = b
             insertBeforeTyping(ChatBubble(.parsedFields(b)), typingID: typingID)
             maybeNudgePhotos(b, typingID: typingID)
+        case .briefState(let b):
+            brief = b               // the approved design riding the brief; stored silently, no bubble
         case .questions(let qs, let stage): insertBeforeTyping(ChatBubble(.questions(qs, stage)), typingID: typingID)
         case .designBrief(let d):  insertBeforeTyping(ChatBubble(.designBrief(d)), typingID: typingID)
         case .review(let r):
@@ -496,17 +556,24 @@ final class FlyerChatViewModel: ObservableObject {
                 insertBeforeTyping(ChatBubble(.concepts(cs, heading: nil)), typingID: typingID)
                 if inReferenceMode { currentReferenceB64 = img }   // the next composer edit builds on this result
                 pendingAnnotationDraft = nil                       // a marked-up edit (if any) succeeded
+                if clearPhotosOnSuccess {                          // the approve turn's photos are now in the flyer
+                    generationPhotos = []; attachedPhotos = []; photoPickerItems = []
+                    clearPhotosOnSuccess = false
+                }
                 onCreditDeduction?()                               // 1 unit per successful create (3 concepts = 1)
             } else {
+                turnHadError = true                                // keep the review card retryable
                 insertBeforeTyping(ChatBubble(.error(Self.generationFailedMessage)), typingID: typingID)
                 reopenAnnotationIfPending()                        // bring the circles back to reword & retry
             }
         case .refined(let c), .resized(let c):
             if c.image_base64 != nil {
                 insertBeforeTyping(ChatBubble(.concepts([c], heading: nil)), typingID: typingID)
+                if inReferenceMode { currentReferenceB64 = c.image_base64 }  // resize/refine stays in the edit chain
                 pendingAnnotationDraft = nil                       // a marked-up edit (if any) succeeded
                 onCreditDeduction?()                               // 1 unit per successful refine/resize
             } else {
+                turnHadError = true
                 insertBeforeTyping(ChatBubble(.error(Self.generationFailedMessage)), typingID: typingID)
                 reopenAnnotationIfPending()                        // bring the circles back to reword & retry
             }
@@ -514,6 +581,7 @@ final class FlyerChatViewModel: ObservableObject {
         case .qrOffer(let dto):    insertBeforeTyping(ChatBubble(.qrOffer(dto, resolved: false)), typingID: typingID)
         case .note(let t):         insertBeforeTyping(ChatBubble(.assistant(t)), typingID: typingID)
         case .error(let msg):
+            turnHadError = true                                // an error event fails the turn's card, too
             insertBeforeTyping(ChatBubble(.error(msg)), typingID: typingID)
             reopenAnnotationIfPending()
         case .unknown: break

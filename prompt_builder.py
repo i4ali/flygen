@@ -615,14 +615,15 @@ class FlyerPromptBuilder:
             spelled = self._spell_out(address)
             parts.append(f'Address must read EXACTLY: "{address}" (SPELLING: {spelled}).')
 
-        # Price / Discount
+        # Price / Discount - independent facts, so both render when both exist ("$25" plus
+        # "Kids under 12 free" is a normal fundraiser shape, not an either/or).
         if text.discount_text:
             spelled = self._spell_out(text.discount_text)
             parts.append(
                 f'Discount/offer must read EXACTLY: "{text.discount_text}" (SPELLING: {spelled}) - '
                 f"make this eye-catching and prominent."
             )
-        elif text.price:
+        if text.price:
             spelled = self._spell_out(text.price)
             parts.append(f'Price must read EXACTLY: "{text.price}" (SPELLING: {spelled}).')
 

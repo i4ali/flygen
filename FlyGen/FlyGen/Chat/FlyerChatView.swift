@@ -23,6 +23,7 @@ struct FlyerChatView: View {
     @State private var didSeedLanguage = false        // seed the session language from the profile once
     @State private var showingSavePrompt = false
     @State private var showingPaywall = false
+    @State private var showingCloseConfirm = false    // Close sits where Back lives; confirm before losing work
     @State private var showMyFlyersPicker = false     // "reuse a flyer" -> pick from My Flyers
     @State private var showExplorePicker = false      // "reuse a flyer" -> pick from Explore
 
@@ -65,7 +66,11 @@ struct FlyerChatView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Close") { dismiss() }.foregroundColor(FGColors.textSecondary)
+                    // The transcript is this chat's only state, so one mis-tap here (top-left,
+                    // exactly where Back lives) used to destroy paid concepts silently.
+                    Button("Close") {
+                        if vm.hasUnsavedWork { showingCloseConfirm = true } else { dismiss() }
+                    }.foregroundColor(FGColors.textSecondary)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { showingSavePrompt = true } label: { Image(systemName: "bookmark") }
@@ -85,6 +90,12 @@ struct FlyerChatView: View {
                 }
                 // Consume one quota unit after each successful generation (mirrors ResultView).
                 vm.onCreditDeduction = { consumeOneGeneration() }
+            }
+            .confirmationDialog("Close this chat?", isPresented: $showingCloseConfirm, titleVisibility: .visible) {
+                Button("Close anyway", role: .destructive) { dismiss() }
+                Button("Keep working", role: .cancel) {}
+            } message: {
+                Text("This chat isn't saved — flyers you haven't added to My Flyers will be lost.")
             }
             .sheet(isPresented: $showingSavePrompt) {
                 PromptEditorSheet(initialText: vm.firstUserPrompt ?? "")
@@ -117,7 +128,10 @@ struct FlyerChatView: View {
 
     /// True when the user has neither subscription quota nor legacy credits left, so a generation
     /// must open the paywall instead. No profile yet -> not blocked (mirrors the wizard's `if let` gate).
+    /// Unresolved entitlements -> not blocked either: on a cold launch StoreKit hasn't answered yet,
+    /// and "unknown" must never read as "not subscribed" - a paying user was being shown the paywall.
     private var isGenerationBlocked: Bool {
+        guard entitlementService.entitlementsResolved else { return false }
         guard let profile = userProfiles.first else { return false }
         return entitlementService.access(for: profile) == .blocked
     }
@@ -151,13 +165,21 @@ struct FlyerChatView: View {
                                       onDismiss: { vm.dismissReferenceNudge() })
         case .typing(let t):      TypingBubble(text: t)
         case .parsedFields(let b): ParsedFieldsCard(brief: b, expanded: bubble.id == latestParsedFieldsID)
-        case .questions(let qs, let stage):  QuestionsCard(questions: qs, onSubmit: { answers, order in
-                                                  gated { vm.submitAnswers(answers, order: order, stage: stage) } })
-        case .designBrief(let d): DesignNotesCard(brief: d)
-        case .review(let r):      ReviewCard(review: r, language: $vm.selectedLanguage,
+        case .questions(let qs, let stage):  QuestionsCard(questions: qs,
+                                      pending: vm.inFlightCardID == bubble.id,
+                                      resolved: vm.resolvedCardIDs.contains(bubble.id),
                                       isBlocked: isGenerationBlocked,
                                       onBlocked: { showingPaywall = true },
-                                      onApprove: { vm.approve(fieldOverrides: $0, decisionOverrides: $1, selectedElements: $2) })
+                                      onSubmit: { answers, order in
+                                          vm.submitAnswers(answers, order: order, stage: stage, cardID: bubble.id) })
+        case .designBrief(let d): DesignNotesCard(brief: d)
+        case .review(let r):      ReviewCard(review: r, language: $vm.selectedLanguage,
+                                      pending: vm.inFlightCardID == bubble.id,
+                                      resolved: vm.resolvedCardIDs.contains(bubble.id),
+                                      isBlocked: isGenerationBlocked,
+                                      onBlocked: { showingPaywall = true },
+                                      onApprove: { vm.approve(fieldOverrides: $0, decisionOverrides: $1,
+                                                              selectedElements: $2, cardID: bubble.id) })
         case .referenceImage(let c):  ReferenceImageCard(concept: c,
                                       onMarkUp: { d in gated { vm.beginAnnotation(on: d) } })
         case .concepts(let cs, let heading):   ConceptsCard(concepts: cs, heading: heading,
@@ -553,9 +575,21 @@ private struct ParsedFieldsCard: View {
 
 private struct QuestionsCard: View {
     let questions: [QuestionDTO]
+    // The latch lives in the view model now (resolved on SUCCESS only), so a network blip,
+    // paywall hit, or empty tap no longer bricks the card - the old `submitted = true` before
+    // dispatch was permanent, with no path back after a failure.
+    var pending: Bool = false                  // this card's turn is in flight
+    var resolved: Bool = false                 // this card's turn succeeded; stays disabled
+    var isBlocked: Bool = false                // no quota/credits -> submit opens the paywall instead
+    var onBlocked: () -> Void = {}
     let onSubmit: ([String: String], [String]) -> Void
     @State private var answers: [String: String] = [:]
-    @State private var submitted = false
+    private var locked: Bool { pending || resolved }
+    /// At least one non-empty answer - the button stays disabled otherwise, because an empty
+    /// submit sends nothing (and used to latch the card dead).
+    private var hasAnswer: Bool {
+        answers.values.contains { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+    }
     private var heading: String {
         switch questions.count {
         case 1:  return "One quick thing"
@@ -576,15 +610,18 @@ private struct QuestionsCard: View {
                             .textFieldStyle(.plain).font(FGTypography.body).foregroundColor(FGColors.textPrimary)
                             .padding(.horizontal, FGSpacing.sm).padding(.vertical, FGSpacing.xs)
                             .background(FGColors.backgroundTertiary).clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
-                            .disabled(submitted)
+                            .disabled(locked)
                     }
                 }
             }
-            Button { submitted = true; onSubmit(answers, questions.map { $0.field }) } label: {
+            Button {
+                if isBlocked { onBlocked(); return }   // paywall first; the card stays live to retry after subscribing
+                onSubmit(answers, questions.map { $0.field })
+            } label: {
                 Text("Send answers").font(FGTypography.button).foregroundColor(FGColors.textOnAccent)
                     .frame(maxWidth: .infinity).padding(.vertical, FGSpacing.sm)
                     .background(FGColors.accentPrimary).clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
-            }.disabled(submitted)
+            }.disabled(locked || !hasAnswer)
         }
         .onAppear {
             // Pre-select each picker's default (first option) so the size is sent even untouched.
@@ -609,7 +646,7 @@ private struct QuestionsCard: View {
             .padding(.horizontal, FGSpacing.sm).padding(.vertical, FGSpacing.xs)
             .background(FGColors.backgroundTertiary).clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
         }
-        .disabled(submitted)
+        .disabled(locked)
     }
 }
 
@@ -646,13 +683,17 @@ private struct DesignNotesCard: View {
 private struct ReviewCard: View {
     let review: ReviewProposalDTO
     @Binding var language: FlyerLanguage    // the flyer's render language; declared here, sticky across edits
+    // The latch lives in the view model (resolved on SUCCESS only): a failed approve turn
+    // re-enables the card instead of leaving it permanently dead mid-edit.
+    var pending: Bool = false               // this card's approve turn is in flight
+    var resolved: Bool = false              // this card's turn succeeded; stays disabled
     var isBlocked: Bool = false             // no quota/credits -> approve opens the paywall instead
     var onBlocked: () -> Void = {}
     let onApprove: (_ fieldOverrides: [String: String], _ decisionOverrides: [String: String], _ selectedElements: [String]?) -> Void
     @State private var fieldValues: [String: String] = [:]
     @State private var decisionValues: [String: String] = [:]
     @State private var elementSelected: [String: Bool] = [:]
-    @State private var approved = false
+    private var locked: Bool { pending || resolved }
     var body: some View {
         AssistantCard {
             Text("Review before I generate").font(FGTypography.h4).foregroundColor(FGColors.textPrimary)
@@ -666,7 +707,7 @@ private struct ReviewCard: View {
                     GrowingScrollTextEditor(
                         text: Binding(get: { fieldValues[f.key] ?? f.value }, set: { fieldValues[f.key] = $0 }),
                         placeholder: "",
-                        isEnabled: !approved,
+                        isEnabled: !locked,
                         fontSize: 13,           // FGTypography.bodySmall
                         insetH: FGSpacing.sm,
                         insetV: FGSpacing.xs,
@@ -695,7 +736,7 @@ private struct ReviewCard: View {
                         }
                         .padding(.horizontal, FGSpacing.sm).padding(.vertical, FGSpacing.xs)
                         .background(FGColors.backgroundTertiary).clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
-                    }.disabled(approved)
+                    }.disabled(locked)
                     if d.supported == false {       // engine flagged this value as off-vocabulary
                         warningLine("Not a standard option - pick a suggested value above.")
                     }
@@ -722,13 +763,12 @@ private struct ReviewCard: View {
                     }
                     .padding(.horizontal, FGSpacing.sm).padding(.vertical, FGSpacing.xs)
                     .background(FGColors.backgroundTertiary).clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
-                }.disabled(approved)
+                }.disabled(locked)
             }
             creativeIdeas
             designNotes
             Button {
                 if isBlocked { onBlocked(); return }   // no quota/credits -> paywall; keep the card active to retry
-                approved = true
                 let fo = fieldValues.filter { key, val in review.fields.first(where: { $0.key == key })?.value != val }
                 var dov: [String: String] = [:]
                 for d in review.decisions { dov[d.key] = decisionValues[d.key] ?? d.value }
@@ -737,7 +777,7 @@ private struct ReviewCard: View {
                 Text("Approve & generate 3 concepts").font(FGTypography.button).foregroundColor(FGColors.textOnAccent)
                     .frame(maxWidth: .infinity).padding(.vertical, FGSpacing.sm)
                     .background(FGColors.accentPrimary).clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
-            }.disabled(approved)
+            }.disabled(locked)
         }
     }
 
@@ -764,7 +804,7 @@ private struct ReviewCard: View {
                     }
                     Spacer()
                     Toggle("", isOn: Binding(get: { isElementOn(e) }, set: { elementSelected[e.what] = $0 }))
-                        .labelsHidden().tint(FGColors.accentPrimary).disabled(approved)
+                        .labelsHidden().tint(FGColors.accentPrimary).disabled(locked)
                 }
             }
         }

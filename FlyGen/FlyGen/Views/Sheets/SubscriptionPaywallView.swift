@@ -576,9 +576,11 @@ private struct PlanCard: View {
     }
 
     private var allotmentText: String {
+        // "designs & edits", not "flyers": the meter charges one unit per image action (create,
+        // refine, resize alike), so promising N *flyers* oversold what a unit buys.
         switch product.id {
-        case SubscriptionConfig.Product.weekly:  return "\(SubscriptionConfig.weeklyQuota) flyers / week"
-        case SubscriptionConfig.Product.monthly: return "\(SubscriptionConfig.monthlyQuota) flyers / month"
+        case SubscriptionConfig.Product.weekly:  return "\(SubscriptionConfig.weeklyQuota) designs & edits / week"
+        case SubscriptionConfig.Product.monthly: return "\(SubscriptionConfig.monthlyQuota) designs & edits / month"
         default: return ""
         }
     }

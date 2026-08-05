@@ -9,11 +9,19 @@ final class EntitlementService: ObservableObject {
     @Published private(set) var products: [Product] = []
     @Published private(set) var activeProductID: String?
     @Published private(set) var didAttemptProductLoad = false
+    /// False until the first entitlement pass completes. Until then `isSubscribed == false` means
+    /// "unknown", not "not subscribed" - gates must fail open, or a paying subscriber on a cold
+    /// launch gets shown the paywall while StoreKit is still answering.
+    @Published private(set) var entitlementsResolved = false
 
     init() {
         Task {
-            await loadProducts()
+            // Entitlements first: they gate the whole UI, while products only feed the paywall.
+            // The old order put the (network) product fetch ahead of the (local) entitlement
+            // check, stretching the window in which a subscriber looked blocked.
             await refreshEntitlements()
+            entitlementsResolved = true
+            await loadProducts()
         }
 
         Task {

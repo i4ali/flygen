@@ -129,3 +129,43 @@ def test_refine_rebuilds_project_from_brief_when_stateless():
     events = list(eng.handle_refine(prior_image_b64=b64, instruction="brighter"))
     assert [e.kind for e in events] == ["refined"]               # not an error
     assert captured["project"].text_content.headline == "Gala"   # project rebuilt from brief
+
+
+def test_approved_design_round_trips_from_approve_to_refine():
+    # THE core edit-loop fix: approval stashes the final decisions + overridden fields onto the
+    # wire brief (emitted as brief_state, echoed by the client), and a later stateless refine
+    # rebuilds THAT design - not the compile-time defaults (warm/light palette, modern-minimal,
+    # portrait) with the pre-correction text re-anchored.
+    import base64
+    from models import AspectRatio, VisualStyle
+    turn = TurnResult(status="ready", category="event", headline="Febuary Gala",
+                      decisions=[TurnDecision(key="format", value="16:9"),
+                                 TurnDecision(key="visual_style", value="elegant_luxury"),
+                                 TurnDecision(key="palette", value="midnight & gold")])
+    eng = Engine(client=MagicMock(),
+                 generate_concepts=lambda project, generator=None, n=3, user_photo_paths=None:
+                     [Concept("v1", "b64")],
+                 generator=MagicMock())
+    eng.turn = turn
+    eng.brief = {"category": "event", "headline": "Febuary Gala"}
+    events = list(eng.handle_approval(field_overrides={"headline": "February Gala"}))
+    assert [e.kind for e in events] == ["brief_state", "concepts"]
+    state = events[0].payload
+    assert state["headline"] == "February Gala"                    # override folded into the brief
+    assert state["field_sources"]["headline"] == "stated"          # the user typed it
+    assert {"key": "format", "value": "16:9"} in state["decisions"]
+
+    # A fresh Engine (new HTTP request) refines from the echoed brief alone.
+    captured = {}
+    def fake_refine(project, path, instruction, generator=None, mode="edit"):
+        captured["project"] = project
+        return Concept("refined", "b64")
+    eng2 = Engine(client=MagicMock(), refine_concept=fake_refine, generator=MagicMock())
+    eng2.brief = dict(state)
+    b64 = base64.b64encode(b"img").decode()
+    list(eng2.handle_refine(prior_image_b64=b64, instruction="brighter"))
+    project = captured["project"]
+    assert project.text_content.headline == "February Gala"        # no typo resurrection
+    assert project.output.aspect_ratio == AspectRatio.LANDSCAPE_16_9   # no portrait snap-back
+    assert project.visuals.style == VisualStyle.ELEGANT_LUXURY     # no style reset
+    assert project.colors.description == "midnight & gold"         # no palette reset

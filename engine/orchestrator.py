@@ -9,7 +9,7 @@ from engine.turn import TurnResult
 from engine import interpret as _interpret
 from engine.gate import is_flyer_request as _is_flyer_request
 from engine.review import assemble_review, to_brief_dict, to_question_set
-from engine.compile_project import build_project
+from engine.compile_project import build_project, _category, _decisions_map, _CONTENT_FIELDS
 from engine import tools as _tools
 import engine.qr_intent as _qr_intent
 
@@ -24,8 +24,13 @@ DEFLECTION = ("I only design flyers here, so I can't help with that one. Tell me
 @dataclass
 class Event:
     kind: str            # parsed_fields | questions | review | note | qr | qr_offer
-                         # | concepts | refined | resized | error
+                         # | brief_state | concepts | refined | resized | error
     payload: Any = None
+
+
+# The prior image/brief the client should have echoed didn't arrive (a client-state bug or a
+# malformed retry) - point the user back at a concrete recovery instead of leaking internals.
+MISSING_STATE = "I couldn't find the flyer to work on - try the change again from the flyer's card."
 
 
 @contextmanager
@@ -217,11 +222,30 @@ class Engine:
         if turn is None and self.brief:
             turn = TurnResult(**{k: v for k, v in self.brief.items() if k in TurnResult.model_fields})
         if turn is None:
-            yield Event("error", "no interpretation to generate from"); return
+            yield Event("error", "I've lost this flyer's details - mind describing it again in a sentence?")
+            return
         project = self._build_project(turn, field_overrides or {}, decision_overrides or {},
                                       selected_elements=selected_elements, language=language,
                                       qr=self.qr)
         self.project = project
+        # Persist the APPROVED design onto the wire brief and hand it back to the client, which
+        # echoes it on every later turn. A refine then rebuilds this exact project instead of
+        # re-deriving defaults - the old path reset palette/style/mood/aspect and re-anchored
+        # pre-correction text (the "fix the typo" prompt also demanded the typo be kept).
+        for k, v in (field_overrides or {}).items():
+            if k not in _CONTENT_FIELDS and k != "category":
+                continue
+            if v:
+                self.brief[k] = _category(v).value if k == "category" else v
+                self.brief.setdefault("field_sources", {})[k] = "stated"   # the user typed it
+            else:
+                self.brief.pop(k, None)                                    # cleared on the card
+        dec = _decisions_map(turn, decision_overrides or {})
+        self.brief["decisions"] = [{"key": k, "value": v} for k, v in dec.items() if v]
+        chosen = selected_elements if selected_elements is not None else \
+            [e.what for e in turn.creative_elements if e.sensitivity == "safe"]
+        self.brief["creative_elements"] = [{"what": w} for w in chosen]
+        yield Event("brief_state", self.brief)   # emitted before the slow generation, so it survives a failed one
         with _materialized_images(user_photos_b64) as photo_paths:
             extra = {}
             if photo_paths:
@@ -249,23 +273,26 @@ class Engine:
         if annotated:
             with _resolved_image(prior_image_path, prior_image_b64) as path:
                 if path is None:
-                    yield Event("error", "no prior image to refine"); return
+                    yield Event("error", MISSING_STATE); return
                 concept = self._annotated_edit(path, self._generator, instruction)
             yield Event("refined", _with_qr(concept, self.qr))
             return
         # Each HTTP request builds a fresh Engine, so self.project is usually None on a refine
         # turn; rebuild it from the brief the client posts back (mirrors the old engine's
         # self.project-or-rebuild-from-brief behavior, now via TurnResult + build_project).
+        # The brief carries the APPROVED decisions + creative elements (stashed by
+        # handle_approval, echoed by the client), so this rebuild reproduces the approved
+        # design - not the compile-time defaults.
         project = self.project
         if project is None and self.brief:
             turn = TurnResult(**{k: v for k, v in self.brief.items() if k in TurnResult.model_fields})
             project = self._build_project(turn, {}, {}, None, language=language, qr=self.qr)
         if project is None:
-            yield Event("error", "no project to refine"); return
+            yield Event("error", MISSING_STATE); return
         concept = None
         with _resolved_image(prior_image_path, prior_image_b64) as path:
             if path is None:
-                yield Event("error", "no prior image to refine"); return
+                yield Event("error", MISSING_STATE); return
             concept = self._refine(project, path, instruction, generator=self._generator, mode=mode)
         yield Event("refined", _with_qr(concept, self.qr))
 
@@ -276,6 +303,6 @@ class Engine:
         concept = None
         with _resolved_image(prior_image_path, prior_image_b64) as path:
             if path is None:
-                yield Event("error", "no prior image to resize"); return
+                yield Event("error", MISSING_STATE); return
             concept = self._resize(path, aspect_ratio, generator=self._generator)
         yield Event("resized", _with_qr(concept, self.qr))

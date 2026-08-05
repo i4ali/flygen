@@ -64,6 +64,11 @@ struct ExtractedBriefDTO: Codable, Equatable {
     var destination: String?
     var field_sources: [String: String]?
     var photo_suggestion: String?      // brain's "add a photo of X" nudge; shown once per flyer
+    // The APPROVED design, stashed onto the brief by the engine at generation time (brief_state
+    // event) and echoed back on every later turn - so a refine rebuilds the approved look
+    // (palette/style/mood/aspect + creative elements) instead of compile-time defaults.
+    var decisions: [BriefDecisionDTO]?
+    var creative_elements: [BriefElementDTO]?
 
     /// Non-empty content fields in display order (category first), with their source.
     var displayFields: [(key: String, value: String, source: String)] {
@@ -86,6 +91,12 @@ struct ExtractedBriefDTO: Codable, Equatable {
         return out
     }
 }
+
+/// One approved design decision (key: format | palette | visual_style | mood | quality).
+/// Opaque to the UI - it only needs to survive the round-trip.
+struct BriefDecisionDTO: Codable, Equatable { var key: String; var value: String }
+/// One approved creative element; rides the brief like decisions do.
+struct BriefElementDTO: Codable, Equatable { var what: String }
 
 // MARK: - questions payload
 
@@ -148,6 +159,7 @@ struct ConceptDTO: Decodable, Identifiable {
 
 enum SSEEvent {
     case parsedFields(ExtractedBriefDTO)
+    case briefState(ExtractedBriefDTO)      // silent brief update (approved design); stored, no bubble
     case questions([QuestionDTO], String)   // payload + stage ("gaps" | "design")
     case designBrief(DesignBriefDTO)
     case review(ReviewProposalDTO)
@@ -165,6 +177,7 @@ enum SSEEvent {
         do {
             switch event {
             case "parsed_fields": return .parsedFields(try dec.decode(ExtractedBriefDTO.self, from: data))
+            case "brief_state":   return .briefState(try dec.decode(ExtractedBriefDTO.self, from: data))
             case "questions":
                 let qs = try dec.decode(QuestionSetDTO.self, from: data)
                 return .questions(qs.questions, qs.stage ?? "gaps")

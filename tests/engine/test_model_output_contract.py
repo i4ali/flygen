@@ -144,8 +144,14 @@ def test_approve_concepts_event_shape_matches_ios_dto():
          patch("engine.app.get_generator", return_value=MagicMock()), \
          patch("engine.tools.generate_concepts", return_value=fake_concepts):
         client = TestClient(app)
-        with client.stream("POST", "/chat", json={"action": "approve", "brief": brief_dict}) as r:
+        with client.stream("POST", "/chat", json={"action": "approve", "brief": brief_dict,
+                                                  "decision_overrides": {"palette": "midnight & gold"}}) as r:
             fs = _frames("".join(r.iter_text()))
-    assert [k for k, _ in fs] == ["concepts"]
+    # brief_state (the approved design, echoed back for later refines) precedes concepts.
+    assert [k for k, _ in fs] == ["brief_state", "concepts"]
     cs = dict(fs)["concepts"]
     assert len(cs) == 3 and all(isinstance(c["version_id"], str) and "image_base64" in c and "error" in c for c in cs)
+    state = dict(fs)["brief_state"]
+    assert state["headline"] == "Bake Sale"
+    assert {"key": "palette", "value": "midnight & gold"} in state["decisions"]
+    assert "creative_elements" in state

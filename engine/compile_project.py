@@ -11,9 +11,16 @@ _CONTENT_FIELDS = ["headline", "subheadline", "body_text", "date", "time", "venu
                    "website", "social_handle"]
 
 def _category(value) -> FlyerCategory:
+    # The review card shows (and lets the user edit) the DISPLAY name ("Church & Faith"),
+    # so accept either the wire value or the display name before falling back.
     try:
         return FlyerCategory(value)
     except (ValueError, TypeError):
+        if isinstance(value, str):
+            needle = value.strip().lower()
+            for c in FlyerCategory:
+                if needle in (c.value.lower(), c.display_name.lower()):
+                    return c
         return FlyerCategory.ANNOUNCEMENT
 
 def _decisions_map(turn, overrides: dict) -> dict:
@@ -76,7 +83,9 @@ def build_project(turn, field_overrides: dict, decision_overrides: dict,
         lang = FlyerLanguage(language) if language else FlyerLanguage.ENGLISH
     except ValueError:
         lang = FlyerLanguage.ENGLISH          # unknown code -> safe English default
-    project = FlyerProject(category=_category(turn.category), language=lang, text_content=tc,
+    # category is editable on the review card like every content field, so its override counts
+    # (it steers the rubric/negatives/hints - silently discarding the edit was the old bug).
+    project = FlyerProject(category=_category(fo.get("category") or turn.category), language=lang, text_content=tc,
                            output=output, visuals=visuals, colors=colors,
                            imagery_description=imagery, special_instructions=instructions)
     # QR is standalone wire state (not part of the brief). When enabled with a target, encode it
