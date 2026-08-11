@@ -56,16 +56,18 @@ OPENROUTER_MODELS = {
 CHAT_COMPLETION_IMAGE_MODELS = ["nano-banana", "nano-banana-pro"]
 
 # Nano Banana supports these aspect ratios directly. The first block is the app's
-# coarse "create" format set (4:5 intentionally snaps to 3:4). The self-mapping block
-# below adds the finer ratios Gemini accepts natively, so an uploaded reference flyer
-# can be edited at its TRUE shape instead of being squished into one of four buckets.
+# "create" format set. Letter/A4 have no native equivalent: they generate at 3:4 (the
+# closest native portrait) and are then deterministically padded to the true paper
+# ratio in _generate_nano_banana (see PRINT_RATIOS). The self-mapping block below adds
+# the finer ratios Gemini accepts natively, so an uploaded reference flyer can be
+# edited at its TRUE shape instead of being squished into one of four buckets.
 NANO_BANANA_ASPECT_RATIOS = {
     "1:1": "1:1",
-    "4:5": "3:4",      # Closest match
+    "4:5": "4:5",
     "9:16": "9:16",
     "16:9": "16:9",
-    "letter": "3:4",
-    "a4": "3:4",
+    "letter": "3:4",   # + pad to 8.5:11
+    "a4": "3:4",       # + pad to 210:297
     # finer ratios, passed through verbatim (used by nearest_aspect_ratio for reference edits)
     "2:3": "2:3",
     "3:2": "3:2",
@@ -74,10 +76,63 @@ NANO_BANANA_ASPECT_RATIOS = {
     "5:4": "5:4",
 }
 
+# True paper proportions (width/height) for the print formats. Applied as a
+# deterministic post-generation pad so "Letter"/"A4" actually fit the paper.
+PRINT_RATIOS = {"letter": 8.5 / 11, "a4": 210 / 297}
+
+# Print formats generate at this resolution tier via OpenRouter's dedicated Images API
+# (the chat-completions endpoint silently ignores every resolution parameter - verified
+# 2026-08-10). 2K on Letter is ~218 DPI and bills the same 1120 image tokens as 1K.
+PRINT_RESOLUTION = "2K"
+
 # Ratios Gemini image models accept natively, for preserving an uploaded reference's
-# true shape (the 4-bucket create set above is too coarse and would distort the edit).
-_REFERENCE_RATIOS = {"1:1": 1.0, "2:3": 2 / 3, "3:2": 3 / 2, "3:4": 3 / 4,
+# true shape (the create set above is too coarse and would distort the edit).
+_REFERENCE_RATIOS = {"1:1": 1.0, "2:3": 2 / 3, "3:2": 3 / 2, "3:4": 3 / 4, "4:5": 4 / 5,
                      "4:3": 4 / 3, "5:4": 5 / 4, "9:16": 9 / 16, "16:9": 16 / 9}
+
+
+def _pad_to_print_ratio(b64_data: str, target_ratio: float) -> str:
+    """Pad a generated image out to the exact paper ratio, extending the edge pixels so
+    the added strips read as part of the artwork rather than bars. Centered, symmetric.
+    Fails open: any error returns the image unpadded (a slightly-off print beats a
+    failed generation, same contract as the QR composite)."""
+    try:
+        import io
+        from PIL import Image
+
+        img = Image.open(io.BytesIO(base64.b64decode(b64_data))).convert("RGB")
+        w, h = img.size
+        if not w or not h:
+            return b64_data
+
+        target_w, target_h = w, h
+        if w / h < target_ratio:
+            target_w = round(h * target_ratio)   # too narrow: widen
+        else:
+            target_h = round(w / target_ratio)   # too wide: heighten
+
+        if (target_w, target_h) == (w, h):
+            return b64_data
+
+        canvas = Image.new("RGB", (target_w, target_h))
+        left = (target_w - w) // 2
+        top = (target_h - h) // 2
+        if left > 0:
+            canvas.paste(img.crop((0, 0, 1, h)).resize((left, h)), (0, top))
+            right = target_w - w - left
+            canvas.paste(img.crop((w - 1, 0, w, h)).resize((right, h)), (left + w, top))
+        if top > 0:
+            canvas.paste(img.crop((0, 0, w, 1)).resize((w, top)), (left, 0))
+            bottom = target_h - h - top
+            canvas.paste(img.crop((0, h - 1, w, h)).resize((w, bottom)), (left, top + h))
+        canvas.paste(img, (left, top))
+
+        buf = io.BytesIO()
+        canvas.save(buf, format="PNG")
+        return base64.b64encode(buf.getvalue()).decode("utf-8")
+    except Exception as e:
+        print(f"Warning: print-ratio padding failed, returning unpadded image: {e}")
+        return b64_data
 
 
 def nearest_aspect_ratio(width: int, height: int) -> str:
@@ -303,6 +358,75 @@ class FlyerImageGenerator:
             print(f"Warning: Could not load image {image_path}: {e}")
             return None
 
+    def _image_data_url(self, img_path: str) -> Optional[str]:
+        """Load an image file as a data URL, or None if unreadable."""
+        img_b64 = self._load_image_as_base64(img_path)
+        if not img_b64:
+            return None
+        ext = Path(img_path).suffix.lower()
+        mime_type = {
+            '.png': 'image/png',
+            '.jpg': 'image/jpeg',
+            '.jpeg': 'image/jpeg',
+            '.gif': 'image/gif',
+            '.webp': 'image/webp'
+        }.get(ext, 'image/png')
+        return f"data:{mime_type};base64,{img_b64}"
+
+    def _generate_nano_banana_hires(
+        self,
+        prompt: str,
+        aspect_ratio: str,
+        save: bool,
+        index: int,
+        model: str,
+        input_images: Optional[List[str]] = None,
+        resolution: str = PRINT_RESOLUTION
+    ) -> GenerationResult:
+        """Generate via OpenRouter's dedicated Images API, which honors the resolution
+        tier (input references use the OpenAI content-part shape). Raises on any
+        failure so the caller can fall back to the standard chat-completions path."""
+        import httpx
+
+        ar = NANO_BANANA_ASPECT_RATIOS.get(aspect_ratio, "1:1")
+        body = {
+            "model": model,
+            "prompt": prompt,
+            "aspect_ratio": ar,
+            "resolution": resolution,
+            "output_format": "png",
+        }
+        refs = [{"type": "image_url", "image_url": {"url": url}}
+                for url in map(self._image_data_url, input_images or []) if url]
+        if refs:
+            body["input_references"] = refs
+
+        resp = httpx.post(
+            f"{self.base_url}/images",
+            json=body,
+            headers={"Authorization": f"Bearer {self.api_key}"},
+            timeout=300,
+        )
+        resp.raise_for_status()
+        b64_data = resp.json()["data"][0]["b64_json"]
+
+        print_ratio = PRINT_RATIOS.get(aspect_ratio)
+        if print_ratio:
+            b64_data = _pad_to_print_ratio(b64_data, print_ratio)
+
+        image_path = None
+        if save:
+            image_path = self._save_image_from_base64(b64_data, "nanobanana", index)
+
+        return GenerationResult(
+            success=True,
+            image_path=str(image_path) if image_path else None,
+            image_base64=b64_data,
+            model_used=model,
+            metadata={"aspect_ratio": ar, "resolution": resolution,
+                      "has_logo": bool(input_images)}
+        )
+
     def _generate_nano_banana(
         self,
         prompt: str,
@@ -313,6 +437,16 @@ class FlyerImageGenerator:
         input_images: Optional[List[str]] = None
     ) -> GenerationResult:
         """Generate with Nano Banana via chat completions API"""
+        # Print formats go through the Images API for 2K output; any failure there
+        # falls back to the standard path below (a 1K print flyer beats a failed turn).
+        if self.use_openrouter and aspect_ratio in PRINT_RATIOS:
+            try:
+                return self._generate_nano_banana_hires(
+                    prompt, aspect_ratio, save, index, model, input_images
+                )
+            except Exception as e:
+                print(f"Warning: hi-res Images API failed, falling back to standard: {e}")
+
         try:
             # Map aspect ratio
             ar = NANO_BANANA_ASPECT_RATIOS.get(aspect_ratio, "1:1")
@@ -321,23 +455,9 @@ class FlyerImageGenerator:
             content = []
 
             # Add input images first (e.g., logo)
-            if input_images:
-                for img_path in input_images:
-                    img_b64 = self._load_image_as_base64(img_path)
-                    if img_b64:
-                        # Detect image type from extension
-                        ext = Path(img_path).suffix.lower()
-                        mime_type = {
-                            '.png': 'image/png',
-                            '.jpg': 'image/jpeg',
-                            '.jpeg': 'image/jpeg',
-                            '.gif': 'image/gif',
-                            '.webp': 'image/webp'
-                        }.get(ext, 'image/png')
-                        content.append({
-                            "type": "image_url",
-                            "image_url": {"url": f"data:{mime_type};base64,{img_b64}"}
-                        })
+            for url in map(self._image_data_url, input_images or []):
+                if url:
+                    content.append({"type": "image_url", "image_url": {"url": url}})
 
             # Add text prompt
             content.append({"type": "text", "text": prompt})
@@ -362,6 +482,10 @@ class FlyerImageGenerator:
                 if image_data_url and "," in image_data_url:
                     # Parse base64 from data URL: "data:image/png;base64,..."
                     b64_data = image_data_url.split(",")[1]
+
+                    print_ratio = PRINT_RATIOS.get(aspect_ratio)
+                    if print_ratio:
+                        b64_data = _pad_to_print_ratio(b64_data, print_ratio)
 
                     image_path = None
                     if save:

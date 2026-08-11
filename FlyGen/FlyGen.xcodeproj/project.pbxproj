@@ -10,6 +10,7 @@
 		018C2423C0C86CE01329D1C1 /* PhotoLibraryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C61A47D28D08C6960017130 /* PhotoLibraryService.swift */; };
 		02C7FBC355F6A0B6897904C8 /* ProfileTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92EF130D6F0181711C3C8D15 /* ProfileTab.swift */; };
 		05236A51D1AADA5B81A322C2 /* NegativePrompts.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5F0A68F65B4BF9A1CFA475A /* NegativePrompts.swift */; };
+		0B40A6CFF194D68C31829F4A /* FlyerPDFExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E38FC5E6633CE9620F4D131C /* FlyerPDFExporter.swift */; };
 		13D4CE93F55BE0BE20BA0B3E /* FlyerChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0EB877522770E516371B37D /* FlyerChatViewModel.swift */; };
 		162CEFDA5FFBDD64CAE60392 /* ColorSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F81AFF070A145CF531597E /* ColorSettings.swift */; };
 		1FA1B5762E86758C83CEF517 /* OpenRouterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC1056727B410D483D6F9ADD /* OpenRouterService.swift */; };
@@ -266,6 +267,7 @@
 		DAB10B9A50AB09E7D83C2772 /* SpaceGrotesk-Bold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; path = "SpaceGrotesk-Bold.ttf"; sourceTree = "<group>"; };
 		DE68BC1381C77E543EAE2C81 /* SuggestionService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SuggestionService.swift; sourceTree = "<group>"; };
 		E1031905BEC715F64F5957DC /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		E38FC5E6633CE9620F4D131C /* FlyerPDFExporter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FlyerPDFExporter.swift; sourceTree = "<group>"; };
 		E8B8C8492F364170AB2291CB /* NotificationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		E9A307A0155A5D0FB32F67E0 /* DemoFlyerReveal.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DemoFlyerReveal.swift; sourceTree = "<group>"; };
 		EB04130801C20BE11F94D733 /* TextContentStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextContentStepView.swift; sourceTree = "<group>"; };
@@ -638,6 +640,7 @@
 				26B398317D4F2F08B799273C /* LogoCompositeService.swift */,
 				BBSMARTSUGSVC01 /* SmartSuggestionsService.swift */,
 				BBENTSVC000001 /* EntitlementService.swift */,
+				E38FC5E6633CE9620F4D131C /* FlyerPDFExporter.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -876,6 +879,7 @@
 				56CFA7C78515914E55A1E844 /* OnboardingQROfferView.swift in Sources */,
 				99CFD645058052006B06516D /* OnboardingResizeView.swift in Sources */,
 				BC72B29597A67D24D9EF54BB /* OnboardingSavePromptView.swift in Sources */,
+				0B40A6CFF194D68C31829F4A /* FlyerPDFExporter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

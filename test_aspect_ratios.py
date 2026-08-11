@@ -32,15 +32,17 @@ from image_generator import create_generator
 # EXPECTED RATIOS
 # =============================================================================
 
-# Expected aspect ratios (width/height) with tolerance
-# Different models may produce slightly different dimensions
+# Expected aspect ratios (width/height) with tolerance.
+# 4:5 is generated natively; letter/a4 are deterministically padded to the true paper
+# ratio after generation, so all six must land within a tight tolerance - loose
+# tolerances here previously made the letter/a4/4:5 collapse to 3:4 unfalsifiable.
 EXPECTED_RATIOS = {
-    "1:1": (1.0, 0.05),       # Square, 5% tolerance
-    "4:5": (0.8, 0.15),       # Portrait - Nano Banana uses 3:4 (0.75)
-    "9:16": (0.5625, 0.05),   # Story/Vertical
-    "16:9": (1.777, 0.05),    # Landscape/Banner
-    "letter": (0.77, 0.15),   # US Letter ~8.5/11 - model approximates
-    "a4": (0.707, 0.15),      # A4 ~210/297 - model approximates
+    "1:1": (1.0, 0.02),          # Square
+    "4:5": (0.8, 0.02),          # Portrait - native on nano-banana-pro
+    "9:16": (0.5625, 0.02),      # Story/Vertical
+    "16:9": (1.777, 0.02),       # Landscape/Banner
+    "letter": (8.5 / 11, 0.01),  # US Letter - exact via post-generation padding
+    "a4": (210 / 297, 0.01),     # A4 - exact via post-generation padding
 }
 
 # Map string to AspectRatio enum

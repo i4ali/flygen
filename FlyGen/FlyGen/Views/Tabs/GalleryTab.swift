@@ -144,6 +144,8 @@ struct FlyerDetailSheet: View {
     var onUseAsTemplate: ((SavedFlyer) -> Void)?
     @State private var showingShareSheet = false
     @State private var showingSaveSuccess = false
+    @State private var showingPDFShareSheet = false
+    @State private var pdfURL: URL?
 
     var body: some View {
         NavigationStack {
@@ -256,6 +258,25 @@ struct FlyerDetailSheet: View {
                                     .stroke(FGColors.accentPrimary, lineWidth: 1.5)
                             )
                         }
+
+                        Button {
+                            sharePDF()
+                        } label: {
+                            HStack(spacing: FGSpacing.sm) {
+                                Image(systemName: "doc.richtext")
+                                Text("PDF")
+                            }
+                            .font(FGTypography.button)
+                            .foregroundColor(FGColors.accentPrimary)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, FGSpacing.md)
+                            .background(FGColors.surfaceDefault)
+                            .clipShape(RoundedRectangle(cornerRadius: FGSpacing.buttonRadius))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: FGSpacing.buttonRadius)
+                                    .stroke(FGColors.accentPrimary, lineWidth: 1.5)
+                            )
+                        }
                     }
                     .padding(.horizontal, FGSpacing.screenHorizontal)
                 }
@@ -278,7 +299,23 @@ struct FlyerDetailSheet: View {
                     ShareSheet(items: [uiImage])
                 }
             }
+            .sheet(isPresented: $showingPDFShareSheet) {
+                if let pdfURL {
+                    ShareSheet(items: [pdfURL])
+                }
+            }
         }
+    }
+
+    private func sharePDF() {
+        guard let imageData = flyer.imageData,
+              let cgImage = UIImage(data: imageData)?.cgImage else { return }
+        let paper = FlyerPDFExporter.paper(matching: cgImage,
+                                           localeRegion: Locale.current.region?.identifier)
+        guard let url = FlyerPDFExporter.writeTemporaryPDF(image: cgImage, paper: paper,
+                                                           named: flyer.headline) else { return }
+        pdfURL = url
+        showingPDFShareSheet = true
     }
 
     private func saveToPhotos() {

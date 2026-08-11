@@ -130,12 +130,19 @@ def annotated_edit(image_path: str, generator, instruction: str,
     return _to_concept(results[0], "annotated_edit")
 
 
+_RESIZE_TARGET_WORDS = {
+    "letter": "US Letter print proportions (8.5x11 portrait)",
+    "a4": "A4 print proportions (portrait)",
+}
+
+
 def resize_concept(prior_image_path: str, aspect_ratio: str, generator,
                    model: str = "nano-banana-pro") -> Concept:
     """Reformat an existing concept to a new aspect ratio, preserving text/style
     (mirrors main.py's reformat_image)."""
+    target = _RESIZE_TARGET_WORDS.get(aspect_ratio, f"{aspect_ratio} aspect ratio")
     prompt = (
-        f"Reformat this flyer image to {aspect_ratio} aspect ratio. "
+        f"Reformat this flyer image to {target}. "
         f"Preserve ALL text exactly as shown - do not change any words or spelling. "
         f"Maintain the same visual style, colors, and layout as much as possible. "
         f"Adapt the composition to fit the new dimensions naturally."
