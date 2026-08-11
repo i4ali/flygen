@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlyGen — Menu Maker · Design Proposal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..600&family=Hanken+Grotesk:wght@400..800&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   FlyGen · Menu Maker concept — storyboard deck
+   Same house style as mockups/chat-v2: warm paper, ink, one
+   vermilion signature. Phone screens show the CURRENT Aurora
+   app (dark, indigo/cyan, Space Grotesk).
+   ============================================================ */
+:root{
+  --paper:#F1ECE1; --paper-2:#FBF9F3; --card:#FFFFFF;
+  --ink:#18140E; --ink-2:#5C5446; --ink-3:#938A78;
+  --line:#E4DCCC; --line-2:#EFE9DC;
+  --accent:#DF4324; --accent-deep:#B5331A; --accent-soft:#FAE1D8;
+  --cool:#1E6E6A; --cool-soft:#DCEBE9; --gold:#C08A2D;
+
+  /* Aurora in-phone tokens (FGColors) */
+  --au-bg:#0A0B0F; --au-surface:#13151B; --au-t3:#1B1E27; --au-sel:#1C2033;
+  --au-indigo:#7C8CF8; --au-indigo2:#8B7CF8; --au-cyan:#63E6D2;
+  --au-text:#EDEFF4; --au-text2:#8A90A0; --au-text3:#565C6B;
+  --au-line:rgba(255,255,255,.12); --au-line2:rgba(255,255,255,.07);
+  --au-warn:#F5A524; --au-ok:#3EC06A;
+
+  --shadow-phone:0 2px 4px rgba(24,20,14,.04), 0 24px 50px -18px rgba(24,20,14,.45), 0 2px 0 rgba(255,255,255,.6) inset;
+  --shadow-card:0 1px 0 rgba(255,255,255,.7) inset, 0 18px 40px -28px rgba(24,20,14,.4);
+  --maxw:1320px;
+  --font-d:"Fraunces",Georgia,serif;
+  --font-b:"Hanken Grotesk",system-ui,sans-serif;
+  --font-m:"JetBrains Mono",ui-monospace,monospace;
+  --font-au:"Space Grotesk",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--font-b); color:var(--ink); background:var(--paper);
+  background-image:
+    radial-gradient(1200px 700px at 82% -10%, rgba(223,67,36,.06), transparent 60%),
+    radial-gradient(900px 600px at -5% 8%, rgba(30,110,106,.05), transparent 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.025'/%3E%3C/svg%3E");
+  line-height:1.5; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+a{color:inherit;text-decoration:none}
+
+.topnav{
+  position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  padding:14px clamp(18px,4vw,46px);background:rgba(241,236,225,.82);
+  backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:9px;font-family:var(--font-d);font-weight:600;font-size:18px;letter-spacing:-.01em}
+.brand .mk{width:26px;height:26px;border-radius:8px;flex:none;display:grid;place-items:center;color:#fff;font-size:14px;
+  background:linear-gradient(150deg,var(--accent),var(--accent-deep));box-shadow:0 4px 10px -3px rgba(223,67,36,.6)}
+.brand small{font-family:var(--font-m);font-weight:500;font-size:10px;color:var(--ink-3);letter-spacing:.04em;text-transform:uppercase}
+.topnav nav{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}
+.topnav nav a{font-size:13.5px;font-weight:600;color:var(--ink-2);padding:7px 13px;border-radius:99px;transition:.15s}
+.topnav nav a:hover{background:var(--paper-2);color:var(--ink)}
+
+main{max-width:var(--maxw);margin:0 auto;padding:clamp(28px,5vw,64px) clamp(18px,4vw,46px) 90px}
+.kicker{font-family:var(--font-m);font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);
+  display:inline-flex;align-items:center;gap:9px}
+.kicker::before{content:"";width:26px;height:1.5px;background:var(--accent)}
+h1.display{font-family:var(--font-d);font-weight:600;font-size:clamp(34px,6vw,64px);line-height:.99;letter-spacing:-.022em;margin:18px 0 0;max-width:17ch}
+h1.display em{font-style:italic;color:var(--accent);font-weight:500}
+.lede{font-size:clamp(16px,2vw,19px);color:var(--ink-2);max-width:62ch;margin-top:20px}
+.lede b{color:var(--ink);font-weight:700}
+.fineprint{font-family:var(--font-m);font-size:11.5px;color:var(--ink-3);margin-top:14px;letter-spacing:.01em}
+
+.section{margin-top:clamp(48px,7vw,96px)}
+.section-head{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:8px}
+.section-head h2{font-family:var(--font-d);font-weight:600;font-size:clamp(24px,3.4vw,38px);letter-spacing:-.018em;line-height:1.02}
+.section-head .idx{font-family:var(--font-m);font-size:13px;color:var(--accent);font-weight:500}
+.section-d{font-size:16px;color:var(--ink-2);max-width:66ch;margin-top:6px}
+.section-d b{color:var(--ink)}
+
+.hero{display:grid;grid-template-columns:1.12fr .88fr;gap:clamp(28px,5vw,72px);align-items:center}
+@media(max-width:880px){.hero{grid-template-columns:1fr}}
+.hero-phone{display:grid;place-items:center}
+
+/* ---------- compare cards ---------- */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:26px}
+@media(max-width:820px){.compare{grid-template-columns:1fr}}
+.cmp{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 24px;box-shadow:var(--shadow-card)}
+.cmp h3{font-family:var(--font-d);font-size:19px;font-weight:600;letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
+.cmp .verdict{margin-left:auto;font-family:var(--font-m);font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  padding:3px 9px;border-radius:99px}
+.cmp.yes .verdict{background:var(--cool-soft);color:var(--cool)}
+.cmp.no .verdict{background:var(--accent-soft);color:var(--accent-deep)}
+.cmp ul{list-style:none;margin-top:14px}
+.cmp li{font-size:13.5px;color:var(--ink-2);padding:7px 0 7px 24px;position:relative;line-height:1.4;border-top:1px solid var(--line-2)}
+.cmp li b{color:var(--ink)}
+.cmp li::before{position:absolute;left:2px;top:7px;font-weight:900;font-size:12px}
+.cmp.yes li::before{content:"✓";color:var(--cool)}
+.cmp.no li::before{content:"✕";color:var(--accent)}
+
+/* ---------- split diagram ---------- */
+.split{display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:stretch;margin-top:28px}
+@media(max-width:880px){.split{grid-template-columns:1fr}.split .plus{transform:rotate(90deg);justify-self:center}}
+.layer{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px 22px;box-shadow:var(--shadow-card)}
+.layer .tag{display:inline-block;font-family:var(--font-m);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  padding:3px 9px;border-radius:6px;margin-bottom:10px}
+.layer.ai .tag{background:var(--accent-soft);color:var(--accent-deep)}
+.layer.code .tag{background:var(--cool-soft);color:var(--cool)}
+.layer h3{font-family:var(--font-d);font-size:20px;font-weight:600;letter-spacing:-.012em}
+.layer p{font-size:13.5px;color:var(--ink-2);margin-top:8px;line-height:1.5}
+.layer p b{color:var(--ink)}
+.split .plus{display:grid;place-items:center;font-family:var(--font-d);font-size:34px;color:var(--ink-3)}
+.stagepair{display:flex;gap:10px;margin-top:14px}
+.stagepair .demo{flex:1;aspect-ratio:.72;border-radius:10px;border:1px solid var(--line);position:relative;overflow:hidden;box-shadow:0 8px 18px -12px rgba(0,0,0,.4)}
+.result-note{margin-top:16px;background:var(--paper-2);border:1px dashed var(--line);border-radius:12px;padding:12px 15px;font-size:13px;color:var(--ink-2)}
+.result-note b{color:var(--ink)}
+
+/* ---------- storyboard ---------- */
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(272px,1fr));gap:clamp(20px,2.6vw,40px) clamp(16px,2vw,30px);margin-top:34px}
+.step{position:relative;display:flex;flex-direction:column;animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+.step-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.step-num{font-family:var(--font-m);font-weight:700;font-size:12px;color:#fff;background:var(--ink);width:25px;height:25px;border-radius:7px;
+  display:grid;place-items:center;flex:none}
+.step.warm .step-num{background:var(--accent)}
+.step.cool .step-num{background:var(--cool)}
+.step-label{font-weight:700;font-size:14.5px;letter-spacing:-.01em;line-height:1.15}
+.step .note{font-size:13.5px;color:var(--ink-2);margin-top:14px;padding-left:2px}
+.step .note b{color:var(--ink);font-weight:700}
+.step .note .tag{display:inline-block;font-family:var(--font-m);font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--accent);background:var(--accent-soft);padding:2px 7px;border-radius:5px;margin-bottom:7px}
+.step.cool .note .tag{color:var(--cool);background:var(--cool-soft)}
+.step .phone{align-self:center}
+.phase{grid-column:1/-1;display:flex;align-items:center;gap:14px;margin:14px 0 -8px;font-family:var(--font-m);font-size:11.5px;
+  font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.phase::after{content:"";flex:1;height:1px;background:var(--line)}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.step{animation:none}}
+
+/* ---------- layers table ---------- */
+.laygrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:26px}
+@media(max-width:880px){.laygrid{grid-template-columns:1fr}}
+.lay{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow-card)}
+.lay h4{font-family:var(--font-m);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.lay ul{list-style:none}
+.lay li{font-size:13px;color:var(--ink-2);padding:6px 0 6px 18px;position:relative;line-height:1.42;border-top:1px solid var(--line-2)}
+.lay li:first-child{border-top:0}
+.lay li::before{content:"·";position:absolute;left:4px;top:4px;font-weight:900;color:var(--accent)}
+.lay li b{color:var(--ink)}
+
+/* ---------- decisions ---------- */
+.decisions{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:26px}
+@media(max-width:820px){.decisions{grid-template-columns:1fr}}
+.dec{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow-card)}
+.dec .q{font-weight:800;font-size:14.5px;letter-spacing:-.01em}
+.dec .pick{display:inline-block;font-family:var(--font-m);font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--cool);background:var(--cool-soft);padding:3px 9px;border-radius:99px;margin:9px 0 7px}
+.dec p{font-size:13px;color:var(--ink-2);line-height:1.5}
+.dec p b{color:var(--ink)}
+
+/* ============================================================
+   Phone frame (house) + Aurora screen
+   ============================================================ */
+.phone{width:268px;flex:none;background:linear-gradient(150deg,#2b2620,#171310);border-radius:40px;padding:9px;box-shadow:var(--shadow-phone)}
+.phone.lg{width:300px}
+.screen{position:relative;width:100%;aspect-ratio:9/19.3;border-radius:32px;overflow:hidden;display:flex;flex-direction:column;
+  background:var(--au-bg);font-family:var(--font-au);color:var(--au-text)}
+.island{position:absolute;top:9px;left:50%;transform:translateX(-50%);width:32%;height:19px;background:#000;border-radius:99px;z-index:20}
+.statusbar{display:flex;justify-content:space-between;align-items:center;padding:11px 20px 4px;font-size:11px;font-weight:700;color:var(--au-text);z-index:10}
+.statusbar .r{display:flex;align-items:center;gap:5px;font-size:10px}
+.a-appbar{display:flex;align-items:center;gap:8px;padding:7px 13px 9px;border-bottom:1px solid var(--au-line2);z-index:9}
+.a-appbar .back{font-size:19px;color:var(--au-indigo);line-height:1;margin-top:-2px}
+.a-appbar .who{display:flex;flex-direction:column;line-height:1.15;flex:1;min-width:0}
+.a-appbar .who b{font-size:12.5px;font-weight:600;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.a-appbar .who small{font-size:9px;color:var(--au-text3);display:flex;align-items:center;gap:4px}
+.a-appbar .who small::before{content:"";width:5px;height:5px;border-radius:99px;background:var(--au-cyan);box-shadow:0 0 4px var(--au-cyan)}
+.a-appbar .act{font-size:14px;color:var(--au-text3);margin-left:auto}
+
+.a-chat{flex:1;overflow:hidden;padding:12px 11px 6px;display:flex;flex-direction:column;gap:8px;
+  background:radial-gradient(circle at 30% 0%, rgba(124,140,248,.07), transparent 42%), var(--au-bg)}
+.a-msg{max-width:86%;font-size:11.5px;line-height:1.35}
+.a-msg.user{align-self:flex-end;color:#fff;background:linear-gradient(135deg,var(--au-indigo),var(--au-indigo2));
+  padding:8px 12px;border-radius:16px;border-bottom-right-radius:5px;box-shadow:0 8px 20px -10px rgba(124,140,248,.55)}
+.a-msg.ai{align-self:flex-start;color:#B9BFCC}
+.a-msg.sys{align-self:center;color:var(--au-text3);font-size:9.5px;font-weight:500;text-align:center}
+.a-chips{display:flex;flex-wrap:wrap;gap:5px;align-self:flex-start;max-width:92%}
+.a-chip{font-size:10px;font-weight:600;padding:6px 10px;border-radius:99px;border:1px solid var(--au-line);color:var(--au-text);
+  display:inline-flex;align-items:center;gap:5px;background:var(--au-surface)}
+.a-chip.sel{background:var(--au-sel);border-color:var(--au-indigo);color:#C7CDF9}
+.a-chip .e{font-size:11px}
+
+/* assistant card (AssistantCard) */
+.a-card{align-self:stretch;background:var(--au-surface);border:1px solid var(--au-line2);border-radius:14px;padding:11px;display:flex;flex-direction:column;gap:8px}
+.a-card .h4{font-size:12.5px;font-weight:600;letter-spacing:-.01em;color:var(--au-text)}
+.a-cap{font-size:8.5px;font-weight:500;color:var(--au-text3);letter-spacing:.02em}
+.a-input{background:var(--au-t3);border-radius:9px;padding:6px 9px;font-size:10.5px;color:var(--au-text);line-height:1.3}
+.a-input small{color:var(--au-text3)}
+.a-row{display:flex;align-items:center;gap:6px}
+.a-badge{margin-left:auto;font-size:7.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--au-text3);
+  border:1px solid var(--au-line2);border-radius:5px;padding:1px 5px}
+.a-badge.cyan{color:var(--au-cyan);border-color:rgba(99,230,210,.35)}
+.a-badge.warn{color:var(--au-warn);border-color:rgba(245,165,36,.4)}
+.a-badge.free{color:var(--au-ok);border-color:rgba(62,192,106,.4)}
+.a-btn{display:flex;align-items:center;justify-content:center;gap:6px;background:var(--au-indigo);color:#0B0D18;font-weight:700;font-size:11px;
+  border-radius:11px;padding:9px;box-shadow:0 10px 24px -10px rgba(124,140,248,.5)}
+.a-btn small{font-weight:600;font-size:8.5px;opacity:.75}
+.a-btn.ghost{background:var(--au-surface);border:1px solid var(--au-line);color:var(--au-text);box-shadow:none}
+.a-btn.cyanline{background:transparent;border:1px solid rgba(99,230,210,.4);color:var(--au-cyan);box-shadow:none;padding:7px}
+.a-divider{height:1px;background:var(--au-line2);margin:1px 0}
+.a-warnline{display:flex;align-items:flex-start;gap:4px;font-size:8.5px;color:var(--au-warn);line-height:1.3}
+.a-select{display:flex;align-items:center;background:var(--au-t3);border-radius:9px;padding:6px 9px;font-size:10.5px;color:var(--au-text)}
+.a-select .chev{margin-left:auto;color:var(--au-text3);font-size:9px}
+
+/* menu item table rows */
+.mi-sec{display:flex;align-items:center;gap:6px;font-size:8.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--au-cyan);margin-top:2px}
+.mi-sec .ln{flex:1;height:1px;background:var(--au-line2)}
+.mi-sec .ct{color:var(--au-text3);font-weight:600;letter-spacing:0;text-transform:none}
+.mi{display:flex;align-items:center;gap:6px}
+.mi .nm{flex:1;min-width:0;font-size:10px;color:var(--au-text);line-height:1.25}
+.mi .nm small{display:block;font-size:8px;color:var(--au-text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mi .pr{font-family:var(--font-m);font-size:9.5px;font-weight:500;background:var(--au-t3);border-radius:6px;padding:3px 6px;color:var(--au-text);
+  min-width:44px;text-align:right;border:1px solid transparent}
+.mi.flag .pr{border-color:var(--au-warn);color:var(--au-warn)}
+.mi.editing .pr{border-color:var(--au-indigo);color:#C7CDF9;background:var(--au-sel)}
+.mi-add{font-size:9.5px;font-weight:600;color:var(--au-indigo);display:flex;align-items:center;gap:5px}
+.pageplan{display:flex;align-items:center;gap:7px;background:var(--au-sel);border:1px solid rgba(124,140,248,.3);border-radius:10px;padding:7px 9px}
+.pageplan .pp-pages{display:flex;gap:3px}
+.pageplan .pp-pages i{width:12px;height:16px;border-radius:2.5px;background:var(--au-t3);border:1px solid var(--au-line);display:block}
+.pageplan .pp-pages i.on{background:var(--au-indigo);border-color:var(--au-indigo)}
+.pageplan span{font-size:9px;color:#C7CDF9;line-height:1.25}
+
+/* ---------- CSS-drawn menu pages ---------- */
+.mpage{background:#F6EFE3;color:#241D14;border-radius:8px;overflow:hidden;position:relative;aspect-ratio:.72;
+  box-shadow:0 10px 24px -12px rgba(0,0,0,.65);border:1px solid rgba(0,0,0,.2);display:flex;flex-direction:column;font-family:var(--font-d)}
+.mpage .m-inner{position:absolute;inset:5%;display:flex;flex-direction:column}
+.mpage .m-head{text-align:center;padding-bottom:4%;border-bottom:1px solid rgba(36,29,20,.25)}
+.mpage .m-head .rn{font-weight:700;letter-spacing:.02em;line-height:1}
+.mpage .m-head .rt{font-family:var(--font-b);font-weight:600;letter-spacing:.28em;text-transform:uppercase;opacity:.55;margin-top:3%}
+.mpage .m-body{flex:1;display:flex;flex-direction:column;justify-content:space-evenly;padding-top:2%}
+.mpage .msec .st{font-family:var(--font-b);font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:#8A5A22;display:flex;align-items:center;gap:5%}
+.mpage .msec .st::after{content:"";flex:1;height:1px;background:rgba(138,90,34,.4)}
+.mpage .mrow{display:flex;align-items:baseline;gap:4px;font-family:var(--font-b)}
+.mpage .mrow .n{font-weight:700;white-space:nowrap}
+.mpage .mrow .dots{flex:1;border-bottom:1.5px dotted rgba(36,29,20,.4);transform:translateY(-2px)}
+.mpage .mrow .p{font-family:var(--font-m);font-weight:500}
+.mpage .mrow.hl .n,.mpage .mrow.hl .p{color:var(--accent-deep)}
+.mpage .m-foot{text-align:center;font-family:var(--font-b);letter-spacing:.14em;text-transform:uppercase;opacity:.5;padding-top:3%}
+/* dark-gold "upscale" variant */
+.mpage.dark{background:#14100B;color:#E8D7B0;border-color:rgba(216,179,106,.35)}
+.mpage.dark .m-head{border-bottom-color:rgba(216,179,106,.4)}
+.mpage.dark .msec .st{color:#D8B36A}
+.mpage.dark .msec .st::after{background:rgba(216,179,106,.35)}
+.mpage.dark .mrow .dots{border-bottom-color:rgba(232,215,176,.3)}
+/* cover variant */
+.mpage.cover .m-inner{justify-content:center;text-align:center;gap:4%}
+.mpage.cover .art{height:34%;border-radius:6px;background:radial-gradient(circle at 60% 35%,#E8A55C,#B4571E 70%,#7A340F)}
+.mpage.cover.dark .art{background:radial-gradient(circle at 60% 35%,#3A2E17,#1E1810 75%)}
+
+/* theme candidate strip */
+.tstrip{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;align-self:stretch}
+.tstrip .tc{position:relative}
+.tstrip .tc .mpage{border-radius:6px}
+.tstrip .tc.pick .mpage{outline:2px solid var(--au-indigo);outline-offset:2px}
+.tstrip .tc .tlab{text-align:center;font-size:8px;color:var(--au-text3);font-weight:600;margin-top:4px}
+.tstrip .tc.pick .tlab{color:#C7CDF9}
+
+/* page viewer inside result card */
+.pgview{display:flex;flex-direction:column;gap:7px;align-self:stretch}
+.pgthumbs{display:flex;gap:6px;justify-content:center}
+.pgthumbs .pt{width:34px;position:relative}
+.pgthumbs .pt .mpage{border-radius:4px}
+.pgthumbs .pt.on .mpage{outline:2px solid var(--au-cyan);outline-offset:1.5px}
+.pgthumbs .pt .pl{text-align:center;font-size:7.5px;color:var(--au-text3);font-weight:600;margin-top:3px}
+.pgthumbs .pt.on .pl{color:var(--au-cyan)}
+.a-actions{display:flex;justify-content:space-between;gap:4px}
+.a-actions .ac{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:7.5px;font-weight:600;color:var(--au-cyan)}
+.a-actions .ac i{width:26px;height:26px;border-radius:8px;border:1px solid var(--au-line2);background:var(--au-t3);display:grid;place-items:center;font-style:normal;font-size:11px}
+
+/* generating screen */
+.genwrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:0 22px;
+  background:radial-gradient(120% 55% at 50% 24%, #161A30, var(--au-bg))}
+.orb{width:74px;height:74px;border-radius:99px;background:conic-gradient(from 210deg,var(--au-indigo),var(--au-cyan),var(--au-indigo2),var(--au-indigo));
+  filter:blur(1px);box-shadow:0 0 44px rgba(124,140,248,.55);position:relative}
+.orb::after{content:"";position:absolute;inset:9px;border-radius:99px;background:var(--au-bg);opacity:.88}
+.gsteps{align-self:stretch;display:flex;flex-direction:column;gap:8px}
+.gstep{display:flex;align-items:center;gap:8px;font-size:10.5px;color:var(--au-text2);background:var(--au-surface);
+  border:1px solid var(--au-line2);border-radius:11px;padding:8px 11px}
+.gstep .ck{width:15px;height:15px;border-radius:99px;flex:none;display:grid;place-items:center;font-size:8px}
+.gstep.done .ck{background:rgba(99,230,210,.15);color:var(--au-cyan)}
+.gstep.live{color:var(--au-text)}
+.gstep.live .ck{border:1.5px solid var(--au-indigo);border-top-color:transparent;animation:spin 1s linear infinite}
+.gstep.wait{opacity:.45}
+.gstep.wait .ck{border:1.5px dashed var(--au-text3)}
+.gstep small{margin-left:auto;font-size:8px;color:var(--au-text3)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.gnote{font-size:9px;color:var(--au-text3);text-align:center;line-height:1.45;max-width:200px}
+.gnote b{color:var(--au-cyan);font-weight:600}
+
+/* composer + tab bar */
+.a-composer{display:flex;align-items:center;gap:8px;padding:8px 12px 9px;border-top:1px solid var(--au-line2)}
+.a-composer .plus{font-size:19px;color:var(--au-text3);line-height:1}
+.a-composer .field{flex:1;background:var(--au-surface);border:1px solid var(--au-line);border-radius:99px;padding:8px 13px;font-size:11px;color:var(--au-text3)}
+.a-composer .field.typed{color:var(--au-text)}
+.a-composer .send{width:28px;height:28px;border-radius:99px;background:var(--au-indigo);color:#0B0D18;display:grid;place-items:center;font-size:13px;flex:none;
+  box-shadow:0 6px 14px -6px rgba(124,140,248,.6)}
+.a-tabbar{display:flex;padding:8px 0 4px;border-top:1px solid var(--au-line2);background:var(--au-bg)}
+.a-tabbar .tb{flex:1;text-align:center;font-size:8px;font-weight:600;color:var(--au-text3);display:flex;flex-direction:column;gap:2px;align-items:center}
+.a-tabbar .tb .i{font-size:13px}
+.a-tabbar .tb.on{color:var(--au-indigo)}
+.homebar{height:5px;width:36%;background:#fff;opacity:.35;border-radius:99px;margin:7px auto 9px}
+
+/* photo bubble */
+.a-photo{align-self:flex-end;width:62%;border-radius:14px;border-bottom-right-radius:5px;overflow:hidden;box-shadow:0 8px 20px -10px rgba(0,0,0,.7);position:relative}
+.a-photo .ph{aspect-ratio:.8;background:
+  linear-gradient(rgba(30,22,12,.25),rgba(30,22,12,.25)),
+  repeating-linear-gradient(0deg,#E9DFC8 0 6%,#E2D6BA 6% 7%),
+  #E9DFC8}
+.a-photo .ph::after{content:"OLD PAPER MENU";position:absolute;inset:0;display:grid;place-items:center;font-size:8px;font-weight:800;letter-spacing:.14em;color:rgba(60,44,20,.55)}
+
+/* gallery group card */
+.g-grid{padding:10px 12px;display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.g-card{position:relative}
+.g-card .gc-im{aspect-ratio:.8;border-radius:11px;overflow:hidden;position:relative;box-shadow:0 8px 18px -10px rgba(0,0,0,.7)}
+.g-card.stack .gc-im{margin-top:6px}
+.g-card.stack::before,.g-card.stack::after{content:"";position:absolute;left:6px;right:6px;height:8px;border-radius:8px 8px 0 0;background:#2A2416;border:1px solid rgba(216,179,106,.3);border-bottom:0}
+.g-card.stack::before{top:0}
+.g-card.stack::after{top:3px;left:3px;right:3px;background:#201B10}
+.g-card .gc-b{margin-top:6px}
+.g-card .gc-b b{font-size:10px;font-weight:600;display:block}
+.g-card .gc-b small{font-size:8px;color:var(--au-text3)}
+.g-badge{position:absolute;top:11px;right:5px;z-index:3;font-size:7px;font-weight:700;background:rgba(10,11,15,.75);border:1px solid var(--au-line);
+  color:var(--au-cyan);border-radius:99px;padding:2px 6px;backdrop-filter:blur(3px)}
+</style>
+</head>
+<body>
+
+<header class="topnav">
+  <a class="brand" href="#"><span class="mk">✦</span> FlyGen <small>menu maker · proposal</small></a>
+  <nav>
+    <a href="#answer">The answer</a>
+    <a href="#trick">How it works</a>
+    <a href="#journey">User journey</a>
+    <a href="#build">What it takes</a>
+    <a href="#decisions">Decisions</a>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ================= HERO ================= -->
+  <section class="hero" id="answer">
+    <div>
+      <span class="kicker">From the 2026-08-05 finding → design proposal</span>
+      <h1 class="display">Same chat. New cards. <em>Real pages.</em></h1>
+      <p class="lede">The menu maker is <b>not a second chat</b>. It's the same conversation with the same design brain — the user just says "I need a menu" and the interpreter routes to a menu content type. What changes are the <b>three cards inside the chat</b>: the review card becomes an editable item-and-price table (every price human-checked before money is spent), the results card shows <b>pages in order</b> instead of three concepts to pick from, and a real <b>print-ready PDF</b> appears. Path B from the finding: <b>the AI paints the stage once, code typesets every word</b> — so typos can't happen and price edits are free.</p>
+      <p class="fineprint">Flow-fidelity mockup · Aurora tokens approximated in CSS · menu pages are CSS stand-ins for composited output</p>
+    </div>
+    <div class="hero-phone">
+      <div class="phone lg"><div class="screen">
+        <div class="island"></div>
+        <div class="statusbar"><span>9:41</span><span class="r">●●● <span>5G</span> ▮</span></div>
+        <div class="a-appbar"><span class="back">‹</span><div class="who"><b>Karachi Grill — Menu</b><small>FlyGen designer</small></div><span class="act">⋯</span></div>
+        <div class="a-chat">
+          <div class="a-card">
+            <div class="h4">Review your menu before I design</div>
+            <div class="a-cap">restaurant</div>
+            <div class="a-input">Karachi Grill <small>· Authentic Pakistani BBQ · (312) 555-0184</small></div>
+            <div class="mi-sec">Starters <span class="ln"></span><span class="ct">6 items</span></div>
+            <div class="mi"><div class="nm">Chicken Samosa <small>crispy pastry, mint chutney</small></div><div class="pr">$4.99</div></div>
+            <div class="mi"><div class="nm">Seekh Kabab Roll <small>grilled, wrapped in fresh naan</small></div><div class="pr">$7.49</div></div>
+            <div class="mi flag"><div class="nm">Chana Chaat <small>I couldn't read this price — tap to fix</small></div><div class="pr">$ ?.??</div></div>
+            <div class="mi-sec">BBQ &amp; Grill <span class="ln"></span><span class="ct">9 items</span></div>
+            <div class="mi"><div class="nm">Chicken Tikka <small>char-grilled leg quarter</small></div><div class="pr">$9.99</div></div>
+            <div class="mi"><div class="nm">Lamb Chops <small>smoky, spice-rubbed</small></div><div class="pr">$18.99</div></div>
+            <div class="mi-add">＋ Add item</div>
+            <div class="a-divider"></div>
+            <div class="pageplan"><div class="pp-pages"><i class="on"></i><i class="on"></i><i class="on"></i></div><span><b>28 items → cover + 2 pages</b> · A4 print · reorder sections by dragging</span></div>
+            <div class="a-btn">Approve &amp; design my menu <small>· 3 themes · 1 generation</small></div>
+          </div>
+        </div>
+        <div class="a-composer"><span class="plus">＋</span><div class="field">Message your designer…</div><div class="send">↑</div></div>
+        <div class="homebar"></div>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ================= SAME CHAT VS NEW CHAT ================= -->
+  <section class="section">
+    <div class="section-head"><span class="idx">01</span><h2>Why the same chat — and not a "menu mode"</h2></div>
+    <p class="section-d">The product's whole identity is <b>one conversation with a designer who figures out what you need</b>. A restaurant owner shouldn't have to know that menus are a separate feature before they type. The brain already routes by content type (the FirstThen spec designed exactly this seam) — a menu is the second document type flowing through the same pipe, not a second pipe.</p>
+    <div class="compare">
+      <div class="cmp yes">
+        <h3>One chat, two document types <span class="verdict">Recommended</span></h3>
+        <ul>
+          <li><b>Zero mode-picking.</b> "I need a menu for my restaurant" just works, mid-conversation, same composer. The interpreter detects menu intent and switches to the <b>MenuSpec</b> path.</li>
+          <li><b>All the expensive machinery is reused:</b> quota gating + paywall, the 13-language row, SSE streaming, chat history, onboarding, reference edits, annotate-to-edit.</li>
+          <li><b>What differs is cards, not conversation:</b> item-table review card, paged results card, PDF row. Three new SwiftUI cards on the existing chat scroll.</li>
+          <li><b>Cross-sell for free.</b> A flyer customer who mentions a menu gets one; a menu customer's "make me a Friday special flyer" already works.</li>
+        </ul>
+      </div>
+      <div class="cmp no">
+        <h3>A separate "Menu maker" chat <span class="verdict">Rejected</span></h3>
+        <ul>
+          <li><b>Forks everything:</b> a second entry point, second gating path, second history list, second onboarding to explain — for the same underlying brain.</li>
+          <li><b>Demands discovery.</b> The user must find the mode before typing; a menu request typed into the normal chat would dead-end or deflect.</li>
+          <li><b>Punishes mixed needs.</b> Restaurants need flyers AND menus; two silos mean two conversations about one business.</li>
+          <li><b>Buys nothing.</b> The only upside — prompt isolation — already exists inside the interpreter's per-content-type branch.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= THE TRICK ================= -->
+  <section class="section" id="trick">
+    <div class="section-head"><span class="idx">02</span><h2>The trick that makes menus possible at all</h2></div>
+    <p class="section-d">The finding's three walls (typos, no pages, no print) all come from one root: <b>the image model paints every letter</b>. Path B splits the job — and every wall falls at once.</p>
+    <div class="split">
+      <div class="layer ai">
+        <span class="tag">Nano Banana · once per menu</span>
+        <h3>The AI paints the stage</h3>
+        <p>One generation renders the <b>theme</b>: background texture, header art, the restaurant's vibe — with <b>reserved clear zones</b> where text will live (same "keep this area clean" clause the QR feature already uses). Reused across every page for perfect consistency.</p>
+        <div class="stagepair">
+          <div class="demo" style="background:radial-gradient(circle at 60% 25%,#E8A55C,#B4571E 60%,#7A340F)"></div>
+          <div class="demo" style="background:linear-gradient(160deg,#F6EFE3 0%,#EFE3CC 100%);border-color:#D8CCAF"></div>
+        </div>
+      </div>
+      <div class="plus">+</div>
+      <div class="layer code">
+        <span class="tag">Headless Chrome · every word</span>
+        <h3>Code sets the type</h3>
+        <p>HTML/CSS templates typeset the sections, items and prices onto the stage — the same engine the carousel export scripts already trust. <b>World-class line-breaking, full RTL shaping for all 13 languages, true A4/Letter dimensions,</b> and <code style="font-family:var(--font-m);font-size:12px">--print-to-pdf</code> makes the print file nearly free.</p>
+        <div class="result-note"><b>What this buys:</b> a wrong price becomes <b>impossible</b>, "change the biryani to $14.99" is a free 3-second re-typeset instead of a minute-long generation, pages are unlimited at one generation's cost, and menus print for real. The same compositing layer is what Noor needs for Qur'anic text and FirstThen wants for props — build once, three products inherit it.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= STORYBOARD ================= -->
+  <section class="section" id="journey">
+    <div class="section-head"><span class="idx">03</span><h2>The user journey, screen by screen</h2></div>
+    <p class="section-d">Imran runs <b>Karachi Grill</b>. He has a worn paper menu with 28 dishes and has never opened a design tool. Everything below happens in the one FlyGen chat he already knows.</p>
+
+    <div class="board">
+
+      <div class="phase">Phase A — start · same chat, no mode switch</div>
+
+      <!-- STEP 1 -->
+      <div class="step warm">
+        <div class="step-head"><span class="step-num">1</span><span class="step-label">He just asks — the brain routes</span></div>
+        <div class="phone"><div class="screen">
+          <div class="island"></div>
+          <div class="statusbar"><span>9:41</span><span class="r">●●● <span>5G</span> ▮</span></div>
+          <div class="a-appbar"><span class="back">‹</span><div class="who"><b>New design</b><small>FlyGen designer</small></div><span class="act">⋯</span></div>
+          <div class="a-chat">
+            <div class="a-msg user">I need a menu for my restaurant, we have around 30 dishes</div>
+            <div class="a-msg ai">Perfect — a proper multi-page menu, printed and shareable. The fastest way is to give me your dishes. How do you want to start?</div>
+            <div class="a-chips">
+              <div class="a-chip sel"><span class="e">📷</span> Snap my old menu</div>
+              <div class="a-chip"><span class="e">📋</span> Paste my item list</div>
+              <div class="a-chip"><span class="e">⌨️</span> Type them out</div>
+            </div>
+            <div class="a-msg sys">Menus are typeset by FlyGen, not painted — prices are always exact.</div>
+          </div>
+          <div class="a-composer"><span class="plus">＋</span><div class="field">Message your designer…</div><div class="send">↑</div></div>
+          <div class="homebar"></div>
+        </div></div>
+        <p class="note"><span class="tag">Interpreter branch</span> No menu tab, no template picker. The one-brain interpreter detects menu intent (exactly how it detects flyer categories today) and switches to the <b>MenuSpec</b> content type. Flyer requests in the same thread keep working.</p>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step warm">
+        <div class="step-head"><span class="step-num">2</span><span class="step-label">Snap the old menu — items extracted</span></div>
+        <div class="phone"><div class="screen">
+          <div class="island"></div>
+          <div class="statusbar"><span>9:42</span><span class="r">●●● <span>5G</span> ▮</span></div>
+          <div class="a-appbar"><span class="back">‹</span><div class="who"><b>Karachi Grill — Menu</b><small>FlyGen designer</small></div><span class="act">⋯</span></div>
+          <div class="a-chat">
+            <div class="a-photo"><div class="ph"></div></div>
+            <div class="a-msg ai">Got it. I read <b style="color:var(--au-text)">28 items in 4 sections</b> from your photo:</div>
+            <div class="a-card">
+              <div class="a-row"><div class="a-cap" style="font-size:9.5px">STARTERS · 6 &nbsp; BBQ &amp; GRILL · 9 &nbsp; BIRYANI &amp; CURRIES · 8 &nbsp; DRINKS &amp; DESSERTS · 5</div></div>
+              <div class="a-divider"></div>
+              <div class="a-warnline">⚠ 1 price I couldn't read (Chana Chaat) — you'll set it in review.</div>
+            </div>
+            <div class="a-msg ai">Next I'll show you every item and price to check. I never guess a price — you approve each one before I design anything.</div>
+          </div>
+          <div class="a-composer"><span class="plus">＋</span><div class="field">Message your designer…</div><div class="send">↑</div></div>
+          <div class="homebar"></div>
+        </div></div>
+        <p class="note"><span class="tag">Scoped Flash extractor</span> Same pattern as the QR extractor: a cheap, scoped Gemini-Flash call turns the photo into structured <b>{name, description, price}</b> rows. Unreadable values are flagged, never invented — the face-value rule applied to prices.</p>
+      </div>
+
+      <div class="phase">Phase B — review · the money moment, fixed</div>
+
+      <!-- STEP 3 -->
+      <div class="step warm">
+        <div class="step-head"><span class="step-num">3</span><span class="step-label">The menu review card — every price checked</span></div>
+        <div class="phone"><div class="screen">
+          <div class="island"></div>
+          <div class="statusbar"><span>9:43</span><span class="r">●●● <span>5G</span> ▮</span></div>
+          <div class="a-appbar"><span class="back">‹</span><div class="who"><b>Karachi Grill — Menu</b><small>FlyGen designer</small></div><span class="act">⋯</span></div>
+          <div class="a-chat">
+            <div class="a-card">
+              <div class="h4">Review your menu before I design</div>
+              <div class="a-cap">restaurant</div>
+              <div class="a-input">Karachi Grill <small>· Authentic Pakistani BBQ</small></div>
+              <div class="a-cap">contact line</div>
+              <div class="a-input">(312) 555-0184 · 2214 W Devon Ave <small>· shown on the back page</small></div>
+              <div class="mi-sec">Starters <span class="ln"></span><span class="ct">6 items · drag ≡</span></div>
+              <div class="mi"><div class="nm">Chicken Samosa <small>crispy pastry, mint chutney</small></div><div class="pr">$4.99</div></div>
+              <div class="mi"><div class="nm">Seekh Kabab Roll <small>grilled, fresh naan</small></div><div class="pr">$7.49</div></div>
+              <div class="mi editing"><div class="nm">Chana Chaat <small>tangy chickpea street snack</small></div><div class="pr">$5.49│</div></div>
+              <div class="mi"><div class="nm">Dahi Bhalla <small>lentil dumplings, yogurt</small></div><div class="pr">$5.99</div></div>
+              <div class="mi-sec">BBQ &amp; Grill <span class="ln"></span><span class="ct">9 items</span></div>
+              <div class="mi"><div class="nm">Chicken Tikka <small>char-grilled leg quarter</small></div><div class="pr">$9.99</div></div>
+              <div class="mi"><div class="nm">Lamb Chops <small>smoky, spice-rubbed</small></div><div class="pr">$18.99</div></div>
+              <div class="mi-add">＋ Add item &nbsp;&nbsp; ＋ Add section</div>
+            </div>
+          </div>
+          <div class="a-composer"><span class="plus">＋</span><div class="field">Message your designer…</div><div class="send">↑</div></div>
+          <div class="homebar"></div>
+        </div></div>
+        <p class="note"><span class="tag">Wall 1 fixed</span> The review card grows a real <b>item table</b> — the structure <code style="font-family:var(--font-m);font-size:11px">TextContent</code> never had. Tap any price to fix it inline; the flagged one must be resolved before approve unlocks. <b>Nothing renders until a human has seen every price.</b></p>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step warm">
+        <div class="step-head"><span class="step-num">4</span><span class="step-label">Page plan, style &amp; approve</span></div>
+        <div class="phone"><div class="screen">
+          <div class="island"></div>
+          <div class="statusbar"><span>9:44</span><span class="r">●●● <span>5G</span> ▮</span></div>
+          <div class="a-appbar"><span class="back">‹</span><div class="who"><b>Karachi Grill — Menu</b><small>FlyGen designer</small></div><span class="act">⋯</span></div>
+          <div class="a-chat">
+            <div class="a-card">
+              <div class="pageplan"><div class="pp-pages"><i class="on"></i><i class="on"></i><i class="on"></i></div><span><b>28 items → cover + 2 pages.</b> I'll balance sections so nothing splits awkwardly.</span></div>
+              <div class="a-cap">design direction</div>
+              <div class="a-select">Warm &amp; rustic — kraft textures, hand-drawn feel <span class="chev">▲▼</span></div>
+              <div class="a-cap" style="color:var(--au-text3)">Why: family BBQ house, walk-in crowd — approachable beats formal.</div>
+              <div class="a-cap">paper size</div>
+              <div class="a-select">A4 — true print dimensions <span class="chev">▲▼</span></div>
+              <div class="a-cap">language</div>
+              <div class="a-select">English <span class="chev">▲▼</span></div>
+              <div class="a-divider"></div>
+              <div class="a-row"><div class="a-cap" style="font-size:9px">Creative idea · illustrated section dividers (grill smoke motif)</div><div class="a-badge cyan">ON</div></div>
+              <div class="a-btn">Approve &amp; design my menu <small>· 3 themes · 1 generation</small></div>
+            </div>
+          </div>
+          <div class="a-composer"><span class="plus">＋</span><div class="field">Message your designer…</div><div class="send">↑</div></div>
+          <div class="homebar"></div>
+        </div></div>
+        <p class="note"><span class="tag">No silent defaults</span> Same review contract as flyers: the brain proposes a direction <b>with its reasoning</b>, and every default (theme, paper, language, creative ideas) is visible and changeable before money is spent. Paper size is now real — A4 means A4, because Chrome typesets to true dimensions.</p>
+      </div>
+
+      <div class="phase">Phase C — generate · paint once, typeset everything</div>
+
+      <!-- STEP 5 -->
+      <div class="step cool">
+        <div class="step-head"><span class="step-num">5</span><span class="step-label">Two-stage generation, honestly narrated</span></div>
+        <div class="phone"><div class="screen">
+          <div class="island"></div>
+          <div class="statusbar"><span>9:45</span><span class="r">●●● <span>5G</span> ▮</span></div>
+          <div class="a-appbar"><span class="back">‹</span><div class="who"><b>Karachi Grill — Menu</b><small>designing…</small></div><span class="act">⋯</span></div>
+          <div class="genwrap">
+            <div class="orb"></div>
+            <div class="gsteps">
+              <div class="gstep done"><span class="ck">✓</span> Menu plan approved <small>28 items</small></div>
+              <div class="gstep live"><span class="ck"></span> Designing 3 theme options… <small>~40s</small></div>
+              <div class="gstep wait"><span class="ck"></span> Typesetting your items <small>instant</small></div>
+            </div>
+            <div class="gnote">Your dishes and prices are <b>typeset by FlyGen, not painted by AI</b> — they'll appear exactly as you approved them.</div>
+          </div>
+          <div class="homebar"></div>
+        </div></div>
+        <p class="note"><span class="tag">1 quota unit</span> The 3-image contract survives: three <b>theme</b> candidates from one approval, same economics as a flyer create. The typesetting stage is code — it can't fail into a typo, and it takes seconds, not minutes.</p>
+      </div>
+
+      <!-- STEP 6 -->
+      <div class="step cool">
+        <div class="step-head"><span class="step-num">6</span><span class="step-label">Pick a theme — judged on the real page 1</span></div>
+        <div class="phone"><div class="screen">
+          <div class="island"></div>
+          <div class="statusbar"><span>9:46</span><span class="r">●●● <span>5G</span> ▮</span></div>
+          <div class="a-appbar"><span class="back">‹</span><div class="who"><b>Karachi Grill — Menu</b><small>FlyGen designer</small></div><span class="act">⋯</span></div>
+          <div class="a-chat">
+            <div class="a-msg ai">Three directions, each shown as your actual page 1 — real items, real prices. Pick one and I'll set the whole menu on it.</div>
+            <div class="a-card">
+              <div class="h4">Three themes</div>
+              <div class="tstrip">
+                <div class="tc pick">
+                  <div class="mpage"><div class="m-inner">
+                    <div class="m-head"><div class="rn" style="font-size:9px">Karachi Grill</div><div class="rt" style="font-size:3.5px">Authentic Pakistani BBQ</div></div>
+                    <div class="m-body">
+                      <div class="msec"><div class="st" style="font-size:3.5px">Starters</div></div>
+                      <div class="mrow" style="font-size:4px"><span class="n">Chicken Samosa</span><span class="dots"></span><span class="p">4.99</span></div>
+                      <div class="mrow" style="font-size:4px"><span class="n">Seekh Kabab Roll</span><span class="dots"></span><span class="p">7.49</span></div>
+                      <div class="mrow" style="font-size:4px"><span class="n">Chana Chaat</span><span class="dots"></span><span class="p">5.49</span></div>
+                      <div class="msec"><div class="st" style="font-size:3.5px">BBQ &amp; Grill</div></div>
+                      <div class="mrow" style="font-size:4px"><span class="n">Chicken Tikka</span><span class="dots"></span><span class="p">9.99</span></div>
+                      <div class="mrow" style="font-size:4px"><span class="n">Lamb Chops</span><span class="dots"></span><span class="p">18.99</span></div>
+                    </div>
+                  </div></div>
+                  <div class="tlab">Warm rustic ✓</div>
+                </div>
+                <div class="tc">
+                  <div class="mpage dark"><div class="m-inner">
+                    <div class="m-head"><div class="rn" style="font-size:9px">Karachi Grill</div><div class="rt" style="font-size:3.5px">Authentic Pakistani BBQ</div></div>
+                    <div class="m-body">
+                      <div class="msec"><div class="st" style="font-size:3.5px">Starters</div></div>
+                      <div class="mrow" style="font-size:4px"><span class="n">Chicken Samosa</span><span class="dots"></span><span class="p">4.99</span></div>
+                      <div class="mrow" style="font-size:4px"><span class="n">Seekh Kabab Roll</span><span class="dots"></span><span class="p">7.49</span></div>
+                      <div class="mrow" style="font-size:4px"><span class="n">Chana Chaat</span><span class="dots"></span><span class="p">5.49</span></div>
+                      <div class="msec"><div class="st" style="font-size:3.5px">BBQ &amp; Grill</div></div>
+                      <div class="mrow" style="font-size:4px"><span class="n">Chicken Tikka</span><span class="dots"></span><span class="p">9.99</span></div>
+                    </div>
+                  </div></div>
+                  <div class="tlab">Midnight gold</div>
+                </div>
+                <div class="tc">
+                  <div class="mpage" style="background:#FFFDF8"><div class="m-inner">
+                    <div class="m-head"><div class="rn" style="font-size:9px">Karachi Grill</div><div class="rt" style="font-size:3.5px">Authentic Pakistani BBQ</div></div>
+                    <div class="m-body">
+                      <div class="msec"><div class="st" style="font-size:3.5px;color:#B4571E">Starters</div></div>
+                      <div class="mrow" style="font-size:4px"><span class="n">Chicken Samosa</span><span class="dots"></span><span class="p">4.99</span></div>
+                      <div class="mrow" style="font-size:4px"><span class="n">Seekh Kabab Roll</span><span class="dots"></span><span class="p">7.49</span></div>
+                      <div class="mrow" style="font-size:4px"><span class="n">Chana Chaat</span><span class="dots"></span><span class="p">5.49</span></div>
+                      <div class="msec"><div class="st" style="font-size:3.5px;color:#B4571E">BBQ &amp; Grill</div></div>
+                      <div class="mrow" style="font-size:4px"><span class="n">Chicken Tikka</span><span class="dots"></span><span class="p">9.99</span></div>
+                    </div>
+                  </div></div>
+                  <div class="tlab">Clean bistro</div>
+                </div>
+              </div>
+              <div class="a-btn cyanline">Use "Warm rustic" — set all 3 pages</div>
+            </div>
+          </div>
+          <div class="a-composer"><span class="plus">＋</span><div class="field">Message your designer…</div><div class="send">↑</div></div>
+          <div class="homebar"></div>
+        </div></div>
+        <p class="note"><span class="tag">Pick of 3, kept</span> The familiar "three options" moment survives — but they're <b>theme</b> candidates carrying real typeset content, so he judges the true thing. Choosing one typesets pages 2–3 instantly. <b>Free</b> — no further generation.</p>
+      </div>
+
+      <div class="phase">Phase D — deliver · pages in order, print for real</div>
+
+      <!-- STEP 7 -->
+      <div class="step cool">
+        <div class="step-head"><span class="step-num">7</span><span class="step-label">The menu card — a paged document</span></div>
+        <div class="phone"><div class="screen">
+          <div class="island"></div>
+          <div class="statusbar"><span>9:47</span><span class="r">●●● <span>5G</span> ▮</span></div>
+          <div class="a-appbar"><span class="back">‹</span><div class="who"><b>Karachi Grill — Menu</b><small>FlyGen designer</small></div><span class="act">⋯</span></div>
+          <div class="a-chat">
+            <div class="a-card">
+              <div class="a-row"><div class="h4">Your menu — 3 pages</div><div class="a-badge cyan">A4 · PDF READY</div></div>
+              <div class="pgview">
+                <div class="mpage" style="width:64%;align-self:center"><div class="m-inner">
+                  <div class="m-head"><div class="rn" style="font-size:12px">Karachi Grill</div><div class="rt" style="font-size:4.5px">Authentic Pakistani BBQ</div></div>
+                  <div class="m-body">
+                    <div class="msec"><div class="st" style="font-size:4.5px">Biryani &amp; Curries</div></div>
+                    <div class="mrow" style="font-size:5px"><span class="n">Chicken Biryani</span><span class="dots"></span><span class="p">11.99</span></div>
+                    <div class="mrow" style="font-size:5px"><span class="n">Lamb Biryani</span><span class="dots"></span><span class="p">13.99</span></div>
+                    <div class="mrow" style="font-size:5px"><span class="n">Nihari</span><span class="dots"></span><span class="p">12.99</span></div>
+                    <div class="mrow" style="font-size:5px"><span class="n">Haleem</span><span class="dots"></span><span class="p">10.99</span></div>
+                    <div class="msec"><div class="st" style="font-size:4.5px">Drinks &amp; Desserts</div></div>
+                    <div class="mrow" style="font-size:5px"><span class="n">Falooda</span><span class="dots"></span><span class="p">6.49</span></div>
+                    <div class="mrow" style="font-size:5px"><span class="n">Kheer</span><span class="dots"></span><span class="p">4.99</span></div>
+                  </div>
+                  <div class="m-foot" style="font-size:3.5px">(312) 555-0184 · 2214 W Devon Ave</div>
+                </div></div>
+                <div class="pgthumbs">
+                  <div class="pt"><div class="mpage cover"><div class="m-inner"><div class="art"></div><div class="rn" style="font-size:5px">Karachi Grill</div></div></div><div class="pl">Cover</div></div>
+                  <div class="pt"><div class="mpage"></div><div class="pl">Page 1</div></div>
+                  <div class="pt on"><div class="mpage"></div><div class="pl">Page 2</div></div>
+                </div>
+              </div>
+              <div class="a-actions">
+                <div class="ac"><i>⤓</i>PDF</div>
+                <div class="ac"><i>🖼</i>Photos</div>
+                <div class="ac"><i>▦</i>My Flyers</div>
+                <div class="ac"><i>↗</i>Share</div>
+                <div class="ac"><i>✎</i>Mark up</div>
+              </div>
+            </div>
+            <div class="a-msg sys">Pages share one theme — perfectly consistent, no drift.</div>
+          </div>
+          <div class="a-composer"><span class="plus">＋</span><div class="field">Message your designer…</div><div class="send">↑</div></div>
+          <div class="homebar"></div>
+        </div></div>
+        <p class="note"><span class="tag">Wall 2 + 3 fixed</span> Not "three concepts" — <b>one document, pages in order</b>, swipeable, with page thumbnails. PDF is a first-class button (Chrome's print-to-PDF, true A4). Saving to My Flyers stores a <b>menu group</b>, not loose images.</p>
+      </div>
+
+      <!-- STEP 8 -->
+      <div class="step cool">
+        <div class="step-head"><span class="step-num">8</span><span class="step-label">In the gallery — one menu, one card</span></div>
+        <div class="phone"><div class="screen">
+          <div class="island"></div>
+          <div class="statusbar"><span>9:48</span><span class="r">●●● <span>5G</span> ▮</span></div>
+          <div class="a-appbar"><div class="who"><b>My Flyers</b><small>12 designs</small></div><span class="act">⋯</span></div>
+          <div class="g-grid">
+            <div class="g-card stack">
+              <div class="g-badge">3 PAGES · PDF</div>
+              <div class="gc-im"><div class="mpage cover" style="border-radius:0;box-shadow:none;border:0;height:100%"><div class="m-inner"><div class="art"></div><div class="rn" style="font-size:8px">Karachi Grill</div><div class="rt" style="font-size:3.5px">Menu · 2026</div></div></div></div>
+              <div class="gc-b"><b>Karachi Grill — Menu</b><small>Menu · edited today</small></div>
+            </div>
+            <div class="g-card">
+              <div class="gc-im" style="background:radial-gradient(circle at 40% 30%,#7C8CF8,#2A2F55)"></div>
+              <div class="gc-b"><b>Eid Special Offer</b><small>Flyer · 1w ago</small></div>
+            </div>
+            <div class="g-card">
+              <div class="gc-im" style="background:radial-gradient(circle at 60% 30%,#63E6D2,#174D44)"></div>
+              <div class="gc-b"><b>Friday Family Deal</b><small>Flyer · 2w ago</small></div>
+            </div>
+            <div class="g-card">
+              <div class="gc-im" style="background:radial-gradient(circle at 50% 40%,#E8A55C,#7A340F)"></div>
+              <div class="gc-b"><b>Grand Opening</b><small>Flyer · 3w ago</small></div>
+            </div>
+          </div>
+          <div style="flex:1"></div>
+          <div class="a-tabbar">
+            <div class="tb"><span class="i">✦</span>Create</div>
+            <div class="tb on"><span class="i">▦</span>My Flyers</div>
+            <div class="tb"><span class="i">◎</span>Explore</div>
+            <div class="tb"><span class="i">👤</span>Profile</div>
+          </div>
+          <div class="homebar"></div>
+        </div></div>
+        <p class="note"><span class="tag">Menu group</span> A stacked card with a page-count badge — one row per <b>menu</b>, not four unrelated flyers. Opening it gives a paged detail view with the same PDF/share actions. (SwiftData group fields → CloudKit Production deploy before release.)</p>
+      </div>
+
+      <div class="phase">Phase E — the living menu · edits that cost nothing</div>
+
+      <!-- STEP 9 -->
+      <div class="step warm">
+        <div class="step-head"><span class="step-num">9</span><span class="step-label">Price changes are free and instant</span></div>
+        <div class="phone"><div class="screen">
+          <div class="island"></div>
+          <div class="statusbar"><span>2:10</span><span class="r">●●● <span>5G</span> ▮</span></div>
+          <div class="a-appbar"><span class="back">‹</span><div class="who"><b>Karachi Grill — Menu</b><small>FlyGen designer</small></div><span class="act">⋯</span></div>
+          <div class="a-chat">
+            <div class="a-msg sys">Three weeks later…</div>
+            <div class="a-msg user">Lamb biryani is now $14.99, and take the falooda off — we stopped making it</div>
+            <div class="a-msg ai">Done — updated the price and removed Falooda, then rebalanced page 2.</div>
+            <div class="a-card">
+              <div class="a-row"><div class="h4">Page 2 — updated</div><div class="a-badge free">FREE · NO GENERATION USED</div></div>
+              <div class="mpage" style="width:64%;align-self:center"><div class="m-inner">
+                <div class="m-head"><div class="rn" style="font-size:12px">Karachi Grill</div><div class="rt" style="font-size:4.5px">Authentic Pakistani BBQ</div></div>
+                <div class="m-body">
+                  <div class="msec"><div class="st" style="font-size:4.5px">Biryani &amp; Curries</div></div>
+                  <div class="mrow" style="font-size:5px"><span class="n">Chicken Biryani</span><span class="dots"></span><span class="p">11.99</span></div>
+                  <div class="mrow hl" style="font-size:5px"><span class="n">Lamb Biryani</span><span class="dots"></span><span class="p">14.99</span></div>
+                  <div class="mrow" style="font-size:5px"><span class="n">Nihari</span><span class="dots"></span><span class="p">12.99</span></div>
+                  <div class="mrow" style="font-size:5px"><span class="n">Haleem</span><span class="dots"></span><span class="p">10.99</span></div>
+                  <div class="msec"><div class="st" style="font-size:4.5px">Drinks &amp; Desserts</div></div>
+                  <div class="mrow" style="font-size:5px"><span class="n">Kheer</span><span class="dots"></span><span class="p">4.99</span></div>
+                  <div class="mrow" style="font-size:5px"><span class="n">Kulfi</span><span class="dots"></span><span class="p">3.99</span></div>
+                </div>
+                <div class="m-foot" style="font-size:3.5px">(312) 555-0184 · 2214 W Devon Ave</div>
+              </div></div>
+              <div class="a-actions">
+                <div class="ac"><i>⤓</i>PDF</div>
+                <div class="ac"><i>🖼</i>Photos</div>
+                <div class="ac"><i>↗</i>Share</div>
+              </div>
+            </div>
+          </div>
+          <div class="a-composer"><span class="plus">＋</span><div class="field">Message your designer…</div><div class="send">↑</div></div>
+          <div class="homebar"></div>
+        </div></div>
+        <p class="note"><span class="tag">Re-typeset only</span> The recurring need of a real restaurant — price and item churn — becomes a <b>3-second, zero-cost re-typeset</b>. No image model call, no quota unit, no typo risk. This is the retention loop: the menu lives in FlyGen because updating it there is easier than anywhere else.</p>
+      </div>
+
+      <!-- STEP 10 -->
+      <div class="step warm">
+        <div class="step-head"><span class="step-num">10</span><span class="step-label">Design changes re-theme every page</span></div>
+        <div class="phone"><div class="screen">
+          <div class="island"></div>
+          <div class="statusbar"><span>2:14</span><span class="r">●●● <span>5G</span> ▮</span></div>
+          <div class="a-appbar"><span class="back">‹</span><div class="who"><b>Karachi Grill — Menu</b><small>FlyGen designer</small></div><span class="act">⋯</span></div>
+          <div class="a-chat">
+            <div class="a-msg user">We're going more upscale for dinner service — make it darker, gold accents</div>
+            <div class="a-msg ai">A midnight-gold take on your theme — same layout, every page re-set automatically. <b style="color:var(--au-text)">This redesigns the artwork, so it uses 1 generation.</b></div>
+            <div class="a-card">
+              <div class="a-row"><div class="h4">New theme applied — 3 pages</div><div class="a-badge">1 GENERATION</div></div>
+              <div class="mpage dark" style="width:64%;align-self:center"><div class="m-inner">
+                <div class="m-head"><div class="rn" style="font-size:12px">Karachi Grill</div><div class="rt" style="font-size:4.5px">Authentic Pakistani BBQ</div></div>
+                <div class="m-body">
+                  <div class="msec"><div class="st" style="font-size:4.5px">Biryani &amp; Curries</div></div>
+                  <div class="mrow" style="font-size:5px"><span class="n">Chicken Biryani</span><span class="dots"></span><span class="p">11.99</span></div>
+                  <div class="mrow" style="font-size:5px"><span class="n">Lamb Biryani</span><span class="dots"></span><span class="p">14.99</span></div>
+                  <div class="mrow" style="font-size:5px"><span class="n">Nihari</span><span class="dots"></span><span class="p">12.99</span></div>
+                  <div class="msec"><div class="st" style="font-size:4.5px">Drinks &amp; Desserts</div></div>
+                  <div class="mrow" style="font-size:5px"><span class="n">Kheer</span><span class="dots"></span><span class="p">4.99</span></div>
+                </div>
+                <div class="m-foot" style="font-size:3.5px">(312) 555-0184 · 2214 W Devon Ave</div>
+              </div></div>
+              <div class="pgthumbs">
+                <div class="pt"><div class="mpage cover dark"><div class="m-inner"><div class="art"></div><div class="rn" style="font-size:5px">Karachi Grill</div></div></div><div class="pl">Cover</div></div>
+                <div class="pt"><div class="mpage dark"></div><div class="pl">Page 1</div></div>
+                <div class="pt on"><div class="mpage dark"></div><div class="pl">Page 2</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="a-composer"><span class="plus">＋</span><div class="field">Message your designer…</div><div class="send">↑</div></div>
+          <div class="homebar"></div>
+        </div></div>
+        <p class="note"><span class="tag">Two edit lanes</span> Content edits (items, prices, sections) → free re-typeset. Design edits (look, colors, art) → one theme regeneration via the existing reference path, then all pages re-set on it. The card always says which lane an edit used — costs stay legible.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= WHAT IT TAKES ================= -->
+  <section class="section" id="build">
+    <div class="section-head"><span class="idx">04</span><h2>What each layer needs (Path B build shape)</h2></div>
+    <p class="section-d">Matches the finding's four phases. The chat, gating, paywall, language machinery and edit paths are <b>reused untouched</b> — this is the delta only.</p>
+    <div class="laygrid">
+      <div class="lay">
+        <h4>Engine</h4>
+        <ul>
+          <li><b>MenuSpec</b> content type: restaurant info + sections of {name, description, price, tags} — the FirstThen vertical seam.</li>
+          <li>Interpreter branch + a real <b>restaurant rubric</b> (today it falls to GENERIC).</li>
+          <li><b>Background-mode prompt</b>: theme with reserved text zones (QR keep-clear clause as precedent).</li>
+          <li>HTML menu templates + <b>headless Chrome</b> typesetting in the container (~1 GB memory bump); PNG pages + one PDF via print-to-pdf.</li>
+          <li>Composite behind the existing <code style="font-family:var(--font-m);font-size:11px">_with_qr</code>-style seam, fail-open.</li>
+        </ul>
+      </div>
+      <div class="lay">
+        <h4>Wire</h4>
+        <ul>
+          <li><b>Page-labeled results</b> (page index + label on concepts, or a new <code style="font-family:var(--font-m);font-size:11px">pages</code> event).</li>
+          <li><b>Per-page SSE frames</b> — never 6 full-res pages in one buffered frame.</li>
+          <li><b>Page-scoped edit actions</b> so "edit page 2" has a wire representation.</li>
+          <li>Menu review payload: the item table with per-row flags (unreadable price etc.).</li>
+        </ul>
+      </div>
+      <div class="lay">
+        <h4>iOS</h4>
+        <ul>
+          <li>Menu review card (item table, inline price editing, section drag).</li>
+          <li><b>Menu group</b> in SwiftData: groupID + pageIndex on SavedFlyer — <b>CloudKit Production schema deploy before release.</b></li>
+          <li>Paged result card + paged gallery detail (swipe, thumbnails).</li>
+          <li>PDF share (surface the engine's PDF; no client-side PDF math).</li>
+          <li>Stacked group card in My Flyers with page-count badge.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DECISIONS ================= -->
+  <section class="section" id="decisions">
+    <div class="section-head"><span class="idx">05</span><h2>The four open decisions — with my picks</h2></div>
+    <div class="decisions">
+      <div class="dec">
+        <div class="q">1 · How ambitious?</div>
+        <span class="pick">Pick: real menu maker (Path B)</span>
+        <p>The single-page "menu board" stopgap keeps the typo risk on the exact category where a typo is a wrong <b>price</b>, and it would be another point patch. If menus fit on one page, Path B simply produces a one-page menu — the small case falls out of the real build for free.</p>
+      </div>
+      <div class="dec">
+        <div class="q">2 · What does a menu cost?</div>
+        <span class="pick">Pick: 1 menu = 1 unit, text edits free</span>
+        <p>Create (3 themes) = <b>1 quota unit</b> — identical to a flyer, easy to explain. Item/price edits are free (they cost us nothing). A design re-theme = 1 unit. Economics are better than flyers: one themed generation serves unlimited pages.</p>
+      </div>
+      <div class="dec">
+        <div class="q">3 · PDF at launch?</div>
+        <span class="pick">Pick: yes — must-have</span>
+        <p>Menus are the one category that <b>prints at a shop</b>. With Chrome typesetting, the PDF is nearly free to produce — shipping without it would discard the strongest differentiator of the whole approach.</p>
+      </div>
+      <div class="dec">
+        <div class="q">4 · Chromium in the engine container?</div>
+        <span class="pick">Pick: yes — bless it</span>
+        <p>The carousel export scripts already trust headless Chrome for pixel-exact rendering locally. It buys world-class text layout and RTL shaping for all 13 languages — the alternative (hand-rolling line-breaking and Arabic shaping in Pillow) is the hard 20% forever. Cost: bigger image, ~1 GB memory bump on Cloud Run.</p>
+      </div>
+    </div>
+    <p class="fineprint" style="margin-top:26px">Source: docs/plans/2026-08-05-restaurant-menu-multipage-finding.md · mock follows mockups/chat-v2 house format · in-phone styling approximates the Aurora tokens (FGColors / Space Grotesk)</p>
+  </section>
+
+</main>
+</body>
+</html>

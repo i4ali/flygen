@@ -63,3 +63,9 @@ DerivedData/
 
 # Superpowers brainstorm scratch (visual companion)
 .superpowers/
+
+# Generated marketing media (regenerable via the carousel/ad pipelines;
+# sources like slides.html and scripts stay tracked)
+marketing/tiktok-carousel/examples/*/out/
+marketing/tiktok-carousel/examples/**/*.png
+marketing/ad-video/*.mp4

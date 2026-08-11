@@ -120,6 +120,35 @@ scripts/build_and_render.py       Embeds screenshot + assets into the html + ren
 examples/rosa-bakery/             Worked baker example: slides.html (captions) + assets/ (8 source images).
 ```
 
+## Concept B: "one flyer, every language" (feature-forward variant)
+
+Same indirect voice, but the swipes themselves demo the multi-language feature: a family-run shop's
+sale flyer shown in English, then re-rendered - IDENTICAL layout - in each neighborhood language,
+one swipe per language. The app appears only on the turn slide (constant screenshot, slide 6 here).
+
+Beats: 1 hook (candid shop scene: `our customers speak N languages` / `our flyer spoke 1.`) ·
+2 the English flyer (`...half our regulars can't read it 💀`) · 3-5 one language per swipe
+(`urdu. one tap.` / `(same flyer. I did nothing.)`) · 6 the turn (`13 languages. same design. 😭`) ·
+7 payoff + whisper CTA.
+
+Build (from repo root, same as Concept A):
+1. Edit CONFIG in `scripts/generate_assets_multilang.py` - business, offer, details, the EXACT
+   translated strings per language, and 2 scene prompts sharing one character - then run it.
+   It generates `scene_1`, `flyer_en`, `flyer_<lang>...`, `scene_7`. Pass asset names as args to
+   regenerate a subset (e.g. `... generate_assets_multilang.py flyer_ar`).
+2. Copy `examples/madina-grocery/slides.html` as the starting template, edit captions.
+3. `build_and_render.py --html ... --assets ... --out ... --names "hook,flyer-english,flyer-urdu,flyer-bengali,flyer-arabic,the-turn,payoff"`
+
+How the language flyers stay identical: each is generated with `input_images=[flyer_en.png]`, so
+Nano Banana reference-edits the base. Two hard rules: give it the exact translated strings (never
+let it translate), and keep the explicit slot rules in TRANSLATE_EDIT (the model likes swapping the
+business name into the headline slot - Arabic did this twice until the slot rule pinned it).
+`build_and_render.py` resolves any unknown `__TOKEN__` generically to `<token lowercased>.png` in
+the assets dir, so new concepts can invent tokens (e.g. `__FLYER_UR__` -> `flyer_ur.png`).
+Worked example: `examples/madina-grocery/` (halal grocery; English/Urdu/Bengali/Arabic).
+
+---
+
 ## Gotchas
 - **App screenshot is constant** across every business (it's the FlyGen home screen) - it lives as
   `app-screenshot.png` and the build script embeds it. Never regenerate it per business; refresh that one

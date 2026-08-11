@@ -26,6 +26,7 @@ CHROME = os.environ.get("CHROME_BIN",
                         "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
 
 # token -> (asset filename, embed width px).  Full-bleed art = 1080; the small trio flyers = 820.
+# Any OTHER __TOKEN__ found in the html resolves generically: __FLYER_UR__ -> flyer_ur.png @1080.
 TOKENS = {
     "__BADFLYER__": ("bad_flyer.png", 1080),
     "__SCENE1__":   ("scene_1.png",   1080),
@@ -56,14 +57,13 @@ def build(html_path, assets, out):
             sys.exit(f"ERROR: missing constant screenshot {SCREENSHOT}")
         html = html.replace("__SCREENSHOT__", data_uri(SCREENSHOT, 1080))
     # per-business images from the assets dir
-    for token, (fname, w) in TOKENS.items():
-        if token not in html:
-            print(f"  note: {token} not in html (skipped)"); continue
+    for token in sorted(set(re.findall(r'__[A-Z0-9_]+__', html))):
+        fname, w = TOKENS.get(token, (token.strip("_").lower() + ".png", 1080))
         f = pathlib.Path(assets) / fname
         if not f.exists():
-            sys.exit(f"ERROR: missing asset {f}")
+            sys.exit(f"ERROR: missing asset {f} (for token {token})")
         html = html.replace(token, data_uri(f, w))
-    left = sorted(set(re.findall(r'__[A-Z0-9]+__', html)))
+    left = sorted(set(re.findall(r'__[A-Z0-9_]+__', html)))
     if left:
         sys.exit(f"ERROR: unresolved tokens still present: {left}")
     built = pathlib.Path(out) / "built.html"
@@ -72,7 +72,7 @@ def build(html_path, assets, out):
     return built
 
 
-def render(built, out):
+def render(built, out, names=SLIDE_NAMES):
     file_url = "file://" + str(pathlib.Path(built).resolve())
     made = []
     for i in range(1, 8):
@@ -93,7 +93,7 @@ def render(built, out):
         ok = png.exists() and png.stat().st_size > 0
         print(f"  slide {i}: {'OK' if ok else 'FAIL'}")
         if ok:
-            final = pathlib.Path(out) / f"{i}_{SLIDE_NAMES[i-1].split('_',1)[1]}.png"
+            final = pathlib.Path(out) / f"{i}_{names[i-1].split('_',1)[1]}.png"
             png.replace(final); made.append(final)
     # tidy chrome profiles
     for d in pathlib.Path(out).glob(".chrome-prof-*"):
@@ -106,14 +106,20 @@ def main():
     ap.add_argument("--html", default=str(DEFAULT_TEMPLATE))
     ap.add_argument("--assets", required=True)
     ap.add_argument("--out", required=True)
+    ap.add_argument("--names", help="comma-separated 7 slide names (default: Concept-A beats)")
     a = ap.parse_args()
+    names = SLIDE_NAMES
+    if a.names:
+        names = [f"{i+1}_{n.strip()}" for i, n in enumerate(a.names.split(","))]
+        if len(names) != 7:
+            sys.exit("ERROR: --names needs exactly 7 comma-separated names")
     out = pathlib.Path(a.out).resolve(); out.mkdir(parents=True, exist_ok=True)
     if not pathlib.Path(CHROME).exists():
         sys.exit(f"ERROR: Chrome not found at {CHROME} (set CHROME_BIN).")
     print("Embedding assets...")
     built = build(a.html, a.assets, out)
     print("Rendering 1080x1920 PNGs...")
-    made = render(built, out)
+    made = render(built, out, names)
     print(f"\nDone: {len(made)}/7 slides -> {out}")
     for m in made: print("  ", m.name)
 

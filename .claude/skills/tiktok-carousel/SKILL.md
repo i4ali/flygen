@@ -19,6 +19,10 @@ the playbook is the source of truth.
 
 - "Make a TikTok/Reels carousel to promote the app", "another one for a nail salon / cleaner / reseller".
 - Any indirect, relatable, problem-first promo where the app should feel incidental.
+- Feature-forward-but-still-indirect variant: **Concept B "one flyer, every language"** - the swipes
+  demo the multi-language feature (same flyer, identical layout, new language per swipe). See the
+  playbook's Concept B section; generator is `scripts/generate_assets_multilang.py`, worked example
+  `examples/madina-grocery/`.
 
 Not for: direct feature ads, app-store screenshots (use `aso-appstore-screenshots`), or in-app flyers.
 
