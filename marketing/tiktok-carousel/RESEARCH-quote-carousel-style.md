@@ -71,6 +71,11 @@ themselves**, each paired with the one throwaway sentence that created it (the "
 Test order: post Concept A variants first (validated format), then Concept C as a stylistic
 counter-test; let the algorithm decide.
 
+**Built:** Concept C is implemented at `examples/gallery-rosa/slides.html` (serif/gold/dark-green
+Thaqalayn register), rendered entirely from the existing Rosa's Bakery assets + the constant app
+screenshot - zero new image generation. Render with `build_and_render.py --assets
+examples/rosa-bakery/assets --names "hook,the-sentence,concept-1,concept-2,concept-3,payoff,whisper-cta"`.
+
 ## Sources
 
 - https://instacarousel.com/blog/tiktok-carousel-photo-mode-2026/ (carousel vs video engagement)

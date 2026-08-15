@@ -1,0 +1,230 @@
+<title>FlyGen TikTok Carousel - Concept C: the gallery</title>
+<style>
+  :root{
+    --bg:#0B0F0D; --panel:#131A17;
+    --ink:#EDE9DC; --muted:#9AA69F; --gold:#C9A96A; --cream:#F0E9D8;
+    --border:rgba(255,255,255,.09);
+    --serif:"Liberation Serif","Times New Roman",Georgia,serif;
+    --ui:-apple-system,system-ui,"Segoe UI",Roboto,sans-serif;
+    --s:0.335; /* preview scale */
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui);line-height:1.5;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1200px;margin:0 auto;padding:40px 24px 96px}
+  header.top{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+  .eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:700}
+  h1{font-family:var(--serif);font-weight:700;font-size:clamp(28px,4.5vw,44px);margin:0}
+  .sub{color:var(--muted);max-width:64ch;font-size:16px;margin:0}
+
+  .deck{display:flex;flex-wrap:wrap;gap:34px 26px;margin-top:26px;justify-content:center}
+  .card{display:flex;flex-direction:column;gap:10px;width:calc(1080px * var(--s))}
+  .frame{position:relative;width:calc(1080px * var(--s));height:calc(1920px * var(--s));
+    border-radius:18px;overflow:hidden;background:#000;border:1px solid var(--border);
+    box-shadow:0 18px 44px rgba(0,0,0,.5)}
+  .cap-under{font-size:12.5px;color:var(--muted);padding:0 2px}
+  .cap-under b{color:var(--ink)}
+
+  /* ---------- 1080x1920 stage ---------- */
+  .slide{position:absolute;top:0;left:0;width:1080px;height:1920px;
+    transform:scale(var(--s));transform-origin:top left;overflow:hidden;
+    background:linear-gradient(178deg,#10201A 0%,#0B1512 42%,#070C0A 100%);color:var(--cream)}
+  .slide .bg-fill{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .veil{position:absolute;inset:0;background:linear-gradient(180deg,
+    rgba(8,14,11,.94) 0%,rgba(8,14,11,.88) 34%,rgba(8,14,11,.72) 62%,rgba(7,11,9,.88) 100%)}
+  .scrim{position:absolute;inset:0;background:linear-gradient(180deg,
+    rgba(6,10,8,.55) 0%,rgba(6,10,8,.15) 30%,rgba(6,10,8,.45) 58%,rgba(6,10,8,.92) 100%)}
+
+  .content{position:absolute;top:250px;left:80px;right:150px;bottom:500px;
+    display:flex;flex-direction:column;align-items:center;text-align:center;z-index:3}
+  .v-center{justify-content:center}
+  .v-split{justify-content:space-between}
+
+  .hero{font-family:var(--serif);font-weight:700;font-size:128px;line-height:1.08;
+    color:var(--cream);margin:0;letter-spacing:.01em}
+  .lede{font-family:var(--serif);font-style:italic;font-weight:400;font-size:56px;line-height:1.35;
+    color:#E9DFC2;margin:0}
+  .quote{font-family:var(--serif);font-weight:400;font-size:66px;line-height:1.42;color:var(--cream);margin:0;
+    text-shadow:0 2px 18px rgba(0,0,0,.85),0 0 60px rgba(0,0,0,.6)}
+  .label{font-family:var(--serif);font-weight:400;font-size:33px;letter-spacing:.42em;
+    text-transform:uppercase;color:var(--gold);margin:0;text-indent:.42em}
+  .label--dim{color:#8E9B93;font-size:29px}
+  .micro-i{font-family:var(--serif);font-style:italic;font-size:44px;color:#DDD3B8;margin:0;line-height:1.4}
+  .rule{width:64px;height:3px;background:var(--gold);border:0;margin:8px auto;opacity:.9}
+  .gap-lg{display:flex;flex-direction:column;gap:44px;align-items:center;width:100%}
+  .gap-md{display:flex;flex-direction:column;gap:26px;align-items:center;width:100%}
+
+  /* framed artwork (the flyer as a gallery piece) */
+  .art{position:absolute;left:140px;right:140px;top:520px;z-index:2;
+    border:1px solid rgba(201,169,106,.45);box-shadow:0 40px 90px rgba(0,0,0,.6);
+    background:#0f0d0a}
+  .art img{display:block;width:100%;height:auto}
+  .art-top{position:absolute;top:280px;left:80px;right:80px;z-index:3;
+    display:flex;flex-direction:column;gap:22px;align-items:center;text-align:center}
+
+  /* app slide screenshot */
+  .shotbox{position:absolute;left:170px;right:170px;top:560px;height:940px;z-index:2;
+    border-radius:44px;overflow:hidden;border:1px solid rgba(201,169,106,.4);
+    box-shadow:0 40px 90px rgba(0,0,0,.6);background:#000}
+  .shotbox img{width:100%;height:100%;object-fit:cover;object-position:top}
+
+  /* ---------- caption panel ---------- */
+  .pnl{background:var(--panel);border:1px solid var(--border);border-radius:16px;
+    padding:20px 22px;margin-top:48px;max-width:760px;margin-left:auto;margin-right:auto}
+  .pnl h2{font-family:var(--serif);font-size:19px;margin:0 0 10px}
+  .copybox{background:#0E1411;border:1px solid var(--border);border-radius:12px;
+    padding:14px 16px;font-size:14px;line-height:1.6;white-space:pre-wrap}
+  .tags{color:var(--gold);font-weight:600}
+
+  /* ===== export mode: #export=N ===== */
+  body.exporting{margin:0;background:#000;overflow:hidden}
+  body.exporting .wrap{padding:0;max-width:none;margin:0}
+  body.exporting .wrap>*:not(.deck){display:none}
+  body.exporting .deck{display:block;margin:0;gap:0}
+  body.exporting .card{display:none;width:1080px;margin:0}
+  body.exporting .card.export-on{display:block}
+  body.exporting .card .cap-under{display:none}
+  body.exporting .frame{width:1080px;height:1920px;border-radius:0;box-shadow:none;border:0}
+  body.exporting .slide{transform:none}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">FlyGen · TikTok carousel · Concept C</div>
+    <h1>"the gallery" — quote-carousel structure, flyer content</h1>
+    <p class="sub">Thaqalayn-style serene swipe deck: a typographic hook, the owner's one throwaway
+    sentence as the "quote," each flyer presented like a gallery piece, and the app only whispered
+    at the end. Built entirely from existing Rosa's Bakery assets - zero new image generation.</p>
+  </header>
+
+  <div class="deck" id="deck">
+
+    <!-- SLIDE 1 · hook -->
+    <div class="card">
+      <div class="frame"><div class="slide">
+        <img class="bg-fill" src="__SCENE1__" alt="">
+        <div class="veil"></div>
+        <div class="content v-split">
+          <div></div>
+          <div class="gap-md">
+            <p class="hero">3 flyers</p>
+            <p class="lede">from one sentence, typed by<br>a baker who can't design</p>
+            <hr class="rule">
+          </div>
+          <p class="label label--dim">keep swiping</p>
+        </div>
+      </div></div>
+      <div class="cap-under"><b>01 · hook</b> — typographic card over a barely-there product photo.</div>
+    </div>
+
+    <!-- SLIDE 2 · the sentence -->
+    <div class="card">
+      <div class="frame"><div class="slide">
+        <img class="bg-fill" src="__SCENE3__" alt="">
+        <div class="veil"></div>
+        <div class="content v-center">
+          <div class="gap-lg">
+            <div class="gap-md">
+              <p class="label">Rosa's Home Bakery</p>
+              <p class="micro-i">typed this, word for word</p>
+            </div>
+            <p class="quote">&ldquo;weekend cupcake sale this<br>Saturday from 10am, a dozen<br>for $18, pre-order by Friday.&rdquo;</p>
+            <div class="gap-md">
+              <hr class="rule">
+              <p class="label label--dim">that was the whole brief</p>
+            </div>
+          </div>
+        </div>
+      </div></div>
+      <div class="cap-under"><b>02 · the "quote"</b> — the one-sentence prompt, presented like scripture.</div>
+    </div>
+
+    <!-- SLIDE 3 · concept I -->
+    <div class="card">
+      <div class="frame"><div class="slide">
+        <div class="art-top">
+          <p class="label">Concept I &middot; Minimal</p>
+          <p class="micro-i">twenty seconds after the sentence</p>
+        </div>
+        <div class="art"><img src="__GOOD0__" alt="minimal cupcake sale flyer"></div>
+      </div></div>
+      <div class="cap-under"><b>03</b> — flyer as gallery piece.</div>
+    </div>
+
+    <!-- SLIDE 4 · concept II -->
+    <div class="card">
+      <div class="frame"><div class="slide">
+        <div class="art-top">
+          <p class="label">Concept II &middot; Elegant</p>
+          <p class="micro-i">same sentence. she changed nothing.</p>
+        </div>
+        <div class="art"><img src="__GOOD1__" alt="elegant cupcake sale flyer"></div>
+      </div></div>
+      <div class="cap-under"><b>04</b> — flyer as gallery piece.</div>
+    </div>
+
+    <!-- SLIDE 5 · concept III -->
+    <div class="card">
+      <div class="frame"><div class="slide">
+        <div class="art-top">
+          <p class="label">Concept III &middot; Playful</p>
+          <p class="micro-i">still the same sentence.</p>
+        </div>
+        <div class="art"><img src="__GOOD2__" alt="playful cupcake sale flyer"></div>
+      </div></div>
+      <div class="cap-under"><b>05</b> — flyer as gallery piece.</div>
+    </div>
+
+    <!-- SLIDE 6 · payoff -->
+    <div class="card">
+      <div class="frame"><div class="slide">
+        <img class="bg-fill" src="__SCENE7__" alt="">
+        <div class="scrim"></div>
+        <div class="content v-split">
+          <div></div>
+          <div class="gap-md" style="padding-bottom:40px">
+            <p class="quote" style="font-size:74px">she posted the second one.<br>sold out by noon.</p>
+            <hr class="rule">
+          </div>
+        </div>
+      </div></div>
+      <div class="cap-under"><b>06 · payoff</b> — the win, in the same reverent voice.</div>
+    </div>
+
+    <!-- SLIDE 7 · whisper CTA -->
+    <div class="card">
+      <div class="frame"><div class="slide">
+        <div class="art-top" style="top:300px">
+          <p class="micro-i" style="font-size:50px">the thing she typed it into &mdash;</p>
+        </div>
+        <div class="shotbox"><img src="__SCREENSHOT__" alt="the app"></div>
+        <div style="position:absolute;left:80px;right:80px;top:1560px;z-index:3;display:flex;flex-direction:column;gap:20px;align-items:center">
+          <hr class="rule" style="margin:0">
+          <p class="label label--dim" style="font-size:31px">it's in my bio &middot; free to try</p>
+        </div>
+      </div></div>
+      <div class="cap-under"><b>07 · whisper CTA</b> — app shown, never named. Bio only, per the voice rules.</div>
+    </div>
+
+  </div>
+
+  <div class="pnl">
+    <h2>Post caption</h2>
+    <div class="copybox">one sentence. three flyers. she picked one and sold out by noon &mdash; for everyone running a small business without a designer, what she used is in my bio 🤍
+
+<span class="tags">#smallbusiness #smallbusinesscheck #homebakery #bakersoftiktok #smallbiztips #aesthetic #foryou</span></div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    var m=(location.hash||'').match(/export=(\d+)/);
+    if(m){
+      document.body.classList.add('exporting');
+      var cards=document.querySelectorAll('.deck .card');
+      var card=cards[parseInt(m[1],10)-1];
+      if(card) card.classList.add('export-on');
+      window.scrollTo(0,0);
+    }
+  })();
+</script>
