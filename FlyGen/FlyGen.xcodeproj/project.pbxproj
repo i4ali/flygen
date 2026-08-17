@@ -65,6 +65,7 @@
 		90AFF4D51F9F7F113B7909E6 /* FlyerChatClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3FCD5B436511EA4CC3ACFB4 /* FlyerChatClient.swift */; };
 		9288B11FBCD6606AF08CDECC /* ColorsStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802D02689D38132C24042AFA /* ColorsStepView.swift */; };
 		95D0F8F627BD2D5768EFA97F /* StoreKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A127BBD1A88D83A876C6249C /* StoreKitService.swift */; };
+		AASPEECHDICT001 /* SpeechDictationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBSPEECHDICT001 /* SpeechDictationService.swift */; };
 		98A9AE6C48084B2A24CE0E99 /* SpaceGrotesk-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DAB10B9A50AB09E7D83C2772 /* SpaceGrotesk-Bold.ttf */; };
 		99A104086420FCC441766ECB /* FlyGenProducts.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 0D3E46940C3FF0B96D5406A0 /* FlyGenProducts.storekit */; };
 		99CFD645058052006B06516D /* OnboardingResizeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6EC55E091B32B8901B98A83 /* OnboardingResizeView.swift */; };
@@ -214,6 +215,7 @@
 		92EF130D6F0181711C3C8D15 /* ProfileTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileTab.swift; sourceTree = "<group>"; };
 		9579E2430EA7DEC2FA8D87BF /* PromptBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptBuilder.swift; sourceTree = "<group>"; };
 		A127BBD1A88D83A876C6249C /* StoreKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitService.swift; sourceTree = "<group>"; };
+		BBSPEECHDICT001 /* SpeechDictationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechDictationService.swift; sourceTree = "<group>"; };
 		A2EEACFB2F2BBDEC9670AA26 /* FlyerChatView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FlyerChatView.swift; path = ../../Chat/FlyerChatView.swift; sourceTree = "<group>"; };
 		A418B28EFEC046775983D673 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		A4E86A123D7FDBB3C7C8AAEF /* TextContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextContent.swift; sourceTree = "<group>"; };
@@ -632,6 +634,7 @@
 				7C61A47D28D08C6960017130 /* PhotoLibraryService.swift */,
 				0BF8F3456115A7D92EB1F149 /* QRCodeService.swift */,
 				A127BBD1A88D83A876C6249C /* StoreKitService.swift */,
+				BBSPEECHDICT001 /* SpeechDictationService.swift */,
 				ACC1727E2B16FC554D251FA6 /* ImageGeneration */,
 				3E2453B6DBB44B211E937F92 /* PromptBuilder */,
 				B5E794700C37A8E743419C16 /* ReviewService.swift */,
@@ -825,6 +828,7 @@
 				3B94A4B396C8D3435B1B7036 /* SettingsView.swift in Sources */,
 				E447D3471E42E86CC0D53039 /* StepProgressBar.swift in Sources */,
 				95D0F8F627BD2D5768EFA97F /* StoreKitService.swift in Sources */,
+				AASPEECHDICT001 /* SpeechDictationService.swift in Sources */,
 				E60540EDAE2B1C02FE942967 /* TemplateLibrary.swift in Sources */,
 				D94F5D6CBFCB6E78D6A0D94A /* TemplatePickerView.swift in Sources */,
 				F0B7A6CC4ABD2C702068AE49 /* TemplatePreviewView.swift in Sources */,
