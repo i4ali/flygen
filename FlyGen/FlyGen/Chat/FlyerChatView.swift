@@ -14,6 +14,7 @@ struct FlyerChatView: View {
     }
 
     @StateObject private var vm = FlyerChatViewModel()
+    @StateObject private var dictation = SpeechDictationService()
     @EnvironmentObject private var entitlementService: EntitlementService
     @EnvironmentObject private var cloudKitService: CloudKitService
     @Environment(\.dismiss) private var dismiss
@@ -90,6 +91,27 @@ struct FlyerChatView: View {
                 }
                 // Consume one quota unit after each successful generation (mirrors ResultView).
                 vm.onCreditDeduction = { consumeOneGeneration() }
+            }
+            // A turn can also start from a card (answers submit, review approve) while the mic
+            // is hot; freeze dictation so late transcripts don't type into a streaming chat.
+            .onChange(of: vm.isStreaming) { _, streaming in
+                if streaming, dictation.isRecording { dictation.cancel() }
+            }
+            .onDisappear { dictation.cancel() }
+            .alert("Allow microphone access", isPresented: $dictation.permissionDenied) {
+                Button("Open Settings") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                }
+                Button("Not now", role: .cancel) {}
+            } message: {
+                Text("To describe your flyer by voice, allow FlyGen to use the microphone and speech recognition in Settings.")
+            }
+            .alert("Dictation isn't available", isPresented: $dictation.unavailable) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("Voice input isn't available right now — you can still type your description.")
             }
             .confirmationDialog("Close this chat?", isPresented: $showingCloseConfirm, titleVisibility: .visible) {
                 Button("Close anyway", role: .destructive) { dismiss() }
@@ -220,12 +242,29 @@ struct FlyerChatView: View {
                 // SwiftUI TextField/TextEditor exposes no persistent scroll indicator (see below).
                 GrowingScrollTextEditor(
                     text: $vm.composerText,
-                    placeholder: vm.inReferenceMode ? "Tell me what to change…" : "Describe a flyer (starts a new one)…",
+                    placeholder: dictation.isRecording ? "Listening…"
+                        : (vm.inReferenceMode ? "Tell me what to change…" : "Describe a flyer (starts a new one)…"),
                     isEnabled: !vm.isStreaming
                 )
                 .background(FGColors.surfaceDefault)
                 .clipShape(RoundedRectangle(cornerRadius: FGSpacing.inputRadius))
+                // Dictate instead of typing: live transcript streams into the composer, stays
+                // editable, and goes out through the same (gated) send button — never auto-sent.
                 Button {
+                    dictation.toggle(existingText: vm.composerText) { vm.composerText = $0 }
+                } label: {
+                    Image(systemName: dictation.isRecording ? "stop.circle.fill" : "mic.circle.fill")
+                        .font(.system(size: 32))
+                        .foregroundColor(dictation.isRecording ? FGColors.error : FGColors.accentSecondary)
+                        .symbolEffect(.pulse, isActive: dictation.isRecording)
+                }
+                .disabled(vm.isStreaming)
+                .accessibilityLabel(dictation.isRecording ? "Stop dictation" : "Dictate your flyer description")
+                Button {
+                    // The composer already shows the latest transcript, so freeze dictation
+                    // first — a final result landing after send() clears the field would
+                    // resurrect ghost text into the empty composer.
+                    if dictation.isRecording { dictation.cancel() }
                     // Any text send reaches the engine (a paid image edit in reference mode, LLM
                     // brain calls otherwise), so it gates on access like refine/resize. A
                     // photos-only send is a free local commit and stays ungated.
